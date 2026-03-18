@@ -90,124 +90,50 @@ export default function ContactFooter() {
     <footer
       ref={footerRef}
       id="contact"
-      className="relative overflow-hidden border-t border-white/5 bg-background pb-12 pt-[15vw]"
+      className="relative overflow-hidden border-t border-white/5 bg-background pb-12 pt-[25vw]"
     >
-      {/* Background large text */}
-      <div className="pointer-events-none absolute -bottom-[5vw] left-1/2 -translate-x-1/2 select-none italic text-[35vw] font-black text-white/[0.02]">
-        WINCORE
-      </div>
-
       <div className="_container relative z-10">
         {/* ── Main Contact Section ── */}
-        <div className="mb-[15vw] grid grid-cols-1 gap-20 lg:grid-cols-2 lg:gap-32">
-          {/* Left: Content */}
-          <div className="flex flex-col justify-center">
-            <span className="cf-kicker mb-10 text-[11px] font-black uppercase tracking-[0.5em] text-accent">
-              Let&apos;s Build Together
+        <div className="mb-[15vw] flex flex-col items-center justify-center text-center">
+          <span className="cf-kicker mb-6 text-[11px] font-black uppercase tracking-[0.5em] text-accent">
+            Let&apos;s Build Together
+          </span>
+          <h2 className="mb-14 text-[16vw] font-black uppercase leading-[0.75] tracking-tighter md:text-[14vw]">
+            <span className="block overflow-hidden">
+              <span className="cf-title-line block">GOT A</span>
             </span>
-            <h2 className="mb-14 text-[13vw] font-black uppercase leading-[0.82] tracking-tighter md:text-[6.5vw]">
-              <span className="block overflow-hidden">
-                <span className="cf-title-line block">HAVE A</span>
+            <span className="block overflow-hidden flex items-center justify-center gap-4">
+              <span className="cf-title-line block italic text-transparent [-webkit-text-stroke:2px_rgba(255,255,255,0.8)] md:[-webkit-text-stroke:4px_rgba(255,255,255,0.8)]">
+                VISION?
               </span>
-              <span className="block overflow-hidden">
-                <span className="cf-title-line block text-white/20 italic">VISION?</span>
+            </span>
+          </h2>
+
+          <div className="cf-contact-block relative z-20">
+            <a
+              href="mailto:hello@wincore.media"
+              className="group relative flex items-center gap-6 overflow-hidden rounded-full border border-white/10 bg-white/[0.03] py-4 pl-8 pr-4 backdrop-blur-xl transition-all duration-500 hover:border-accent/50 hover:bg-white/10"
+            >
+              <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-accent/20 to-transparent transition-transform duration-500 group-hover:translate-x-0" />
+              <span className="relative z-10 text-sm font-bold uppercase tracking-widest text-white/90 transition-colors group-hover:text-white md:text-xl">
+                hello@wincore.media
               </span>
-            </h2>
-
-            <div className="cf-contact-block space-y-12">
-              <div className="group">
-                <p className="mb-4 text-[10px] font-black uppercase tracking-[0.4em] text-white/30 transition-colors group-hover:text-accent">
-                  Direct Line
-                </p>
-                <a
-                  href="mailto:hello@wincore.media"
-                  className="cursor-hover text-3xl font-light tracking-tight transition-all duration-500 hover:tracking-wide md:text-4xl"
+              <div className="relative z-10 flex h-14 w-14 items-center justify-center rounded-full bg-accent text-black transition-transform duration-500 group-hover:scale-110 group-hover:bg-white">
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
                 >
-                  hello@wincore.media
-                </a>
+                  <path d="M5 12h14"></path>
+                  <path d="m12 5 7 7-7 7"></path>
+                </svg>
               </div>
-
-              <div className="h-[2px] w-full bg-gradient-to-r from-accent/40 via-white/5 to-transparent" />
-
-              <div className="grid grid-cols-2 gap-10 md:gap-20">
-                <div>
-                  <p className="mb-4 text-[10px] font-black uppercase tracking-[0.4em] text-white/30">
-                    Presence
-                  </p>
-                  <p className="text-xl font-light text-white/70 leading-relaxed">
-                    Colombo <br />
-                    <span className="text-white/20">Sri Lanka</span>
-                  </p>
-                </div>
-                <div>
-                  <p className="mb-4 text-[10px] font-black uppercase tracking-[0.4em] text-white/30">
-                    Socials
-                  </p>
-                  <div className="flex flex-col gap-3 text-sm font-bold uppercase tracking-widest text-white/40">
-                    <a href="#" className="cursor-hover transition-colors hover:text-white">Instagram</a>
-                    <a href="#" className="cursor-hover transition-colors hover:text-white">LinkedIn</a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Right: Form */}
-          <div className="cf-form-shell relative">
-            {/* Glow effect */}
-            <div className="absolute -inset-1 rounded-[3rem] bg-gradient-to-br from-accent/20 to-secondary/10 blur-2xl opacity-50" />
-            
-            <div className="relative rounded-[2.5rem] border border-white/[0.08] bg-white/[0.03] p-10 backdrop-blur-2xl md:p-14">
-              <form className="space-y-10" aria-label="Quick contact">
-                <div className="space-y-8">
-                  <div className="relative border-b border-white/10 pb-4 transition-all focus-within:border-accent">
-                    <label className="mb-2 block text-[9px] font-black uppercase tracking-[0.4em] text-white/30">
-                      Discovery
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="My name is..."
-                      className="w-full bg-transparent text-xl font-light outline-none placeholder:text-white/10 focus:placeholder:opacity-0"
-                      required
-                    />
-                  </div>
-
-                  <div className="relative border-b border-white/10 pb-4 transition-all focus-within:border-accent">
-                    <label className="mb-2 block text-[9px] font-black uppercase tracking-[0.4em] text-white/30">
-                      Email
-                    </label>
-                    <input
-                      type="email"
-                      placeholder="Reach me at..."
-                      className="w-full bg-transparent text-xl font-light outline-none placeholder:text-white/10 focus:placeholder:opacity-0"
-                      required
-                    />
-                  </div>
-
-                  <div className="relative border-b border-white/10 pb-4 transition-all focus-within:border-accent">
-                    <label className="mb-2 block text-[9px] font-black uppercase tracking-[0.4em] text-white/30">
-                      The Challenge
-                    </label>
-                    <textarea
-                      placeholder="I want to build..."
-                      rows={2}
-                      className="w-full resize-none bg-transparent text-xl font-light outline-none placeholder:text-white/10 focus:placeholder:opacity-0"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <button
-                  type="submit"
-                  className="cursor-hover group relative flex w-full items-center justify-center overflow-hidden rounded-2xl bg-white p-6 transition-all duration-500 hover:bg-accent"
-                >
-                  <span className="relative z-10 text-[11px] font-black uppercase tracking-[0.4em] text-black transition-colors group-hover:text-black">
-                    Unlock Velocity
-                  </span>
-                  <div className="absolute inset-0 -translate-x-full bg-accent transition-transform duration-500 group-hover:translate-x-0" />
-                </button>
-              </form>
-            </div>
+            </a>
           </div>
         </div>
 
