@@ -1,6 +1,6 @@
 import WorkCarousel from "@/components/WorkCarousel";
 import RecognitionBar from "@/components/RecognitionBar";
-import PageMotion from "@/components/PageMotion";
+import PageMain from "@/components/PageMain";
 
 export const metadata = {
   title: "Works — Wincore Agency",
@@ -9,16 +9,9 @@ export const metadata = {
 
 export default function WorksPage() {
   return (
-    <main className="bg-background text-foreground">
-      <PageMotion>
-        <div className="page-motion-item" data-page-motion>
-          <RecognitionBar />
-        </div>
-        <div className="page-motion-item" data-page-motion>
-          <WorkCarousel />
-        </div>
-      </PageMotion>
-    </main>
+    <PageMain>
+      <RecognitionBar />
+      <WorkCarousel />
+    </PageMain>
   );
 }
-

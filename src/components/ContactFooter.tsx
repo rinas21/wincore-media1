@@ -90,11 +90,11 @@ export default function ContactFooter() {
     <footer
       ref={footerRef}
       id="contact"
-      className="relative overflow-hidden border-t border-white/5 bg-background pb-12 pt-[25vw]"
+      className="relative overflow-hidden border-t border-white/5 bg-background pb-16 pt-20 md:pb-24 md:pt-28"
     >
       <div className="_container relative z-10">
         {/* ── Main Contact Section ── */}
-        <div className="mb-[15vw] flex flex-col items-center justify-center text-center">
+        <div className="mb-16 flex flex-col items-center justify-center text-center md:mb-24">
           <span className="cf-kicker mb-6 text-[11px] font-black uppercase tracking-[0.5em] text-accent">
             Let&apos;s Build Together
           </span>
@@ -136,6 +136,27 @@ export default function ContactFooter() {
             </a>
           </div>
         </div>
+
+        <nav
+          className="cf-reveal mb-12 flex flex-wrap items-center justify-center gap-x-10 gap-y-4 border-b border-white/5 pb-12 md:justify-between"
+          aria-label="Footer"
+        >
+          <Link href="/" className="text-[10px] font-black uppercase tracking-[0.45em] text-white/35 transition-colors hover:text-accent">
+            Home
+          </Link>
+          <Link href="/works" className="text-[10px] font-black uppercase tracking-[0.45em] text-white/35 transition-colors hover:text-accent">
+            Works
+          </Link>
+          <Link href="/services" className="text-[10px] font-black uppercase tracking-[0.45em] text-white/35 transition-colors hover:text-accent">
+            Services
+          </Link>
+          <Link href="/about" className="text-[10px] font-black uppercase tracking-[0.45em] text-white/35 transition-colors hover:text-accent">
+            About
+          </Link>
+          <Link href="/contact" className="text-[10px] font-black uppercase tracking-[0.45em] text-white/35 transition-colors hover:text-accent">
+            Contact
+          </Link>
+        </nav>
 
         {/* ── Secondary Footer ── */}
         <div className="cf-reveal flex flex-col items-start justify-between gap-16 border-t border-white/5 pt-16 md:flex-row md:items-end">

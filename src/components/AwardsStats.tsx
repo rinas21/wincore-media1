@@ -46,6 +46,7 @@ export default function AwardsStats() {
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
+    const scroller = document.documentElement;
     const splits: SplitType[] = [];
 
     const ctx = gsap.context(() => {
@@ -65,7 +66,7 @@ export default function AwardsStats() {
               stagger: 0.018,
               ease: "expo.out",
               clearProps: "transform,opacity",
-              scrollTrigger: { trigger: headingEl, start: "top 85%", once: true },
+              scrollTrigger: { trigger: headingEl, scroller, start: "top 85%", once: true },
             }
           );
         }
@@ -76,7 +77,7 @@ export default function AwardsStats() {
         { y: 20, opacity: 0 },
         {
           y: 0, opacity: 1, duration: 0.8, ease: "expo.out", clearProps: "transform,opacity",
-          scrollTrigger: { trigger: ".aw-kicker", start: "top 90%", once: true },
+          scrollTrigger: { trigger: ".aw-kicker", scroller, start: "top 90%", once: true },
         }
       );
       gsap.fromTo(
@@ -84,7 +85,7 @@ export default function AwardsStats() {
         { y: 22, opacity: 0 },
         {
           y: 0, opacity: 1, duration: 1, ease: "expo.out", clearProps: "transform,opacity",
-          scrollTrigger: { trigger: ".aw-body", start: "top 90%", once: true },
+          scrollTrigger: { trigger: ".aw-body", scroller, start: "top 90%", once: true },
         }
       );
 
@@ -101,6 +102,7 @@ export default function AwardsStats() {
           ease: "power2.out",
           scrollTrigger: {
             trigger: card,
+            scroller,
             start: "top 65%",
             once: true,
           },
@@ -121,6 +123,7 @@ export default function AwardsStats() {
             clearProps: "transform,opacity",
             scrollTrigger: {
               trigger: card,
+              scroller,
               start: "top 80%",
               once: true,
             },

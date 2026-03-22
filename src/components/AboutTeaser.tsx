@@ -43,6 +43,7 @@ export default function AboutTeaser() {
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
+    const scroller = document.documentElement;
     const splits: SplitType[] = [];
 
     const ctx = gsap.context(() => {
@@ -61,6 +62,7 @@ export default function AboutTeaser() {
             immediateRender: false,
             scrollTrigger: {
               trigger: headingEl,
+              scroller,
               start: "top 85%",
               once: true,
             },
@@ -72,21 +74,21 @@ export default function AboutTeaser() {
       gsap.from(".abt-kicker", {
         y: 20, opacity: 0, duration: 0.8, ease: "expo.out",
         immediateRender: false,
-        scrollTrigger: { trigger: ".abt-kicker", start: "top 90%", once: true },
+        scrollTrigger: { trigger: ".abt-kicker", scroller, start: "top 90%", once: true },
       });
 
       // ── Lead paragraph ──
       gsap.from(".abt-lead", {
         y: 28, opacity: 0, filter: "blur(8px)", duration: 1, ease: "expo.out",
         immediateRender: false,
-        scrollTrigger: { trigger: ".abt-lead", start: "top 88%", once: true },
+        scrollTrigger: { trigger: ".abt-lead", scroller, start: "top 88%", once: true },
       });
 
       // ── Rule ──
       gsap.from(".abt-rule", {
         scaleX: 0, transformOrigin: "left", duration: 1.1, ease: "expo.out",
         immediateRender: false,
-        scrollTrigger: { trigger: ".abt-rule", start: "top 90%", once: true },
+        scrollTrigger: { trigger: ".abt-rule", scroller, start: "top 90%", once: true },
       });
 
       // ── Stat cards ──
@@ -95,7 +97,7 @@ export default function AboutTeaser() {
         gsap.from(card, {
           y: 40, opacity: 0, scale: 0.97, duration: 0.9, delay: i * 0.08, ease: "expo.out",
           immediateRender: false,
-          scrollTrigger: { trigger: card, start: "top 90%", once: true },
+          scrollTrigger: { trigger: card, scroller, start: "top 90%", once: true },
         });
 
         // Count-up
@@ -106,7 +108,7 @@ export default function AboutTeaser() {
           gsap.to(proxy, {
             val: target, duration: 1.8, ease: "power2.out",
             immediateRender: false,
-            scrollTrigger: { trigger: card, start: "top 85%", once: true },
+            scrollTrigger: { trigger: card, scroller, start: "top 85%", once: true },
             onUpdate() { numEl.textContent = Math.round(proxy.val).toString(); },
           });
         }
@@ -120,7 +122,7 @@ export default function AboutTeaser() {
           clipPath: "inset(16% 0 0 0 round 1.25rem)",
           duration: 1.1, delay: i * 0.07, ease: "expo.out",
           immediateRender: false,
-          scrollTrigger: { trigger: card, start: "top 88%", once: true },
+          scrollTrigger: { trigger: card, scroller, start: "top 88%", once: true },
         });
       });
 
@@ -130,6 +132,7 @@ export default function AboutTeaser() {
         ease: "none",
         scrollTrigger: {
           trigger: sectionRef.current,
+          scroller,
           start: "top bottom",
           end: "bottom top",
           scrub: true,

@@ -5,7 +5,6 @@ import { useEffect, useRef } from "react";
 import type { ComponentType } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import SplitType from "split-type";
 import {
   ArrowUpRight,
   Bot,
@@ -16,7 +15,6 @@ import {
   Video,
 } from "lucide-react";
 
-// Register outside to ensure it's done once and early
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
@@ -32,45 +30,39 @@ type ServiceItem = {
 const SERVICES: ServiceItem[] = [
   {
     title: "Digital-First Branding",
-    summary:
-      "Identity systems, visual language, and brand architecture built for modern channels.",
-    outcomes: ["Naming and strategy", "Brand systems", "Guidelines and rollout"],
+    summary: "Identity, visual language, and brand systems for modern channels.",
+    outcomes: ["Strategy & naming", "Design systems", "Rollout"],
     icon: Layers,
   },
   {
-    title: "Social Media and Influence",
-    summary:
-      "Editorial systems and creator partnerships that grow communities and measurable demand.",
-    outcomes: ["Content pillars", "Campaign planning", "Influencer alignment"],
+    title: "Social & Influence",
+    summary: "Editorial rhythm and creator partnerships that convert attention.",
+    outcomes: ["Content pillars", "Campaigns", "Partnerships"],
     icon: Sparkles,
   },
   {
-    title: "Motion Video and 3D",
-    summary:
-      "High-impact motion assets and product storytelling tailored for paid and organic channels.",
-    outcomes: ["Explainer reels", "3D motion design", "Cutdowns for ads"],
+    title: "Motion Video & 3D",
+    summary: "Reels, explainers, and 3D storytelling for paid and organic.",
+    outcomes: ["Motion design", "3D assets", "Ad cutdowns"],
     icon: Video,
   },
   {
     title: "AI-Powered Web Development",
-    summary:
-      "Premium websites accelerated with AI workflows while keeping quality, speed, and conversion first.",
-    outcomes: ["Rapid prototyping", "Performance optimization", "Scalable CMS architecture"],
+    summary: "Fast, premium sites with AI-assisted workflows and strong performance.",
+    outcomes: ["Prototyping", "Performance", "CMS"],
     icon: Bot,
     link: "https://winpro-ai-site.vercel.app",
   },
   {
     title: "Performance Marketing",
-    summary:
-      "Full-funnel paid campaigns and analytics loops that optimize spend and maximize revenue.",
-    outcomes: ["Paid strategy", "Creative testing", "Attribution and reporting"],
+    summary: "Full-funnel paid media with testing loops and clear reporting.",
+    outcomes: ["Paid strategy", "Creative tests", "Attribution"],
     icon: ChartNoAxesCombined,
   },
   {
-    title: "UX/UI and WebGL Experiences",
-    summary:
-      "Immersive interfaces and interactive product journeys engineered for memorability.",
-    outcomes: ["Experience design", "Interaction systems", "WebGL implementation"],
+    title: "UX/UI & WebGL",
+    summary: "Product UX, UI craft, and immersive WebGL where it matters.",
+    outcomes: ["UX systems", "UI design", "WebGL"],
     icon: Monitor,
   },
 ];
@@ -79,176 +71,155 @@ const PROCESS = [
   {
     step: "01",
     title: "Discover",
-    text: "We map your market, audience, and constraints into a clear strategic brief.",
+    text: "Market, audience, and constraints into a focused brief.",
   },
   {
     step: "02",
     title: "Design",
-    text: "We shape concepts into production-ready systems with clear creative direction.",
+    text: "Concepts into production-ready systems and creative direction.",
   },
   {
     step: "03",
-    title: "Deploy and Scale",
-    text: "We launch, test, and continuously optimize for long-term growth.",
+    title: "Deploy",
+    text: "Launch, measure, and refine for long-term growth.",
   },
 ];
 
 export default function ServicesPageContent() {
   const rootRef = useRef<HTMLElement>(null);
+  const glowRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const cleanupFns: Array<() => void> = [];
-    const splits: SplitType[] = [];
+    gsap.registerPlugin(ScrollTrigger);
+
+    const scroller = document.documentElement;
+
+    const reduced =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
     const ctx = gsap.context(() => {
-      // Split text for cinematic entry
-      const titleEls = gsap.utils.toArray<HTMLElement>(".svc-title-split");
-      titleEls.forEach(el => {
-        const split = new SplitType(el, { types: "chars" });
-        splits.push(split);
-      });
+      // --- Hero: entrance on load (does not depend on scroll) ---
+      if (!reduced) {
+        const tl = gsap.timeline({
+          defaults: { ease: "expo.out" },
+          delay: 0.05,
+        });
+        tl.from(".svc-orb", { opacity: 0, scale: 0.85, duration: 1.2 }, 0)
+          .from(".svc-kicker", { opacity: 0, y: 18, duration: 0.65 }, 0.15)
+          .from(
+            ".svc-title-line",
+            { opacity: 0, y: 36, duration: 0.85, stagger: 0.1 },
+            0.22,
+          )
+          .from(".svc-lead", { opacity: 0, y: 22, duration: 0.75 }, "-=0.45")
+          .from(".svc-meta-row", { opacity: 0, y: 14, duration: 0.55 }, "-=0.35");
 
-      const introTl = gsap.timeline({ defaults: { ease: "expo.out" } });
-
-      introTl
-        .fromTo(
-          ".svc-kicker",
-          { y: 24, opacity: 0 },
-          { y: 0, opacity: 1, duration: 1.2, delay: 0.2, clearProps: "all" },
-        )
-        .fromTo(
-          ".svc-title-split .char",
-          { y: 120, opacity: 0, rotateX: -90, transformOrigin: "0% 50% -50px" },
-          {
-            y: 0,
-            opacity: 1,
-            rotateX: 0,
-            duration: 1.5,
-            stagger: 0.02,
-            ease: "expo.out",
-            clearProps: "all"
-          },
-          "-=1.1",
-        )
-        .fromTo(
-          ".svc-lead",
-          { y: 30, opacity: 0 },
-          { y: 0, opacity: 1, duration: 1.2, clearProps: "all" },
-          "-=1.2",
+        if (glowRef.current) {
+          gsap.to(glowRef.current, {
+            opacity: 0.55,
+            duration: 2.4,
+            ease: "sine.inOut",
+            yoyo: true,
+            repeat: -1,
+          });
+        }
+      } else {
+        gsap.set(
+          [".svc-kicker", ".svc-title-line", ".svc-lead", ".svc-meta-row", ".svc-orb"],
+          { clearProps: "all" },
         );
+      }
 
-      // Parallax hero section background/text effect
-      gsap.to(".svc-hero", {
-        y: -100,
-        opacity: 0,
-        ease: "none",
-        scrollTrigger: {
-          trigger: rootRef.current,
-          start: "top top",
-          end: "bottom top",
-          scrub: true,
-        },
-      });
-
-      // Interactive Scroll-Scrubbed Card Entry (Premium Parallax Feel)
-      const cardsObj = gsap.utils.toArray<HTMLElement>(".svc-card");
-      cardsObj.forEach((card, i) => {
-        gsap.fromTo(
-          card,
-          { 
-            y: 150, 
-            opacity: 0, 
-            scale: 0.9, 
-            rotateX: -15, 
-            transformPerspective: 1000 
-          },
-          {
-            y: 0,
-            opacity: 1,
-            scale: 1,
-            rotateX: 0,
-            ease: "none",
+      // --- Cards: per-card scroll reveal (Lenis needs explicit scroller) ---
+      if (!reduced) {
+        const cards = gsap.utils.toArray<HTMLElement>(".svc-card");
+        cards.forEach((card) => {
+          gsap.from(card, {
+            opacity: 0,
+            y: 44,
+            rotateX: -6,
+            transformOrigin: "50% 0%",
+            duration: 0.75,
+            ease: "power3.out",
             scrollTrigger: {
               trigger: card,
-              start: "top 95%",
-              end: "top 60%",
-              scrub: 1.5, // 1.5s smoothing binds the animation directly to scroll momentum
+              scroller,
+              start: "top 90%",
+              once: true,
+              invalidateOnRefresh: true,
             },
-          }
-        );
-      });
-
-      // Process and CTA entry
-      gsap.fromTo(
-        ".svc-process-reveal",
-        { y: 60, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 1.2,
-          ease: "expo.out",
-          clearProps: "all",
-          scrollTrigger: {
-            trigger: ".svc-process",
-            start: "top 80%",
-          },
-        },
-      );
-      
-      gsap.fromTo(
-        ".svc-cta-reveal",
-        { y: 60, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 1.2,
-          ease: "expo.out",
-          clearProps: "all",
-          scrollTrigger: {
-            trigger: ".svc-cta-reveal",
-            start: "top 85%",
-          },
-        },
-      );
-
-      // Interactive magnetic tilt for cards
-      const cards = gsap.utils.toArray<HTMLElement>(".svc-card");
-      cards.forEach((card) => {
-        const toRX = gsap.quickTo(card, "rotationX", { duration: 0.5, ease: "power3.out" });
-        const toRY = gsap.quickTo(card, "rotationY", { duration: 0.5, ease: "power3.out" });
-        const toY = gsap.quickTo(card, "y", { duration: 0.5, ease: "power3.out" });
-
-        gsap.set(card, { transformPerspective: 1200, transformOrigin: "center" });
-
-        const onMove = (event: MouseEvent) => {
-          const rect = card.getBoundingClientRect();
-          const px = (event.clientX - rect.left) / rect.width;
-          const py = (event.clientY - rect.top) / rect.height;
-
-          toRX((py - 0.5) * -12);
-          toRY((px - 0.5) * 12);
-          toY(-10);
-        };
-
-        const onLeave = () => {
-          toRX(0);
-          toRY(0);
-          toY(0);
-        };
-
-        card.addEventListener("mousemove", onMove);
-        card.addEventListener("mouseleave", onLeave);
-        cleanupFns.push(() => {
-          card.removeEventListener("mousemove", onMove);
-          card.removeEventListener("mouseleave", onLeave);
+          });
         });
+      }
+
+      // --- Process strip ---
+      gsap.from(".svc-process-inner", {
+        opacity: reduced ? 1 : 0,
+        y: reduced ? 0 : 48,
+        duration: reduced ? 0 : 0.9,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: ".svc-process",
+          scroller,
+          start: "top 86%",
+          once: true,
+        },
       });
 
+      gsap.from(".svc-phase", {
+        opacity: reduced ? 1 : 0,
+        y: reduced ? 0 : 28,
+        duration: reduced ? 0 : 0.65,
+        stagger: reduced ? 0 : 0.12,
+        ease: "power2.out",
+        scrollTrigger: {
+          trigger: ".svc-process",
+          scroller,
+          start: "top 78%",
+          once: true,
+        },
+      });
+
+      // --- CTA ---
+      gsap.from(".svc-cta-inner", {
+        opacity: reduced ? 1 : 0,
+        y: reduced ? 0 : 32,
+        scale: reduced ? 1 : 0.98,
+        duration: reduced ? 0 : 0.85,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: ".svc-cta",
+          scroller,
+          start: "top 88%",
+          once: true,
+        },
+      });
+
+      // Subtle parallax on section glow (scroll-linked)
+      if (!reduced && glowRef.current) {
+        gsap.to(glowRef.current, {
+          yPercent: 12,
+          ease: "none",
+          scrollTrigger: {
+            trigger: rootRef.current,
+            scroller,
+            start: "top bottom",
+            end: "bottom top",
+            scrub: 1.2,
+          },
+        });
+      }
     }, rootRef);
 
+    const refresh = () => ScrollTrigger.refresh();
+    requestAnimationFrame(refresh);
+    const t1 = window.setTimeout(refresh, 120);
+    const t2 = window.setTimeout(refresh, 450);
+
     return () => {
-      cleanupFns.forEach((fn) => fn());
-      splits.forEach((s) => s.revert());
+      window.clearTimeout(t1);
+      window.clearTimeout(t2);
       ctx.revert();
     };
   }, []);
@@ -256,132 +227,166 @@ export default function ServicesPageContent() {
   return (
     <section
       ref={rootRef}
-      className="relative overflow-hidden border-t border-white/5 bg-background pt-36 md:pt-44"
+      className="relative overflow-hidden border-t border-white/5 bg-background pb-20 pt-6 md:pb-28 md:pt-8"
       aria-label="Services overview"
     >
+      {/* Ambient + grid */}
       <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-[-12rem] top-28 h-[40rem] w-[40rem] rounded-full bg-accent/10 blur-[120px]" />
-        <div className="absolute bottom-[-8rem] right-[-8rem] h-[50rem] w-[50rem] rounded-full bg-secondary/10 blur-[150px]" />
+        <div
+          ref={glowRef}
+          className="svc-orb absolute left-1/2 top-[-18%] h-[min(55vh,480px)] w-[min(90vw,720px)] -translate-x-1/2 rounded-full bg-accent/[0.09] blur-[120px]"
+        />
+        <div
+          className="absolute inset-0 opacity-[0.35]"
+          style={{
+            backgroundImage: `
+              linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)
+            `,
+            backgroundSize: "64px 64px",
+            maskImage: "radial-gradient(ellipse 80% 60% at 50% 20%, black 20%, transparent 75%)",
+          }}
+        />
       </div>
 
       <div className="_container relative z-10">
-        <div className="svc-hero mb-32 md:mb-56 mt-16 md:mt-24">
-          <p className="svc-kicker mb-8 text-[11px] font-black uppercase tracking-[0.6em] text-accent">
-            Expertise / Solutions
-          </p>
-          <h1 className="max-w-6xl text-[14vw] font-black uppercase leading-[0.8] tracking-tighter md:text-[8.5vw]">
-            <span className="block overflow-hidden pb-2">
-              <span className="svc-title-split block">Crafted To</span>
-            </span>
-            <span className="block overflow-hidden py-1">
-              <span className="svc-title-split block ml-8 md:ml-24 text-transparent [-webkit-text-stroke:2px_rgba(255,255,255,0.8)] md:[-webkit-text-stroke:3px_rgba(255,255,255,0.8)] italic">Scale</span>
-            </span>
-            <span className="block overflow-hidden pt-2">
-              <span className="svc-title-split block">Modern Brands</span>
-            </span>
-          </h1>
-          <p className="svc-lead mt-16 max-w-2xl text-lg leading-relaxed text-white/50 md:text-2xl font-light">
-            Wincore combines human strategy, cinematic production, and AI-enhanced execution to deliver bold
-            digital outcomes. Every service is built as a growth layer, not a one-off task.
-          </p>
+        <header className="svc-intro mb-16 md:mb-20">
+          <div className="relative rounded-2xl border border-white/[0.07] bg-white/[0.02] p-6 md:p-10 lg:p-12">
+            <div className="absolute left-0 top-0 h-full w-px bg-gradient-to-b from-accent/80 via-accent/20 to-transparent md:left-6" />
+            <div className="pl-4 md:pl-8">
+              <p className="svc-kicker mb-5 text-[10px] font-black uppercase tracking-[0.55em] text-accent">
+                Services
+              </p>
+              <h1 className="font-heading text-3xl font-black uppercase leading-[1.06] tracking-tight text-white sm:text-4xl md:text-5xl lg:text-[2.85rem] lg:leading-[1.08]">
+                <span className="svc-title-line block">
+                  Built to scale{" "}
+                  <span className="text-secondary italic">modern</span> brands.
+                </span>
+                <span className="svc-title-line mt-2 block text-white/55 md:mt-3">
+                  Strategy, craft &amp; AI — end to end.
+                </span>
+              </h1>
+              <p className="svc-lead mt-6 max-w-2xl text-sm leading-relaxed text-white/50 md:text-base">
+                Wincore Agency delivers digital-first branding, motion, performance, and immersive
+                web. One partner, one bar for quality.
+              </p>
+              <div className="svc-meta-row mt-8 flex flex-wrap gap-6 border-t border-white/[0.06] pt-6 text-[10px] font-black uppercase tracking-[0.35em] text-white/30">
+                <span>Colombo &amp; remote</span>
+                <span className="text-accent/90">WebGL · AI · Motion</span>
+                <span>Strategy-led delivery</span>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <div className="mb-10 flex items-end justify-between gap-4">
+          <h2 className="text-xl font-black uppercase tracking-tight text-white md:text-2xl">
+            Capabilities
+          </h2>
+          <span className="hidden text-[9px] font-black uppercase tracking-[0.4em] text-white/25 sm:inline">
+            06 disciplines
+          </span>
         </div>
 
-        <div className="svc-card-grid mb-32 grid grid-cols-1 gap-8 md:mb-48 md:grid-cols-2 xl:grid-cols-3 xl:gap-10">
+        <div className="svc-card-grid mb-20 grid grid-cols-1 gap-4 perspective-[1200px] sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
           {SERVICES.map((service, index) => {
             const Icon = service.icon;
-
             return (
               <article
                 key={service.title}
-                className="svc-card group relative min-h-[400px] flex flex-col justify-between overflow-hidden rounded-[2.5rem] border border-white/10 bg-white/[0.02] p-10 md:p-14 transition-colors duration-500 hover:border-accent/40"
+                className="svc-card group relative flex flex-col rounded-2xl border border-white/[0.09] bg-gradient-to-b from-white/[0.04] to-transparent p-6 transition-[border-color,box-shadow] duration-500 hover:border-accent/40 hover:shadow-[0_0_0_1px_rgba(0,191,255,0.12)] md:min-h-[300px] md:p-7"
+                style={{ transformStyle: "preserve-3d" }}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-white/[0.03] to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-                
-                <div className="relative z-10">
-                  <div className="mb-10 flex items-center justify-between">
-                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/20">
-                      Phase 0{index + 1}
-                    </span>
-                    <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-accent transition-all duration-500 group-hover:scale-110 group-hover:border-accent/40 group-hover:bg-accent/10">
-                      <Icon size={24} />
-                    </div>
+                <div className="pointer-events-none absolute inset-0 rounded-2xl bg-[radial-gradient(120%_80%_at_10%_0%,rgba(0,191,255,0.08),transparent_55%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                <div className="relative mb-5 flex items-start justify-between gap-3">
+                  <span className="text-[9px] font-black uppercase tracking-[0.35em] text-white/30">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <div className="rounded-xl border border-white/10 bg-white/[0.06] p-2.5 text-accent transition-transform duration-500 group-hover:scale-105 group-hover:border-accent/30">
+                    <Icon size={20} />
                   </div>
-
-                  <h2 className="mb-5 text-2xl font-black leading-[1.1] md:text-[1.85rem]">
-                    {service.title}
-                  </h2>
-                  <p className="mb-8 text-sm leading-relaxed text-white/50 md:text-base font-light">{service.summary}</p>
-
-                  <ul className="mb-10 space-y-3">
-                    {service.outcomes.map((outcome) => (
-                      <li key={outcome} className="flex items-center gap-3 text-sm text-white/70">
-                        <span className="h-1 w-1 rounded-full bg-accent/60" aria-hidden="true" />
-                        <span className="font-medium tracking-tight">{outcome}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  {service.link ? (
-                    <a
-                      href={service.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.4em] text-accent transition-all duration-300 group-hover:gap-5"
-                    >
-                      Experience Platform
-                      <ArrowUpRight size={14} />
-                    </a>
-                  ) : (
-                    <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/30 italic">
-                      Strategy First
-                    </p>
-                  )}
                 </div>
+                <h3 className="relative mb-2 text-[15px] font-bold leading-snug tracking-tight text-white md:text-base">
+                  {service.title}
+                </h3>
+                <p className="relative mb-4 flex-1 text-[13px] leading-relaxed text-white/45 md:text-sm">
+                  {service.summary}
+                </p>
+                <ul className="relative mb-4 space-y-1.5 border-t border-white/[0.07] pt-4">
+                  {service.outcomes.map((outcome) => (
+                    <li
+                      key={outcome}
+                      className="flex items-center gap-2 text-[11px] text-white/55 md:text-xs"
+                    >
+                      <span className="h-1 w-1 shrink-0 rounded-full bg-accent/80" aria-hidden />
+                      {outcome}
+                    </li>
+                  ))}
+                </ul>
+                {service.link ? (
+                  <a
+                    href={service.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="relative inline-flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.3em] text-accent hover:opacity-90"
+                  >
+                    WinPro AI
+                    <ArrowUpRight size={12} />
+                  </a>
+                ) : (
+                  <span className="relative text-[9px] font-black uppercase tracking-[0.25em] text-white/25">
+                    Strategy-led
+                  </span>
+                )}
               </article>
             );
           })}
         </div>
 
-        <div className="svc-process svc-process-reveal mb-32 rounded-[3.5rem] border border-white/5 bg-white/[0.015] p-12 md:mb-48 md:p-24 backdrop-blur-md">
-          <div className="mb-20 flex flex-col md:flex-row items-start md:items-end justify-between gap-8 border-b border-white/10 pb-12">
-            <h3 className="text-5xl font-black uppercase tracking-tighter md:text-7xl leading-none">The <span className="text-white/20 italic">Wincore</span> Way</h3>
-            <span className="text-[11px] font-black uppercase tracking-[0.5em] text-white/20">
-              Agile / Creative / Data-Driven
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 gap-12 md:grid-cols-3 md:gap-20">
-            {PROCESS.map((phase) => (
-              <article
-                key={phase.step}
-                className="group relative"
-              >
-                <p className="mb-6 text-[11px] font-black uppercase tracking-[0.4em] text-accent/60">
-                  Phase {phase.step}
-                </p>
-                <h4 className="mb-6 text-3xl font-black tracking-tight md:text-4xl">{phase.title}</h4>
-                <div className="w-16 h-[2px] bg-white/10 mb-8 transition-all duration-700 group-hover:w-full group-hover:bg-accent/40" />
-                <p className="text-lg text-white/40 leading-relaxed font-light">{phase.text}</p>
-              </article>
-            ))}
+        <div className="svc-process relative mb-20 overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.02] p-6 md:p-10">
+          <div className="svc-process-inner relative">
+            <div className="pointer-events-none absolute right-0 top-0 h-40 w-40 rounded-full bg-secondary/[0.06] blur-3xl" />
+            <div className="relative mb-10 flex flex-col gap-3 border-b border-white/[0.06] pb-8 md:flex-row md:items-end md:justify-between">
+              <h3 className="text-xl font-black uppercase tracking-tight text-white md:text-2xl">
+                How we <span className="text-secondary/90 italic">work</span>
+              </h3>
+              <span className="text-[9px] font-black uppercase tracking-[0.4em] text-white/25">
+                Discover → Design → Deploy
+              </span>
+            </div>
+            <div className="relative grid grid-cols-1 gap-10 md:grid-cols-3 md:gap-8">
+              {PROCESS.map((phase) => (
+                <article key={phase.step} className="svc-phase">
+                  <p className="mb-2 text-[9px] font-black uppercase tracking-[0.35em] text-accent/90">
+                    {phase.step}
+                  </p>
+                  <h4 className="mb-2 text-lg font-bold text-white">{phase.title}</h4>
+                  <p className="text-[13px] leading-relaxed text-white/42 md:text-sm">{phase.text}</p>
+                </article>
+              ))}
+            </div>
           </div>
         </div>
 
-        <div className="svc-cta-reveal mb-32 flex flex-col items-start justify-between gap-16 rounded-[3.5rem] border border-accent/20 bg-gradient-to-br from-accent/[0.08] to-transparent p-12 md:mb-48 md:flex-row md:items-center md:p-24 shadow-2xl shadow-accent/5">
-          <div className="max-w-3xl">
-            <p className="mb-6 text-[11px] font-black uppercase tracking-[0.5em] text-accent">Co-create with us</p>
-            <h2 className="text-4xl font-black leading-[0.9] md:text-7xl tracking-tighter uppercase">
-              Ready to <span className="text-white/10 italic">evolve</span><br/> your brand?
-            </h2>
+        <div className="svc-cta relative overflow-hidden rounded-2xl border border-accent/30 bg-gradient-to-br from-accent/[0.09] via-transparent to-secondary/[0.05]">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_80%_20%,rgba(0,191,255,0.12),transparent_60%)]" />
+          <div className="svc-cta-inner relative flex flex-col items-start justify-between gap-8 p-6 md:flex-row md:items-center md:p-10">
+            <div>
+              <p className="mb-2 text-[9px] font-black uppercase tracking-[0.45em] text-accent">
+                Next step
+              </p>
+              <p className="text-xl font-black uppercase leading-tight tracking-tight text-white md:text-2xl">
+                Tell us what you&apos;re building — we&apos;ll scope it.
+              </p>
+            </div>
+            <Link
+              href="/contact"
+              className="relative inline-flex shrink-0 items-center gap-3 rounded-full bg-accent px-10 py-3.5 text-[10px] font-black uppercase tracking-[0.35em] text-[#0A0A0A] transition-transform hover:scale-[1.02] active:scale-[0.98]"
+            >
+              Contact
+              <ArrowUpRight size={16} />
+            </Link>
           </div>
-
-          <Link
-            href="/contact"
-            className="group relative inline-flex items-center gap-6 rounded-full bg-white px-12 py-6 text-xs font-black uppercase tracking-[0.4em] text-black transition-all duration-500 hover:bg-accent hover:px-14 shadow-2xl shadow-accent/20"
-          >
-            Start Project
-            <ArrowUpRight size={18} className="transition-transform duration-500 group-hover:rotate-45" />
-          </Link>
         </div>
       </div>
     </section>

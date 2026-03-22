@@ -2,6 +2,7 @@ import AboutTeaser from "@/components/AboutTeaser";
 import AwardsStats from "@/components/AwardsStats";
 import RecognitionBar from "@/components/RecognitionBar";
 import PageMotion from "@/components/PageMotion";
+import PageMain from "@/components/PageMain";
 
 export const metadata = {
   title: "About — Wincore Agency",
@@ -10,7 +11,7 @@ export const metadata = {
 
 export default function AboutPage() {
   return (
-    <main className="bg-background text-foreground">
+    <PageMain>
       <PageMotion>
         <div className="page-motion-item" data-page-motion>
           <RecognitionBar />
@@ -22,7 +23,6 @@ export default function AboutPage() {
           <AwardsStats />
         </div>
       </PageMotion>
-    </main>
+    </PageMain>
   );
 }
-

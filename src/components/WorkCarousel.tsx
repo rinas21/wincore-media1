@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Image from "next/image";
 import ProjectModal, { type Project } from "@/components/ProjectModal";
+import { ArrowRight } from "lucide-react";
 
 const PROJECTS: Project[] = [
   {
@@ -42,220 +43,192 @@ const PROJECTS: Project[] = [
 ];
 
 export default function WorkCarousel() {
-  const triggerRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const pinRef = useRef<HTMLDivElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const progressRef = useRef<HTMLDivElement>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
+    const scroller = document.documentElement;
 
-    const ctx = gsap.context(() => {
-      // Heading reveal
-      gsap.from(".wc-heading", {
-        y: 50, opacity: 0, duration: 1.1, ease: "expo.out",
-        immediateRender: false,
-        scrollTrigger: { trigger: ".wc-heading", start: "top 88%", once: true },
-      });
-      gsap.from(".wc-meta", {
-        y: 24, opacity: 0, duration: 0.9, ease: "expo.out", delay: 0.12,
-        immediateRender: false,
-        scrollTrigger: { trigger: ".wc-meta", start: "top 90%", once: true },
-      });
+    const track = trackRef.current;
+    const pin = pinRef.current;
+    if (!track || !pin) return;
 
-      // The card wrapper count = PROJECTS.length + 1 (intro slide)
-      const totalSlides = PROJECTS.length + 1;
-      const horizontalScroll = gsap.to(".wc-project-card-wrapper", {
-        xPercent: -100 * totalSlides,
-        ease: "none",
-        scrollTrigger: {
-          trigger: triggerRef.current,
-          pin: true,
-          scrub: 1.2,
-          start: "top top",
-          end: () => `+=${(triggerRef.current?.offsetWidth || 0) * (totalSlides - 1)}`,
-          invalidateOnRefresh: true,
-          anticipatePin: 1,
-        },
-      });
+    const scrollDistance = () => Math.max(0, track.scrollWidth - window.innerWidth);
 
-      gsap.to(".wc-bg-text", {
-        x: -500,
-        ease: "none",
-        scrollTrigger: {
-          trigger: triggerRef.current,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: true,
-        },
-      });
-
-      // Premium hover tilt + lift for each card
-      const cards = gsap.utils.toArray<HTMLElement>(".wc-tilt");
-      cards.forEach((card) => {
-        const media = card.querySelector(".wc-media") as HTMLElement | null;
-        const shine = card.querySelector(".wc-shine") as HTMLElement | null;
-        if (!media) return;
-
-        gsap.set(card, { transformPerspective: 1100, transformOrigin: "center" });
-        const toRX = gsap.quickTo(card, "rotationX", { duration: 0.45, ease: "power3.out" });
-        const toRY = gsap.quickTo(card, "rotationY", { duration: 0.45, ease: "power3.out" });
-        const toY  = gsap.quickTo(card, "y",         { duration: 0.45, ease: "power3.out" });
-        const toMX = gsap.quickTo(media, "x",         { duration: 0.7,  ease: "power3.out" });
-        const toMY = gsap.quickTo(media, "y",         { duration: 0.7,  ease: "power3.out" });
-        const toMS = gsap.quickTo(media, "scale",     { duration: 0.9,  ease: "power3.out" });
-        const toShineOpacity = shine
-          ? gsap.quickTo(shine, "opacity", { duration: 0.3, ease: "power2.out" })
-          : null;
-
-        const onMove = (e: MouseEvent) => {
-          const r = card.getBoundingClientRect();
-          const px = (e.clientX - r.left) / r.width;
-          const py = (e.clientY - r.top)  / r.height;
-          toRX((py - 0.5) * -8);
-          toRY((px - 0.5) * 10);
-          toY(-6);
-          toMX((px - 0.5) * 18);
-          toMY((py - 0.5) * 14);
-          toMS(1.06);
-          toShineOpacity?.(1);
-          if (shine) {
-            shine.style.background = `radial-gradient(500px circle at ${px * 100}% ${py * 100}%, rgba(0,191,255,0.15), transparent 50%)`;
+    const tween = gsap.to(track, {
+      x: () => -scrollDistance(),
+      ease: "none",
+      scrollTrigger: {
+        trigger: pin,
+        scroller,
+        start: "top top",
+        end: () => "+=" + String(scrollDistance()),
+        pin: true,
+        scrub: 1,
+        anticipatePin: 1,
+        invalidateOnRefresh: true,
+        onUpdate(self) {
+          if (progressRef.current) {
+            progressRef.current.style.transform = `scaleX(${self.progress})`;
           }
-        };
+        },
+      },
+    });
 
-        const onLeave = () => {
-          toRX(0);
-          toRY(0);
-          toY(0);
-          toMX(0);
-          toMY(0);
-          toMS(1);
-          toShineOpacity?.(0);
-        };
+    const ro = new ResizeObserver(() => ScrollTrigger.refresh());
+    ro.observe(track);
 
-        card.addEventListener("mousemove", onMove);
-        card.addEventListener("mouseleave", onLeave);
-      });
+    gsap.from(".wc-heading-block", {
+      y: 32,
+      opacity: 0,
+      duration: 0.9,
+      ease: "expo.out",
+      scrollTrigger: {
+        trigger: sectionRef.current,
+        scroller,
+        start: "top 88%",
+        once: true,
+      },
+    });
 
-      return () => horizontalScroll.kill();
-    }, triggerRef);
+    const cards = gsap.utils.toArray<HTMLElement>(".wc-tilt");
+    cards.forEach((card) => {
+      const media = card.querySelector(".wc-media") as HTMLElement | null;
+      const shine = card.querySelector(".wc-shine") as HTMLElement | null;
+      if (!media) return;
 
-    return () => ctx.revert();
+      gsap.set(card, { transformPerspective: 1000 });
+      const toRX = gsap.quickTo(card, "rotationX", { duration: 0.4, ease: "power3.out" });
+      const toRY = gsap.quickTo(card, "rotationY", { duration: 0.4, ease: "power3.out" });
+      const toMX = gsap.quickTo(media, "x", { duration: 0.6, ease: "power3.out" });
+      const toMY = gsap.quickTo(media, "y", { duration: 0.6, ease: "power3.out" });
+      const toMS = gsap.quickTo(media, "scale", { duration: 0.8, ease: "power3.out" });
+
+      const onMove = (e: MouseEvent) => {
+        const r = card.getBoundingClientRect();
+        const px = (e.clientX - r.left) / r.width;
+        const py = (e.clientY - r.top) / r.height;
+        toRX((py - 0.5) * -6);
+        toRY((px - 0.5) * 7);
+        toMX((px - 0.5) * 12);
+        toMY((py - 0.5) * 10);
+        toMS(1.04);
+        if (shine) {
+          shine.style.opacity = "1";
+          shine.style.background = `radial-gradient(400px circle at ${px * 100}% ${py * 100}%, rgba(0,191,255,0.14), transparent 50%)`;
+        }
+      };
+      const onLeave = () => {
+        toRX(0);
+        toRY(0);
+        toMX(0);
+        toMY(0);
+        toMS(1);
+        if (shine) shine.style.opacity = "0";
+      };
+      card.addEventListener("mousemove", onMove);
+      card.addEventListener("mouseleave", onLeave);
+    });
+
+    requestAnimationFrame(() => ScrollTrigger.refresh());
+
+    return () => {
+      ro.disconnect();
+      tween.kill();
+    };
   }, []);
 
   return (
     <section
       id="works"
-      ref={triggerRef}
-      className="relative min-h-screen overflow-hidden bg-background py-[10vh] border-t border-white/5"
+      ref={sectionRef}
+      className="relative border-t border-white/5 bg-background"
       aria-label="Featured works"
     >
-      <div className="wc-bg-text absolute top-1/2 left-[-10vw] -translate-y-1/2 text-[40vw] font-black text-white/[0.02] pointer-events-none select-none uppercase italic whitespace-nowrap">
+      <div className="pointer-events-none absolute left-[-6vw] top-[22%] select-none text-[min(36vw,380px)] font-black uppercase italic leading-none text-white/[0.035]">
         Works
       </div>
 
-      <div className="_container relative z-10 mb-[5vh]">
-        <div className="flex flex-col md:flex-row justify-between items-end gap-10">
-          <div>
-            <p className="text-accent text-[11px] uppercase tracking-[0.6em] font-black mb-8 italic">
-              Selected Work
-            </p>
-            <h2 className="wc-heading text-[12vw] md:text-[6vw] leading-[0.85] font-black uppercase tracking-tighter">
-              Our <br />
-              <span className="text-white/10 italic">Works</span>
+      <div className="wc-heading-block _container relative z-10 border-b border-white/[0.06] pb-10 pt-14 md:pb-12 md:pt-16">
+        <div className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
+          <div className="max-w-2xl">
+            <p className="mb-3 text-[10px] font-black uppercase tracking-[0.5em] text-accent">Selected work</p>
+            <h2 className="font-heading text-3xl font-black uppercase leading-[1.05] tracking-tight text-white md:text-4xl lg:text-5xl">
+              Projects that <span className="text-white/30">earn attention</span>
             </h2>
           </div>
-          <div className="flex items-center gap-10 mb-3">
-            <span className="wc-meta text-[10px] uppercase tracking-[0.5em] font-black opacity-30">
-              Selection 2026®
+          <div className="flex items-center gap-4 text-white/35">
+            <span className="hidden text-[10px] font-black uppercase tracking-[0.35em] sm:inline">
+              Scroll sideways
             </span>
-            <div className="w-24 h-px bg-white/10" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.03]">
+              <ArrowRight className="h-4 w-4 text-accent" aria-hidden />
+            </div>
           </div>
+        </div>
+        <div className="mt-8 h-px w-full overflow-hidden bg-white/[0.06]">
+          <div
+            ref={progressRef}
+            className="h-full origin-left scale-x-0 bg-gradient-to-r from-accent/80 to-accent/30"
+            aria-hidden
+          />
         </div>
       </div>
 
-      <div className="relative h-[80vh] flex">
-        <div className="flex h-full">
-          <div className="wc-project-card-wrapper w-[100vw] flex items-center justify-center flex-shrink-0">
-            <div className="text-center">
-              <p className="text-accent text-[11px] uppercase tracking-[0.5em] font-black mb-8 italic">
-                Scroll To Reveal Projects
-              </p>
-              <div className="w-px h-32 bg-gradient-to-b from-accent to-transparent mx-auto" />
-            </div>
-          </div>
-
+      <div ref={pinRef} className="relative z-[1] h-[min(82vh,860px)] w-full overflow-hidden">
+        <div ref={trackRef} className="flex h-full w-max will-change-transform">
           {PROJECTS.map((project, i) => (
             <div
               key={project.id}
-              className="wc-project-card-wrapper w-[100vw] h-full flex-shrink-0 px-[10vw]"
+              className="box-border flex h-full w-[100vw] max-w-[100vw] flex-shrink-0 items-stretch px-4 pb-10 pt-4 sm:px-6 md:px-10 md:pb-14"
             >
               <button
                 type="button"
                 onClick={() => setSelectedProject(project)}
-                className="wc-tilt cursor-hover group relative w-full h-[65vh] md:h-full overflow-hidden bg-muted rounded-[2rem] border border-white/10 text-left shadow-[0_20px_80px_rgba(0,0,0,0.55)]"
+                className="wc-tilt group relative mx-auto h-full w-full max-w-6xl overflow-hidden rounded-2xl border border-white/[0.12] bg-[#0d0d0d] text-left shadow-[0_24px_80px_-24px_rgba(0,0,0,0.85)] md:rounded-3xl"
               >
-                <div className="wc-media absolute inset-0 scale-125">
+                <div className="wc-media absolute inset-0">
                   <Image
                     src={project.image}
                     alt={project.title}
                     fill
-                    className="object-cover grayscale group-hover:grayscale-0 opacity-40 group-hover:opacity-100 transition-all duration-[1s]"
-                    sizes="100vw"
+                    className="object-cover transition-all duration-700 group-hover:scale-[1.03]"
+                    sizes="(max-width:768px) 100vw, 1152px"
+                    priority={i === 0}
                   />
                 </div>
-
-                <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent pointer-events-none" />
-                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="wc-shine absolute inset-0 opacity-0 pointer-events-none" />
-
-                <div className="absolute top-10 left-10 flex items-center gap-4">
-                  <span className="text-[12px] font-black italic text-accent opacity-70">
-                    {i + 1} / {PROJECTS.length}
+                <div className="wc-shine pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-[#0a0a0a]/55 to-[#0a0a0a]/20" />
+                <div className="absolute left-5 top-5 flex items-center gap-3 md:left-8 md:top-8">
+                  <span className="rounded-full border border-white/10 bg-black/40 px-3 py-1 text-[10px] font-black tabular-nums text-white/80 backdrop-blur-sm">
+                    {String(i + 1).padStart(2, "0")} — {String(PROJECTS.length).padStart(2, "0")}
                   </span>
                 </div>
-
-                <div className="absolute bottom-0 left-0 p-10 md:p-16 w-full flex flex-col md:flex-row justify-between items-end gap-10">
-                  <div className="max-w-[70%]">
-                    <p className="text-accent text-[11px] uppercase tracking-[0.4em] mb-4 font-black">
-                      {project.category}
-                    </p>
-                    <h3 className="text-[10vw] md:text-[5vw] leading-[0.85] text-white font-black uppercase tracking-tighter">
-                      {project.title.split(" ").map((word, idx) => (
-                        <span key={idx} className="block">
-                          {word}
-                        </span>
-                      ))}
-                    </h3>
-                  </div>
-
-                  <div className="flex flex-col items-end gap-6 text-right">
-                    <ul className="flex flex-wrap gap-3 justify-end">
-                      {project.tags.map((tag) => (
-                        <li
-                          key={tag}
-                          className="text-[10px] uppercase tracking-widest font-black px-4 py-2 bg-white/5 rounded-full border border-white/10"
-                        >
-                          {tag}
-                        </li>
-                      ))}
-                    </ul>
-                    <div className="flex items-center gap-4 group/btn">
-                      <span className="text-xl md:text-2xl font-black italic tracking-tighter transform group-hover/btn:translate-x-[-10px] transition-transform">
-                        VIEW PROJECT
+                <div className="absolute bottom-0 left-0 right-0 p-6 md:p-10">
+                  <p className="mb-2 text-[10px] font-black uppercase tracking-[0.4em] text-accent/95">
+                    {project.category}
+                  </p>
+                  <h3 className="max-w-[22ch] text-2xl font-black uppercase leading-[1.08] tracking-tight text-white md:text-4xl lg:text-[2.75rem]">
+                    {project.title}
+                  </h3>
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    {project.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="rounded-md border border-white/[0.08] bg-white/[0.06] px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.12em] text-white/65"
+                      >
+                        {tag}
                       </span>
-                      <div className="w-14 h-14 rounded-full bg-accent flex items-center justify-center">
-                        <svg
-                          viewBox="0 0 24 24"
-                          className="w-6 h-6 text-white"
-                          fill="none"
-                          stroke="currentColor"
-                          aria-hidden="true"
-                        >
-                          <path d="M5 12h14M12 5l7 7-7 7" strokeWidth="3" />
-                        </svg>
-                      </div>
-                    </div>
+                    ))}
                   </div>
+                  <p className="mt-6 inline-flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.35em] text-white/40 transition-colors group-hover:text-accent">
+                    Open case
+                    <ArrowRight className="h-3.5 w-3.5" />
+                  </p>
                 </div>
               </button>
             </div>
@@ -263,12 +236,7 @@ export default function WorkCarousel() {
         </div>
       </div>
 
-      <ProjectModal
-        project={selectedProject}
-        isOpen={!!selectedProject}
-        onClose={() => setSelectedProject(null)}
-      />
+      <ProjectModal project={selectedProject} isOpen={!!selectedProject} onClose={() => setSelectedProject(null)} />
     </section>
   );
 }
-

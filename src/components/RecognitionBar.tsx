@@ -13,17 +13,17 @@ export default function RecognitionBar() {
 
     // Standard GSAP Ticker logic for seamless loop
     const content = ticker.children[0] as HTMLElement;
-    const contentWidth = content.offsetWidth;
-    
-    // Duplicate for seamlessness if needed (though we'll use a better way)
+    const contentWidth = content?.offsetWidth ?? 0;
+    if (contentWidth <= 0) return;
+
     const tl = gsap.timeline({
       repeat: -1,
-      defaults: { ease: "none" }
+      defaults: { ease: "none" },
     });
 
     tl.to(ticker, {
       x: -contentWidth,
-      duration: 30, // Slower for readability and premium feel
+      duration: 30,
     });
 
     return () => {

@@ -12,38 +12,44 @@ const SERVICES = [
   {
     num: "01",
     title: "Digital Branding",
-    image: "/images/services/branding.png",
+    image:
+      "https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&q=80&w=1200",
     desc: "Identity systems engineered for authority across modern channels.",
   },
   {
     num: "02",
     title: "Social & Influence",
-    image: "https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&q=80&w=1200",
+    image:
+      "https://images.unsplash.com/photo-1611162617474-5b21e879e113?auto=format&fit=crop&q=80&w=1200",
     desc: "Campaign narratives designed for reach, retention, and action.",
   },
   {
     num: "03",
     title: "Motion & 3D Video",
-    image: "/images/services/motion_3d.png",
+    image:
+      "https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?auto=format&fit=crop&q=80&w=1200",
     desc: "Cinematic motion language built to stop the scroll.",
   },
   {
     num: "04",
     title: "AI & Web Builds",
-    image: "/images/services/ai_web.png",
+    image:
+      "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=1200",
     desc: "Modern builds, AI-accelerated workflows, premium performance.",
     link: "https://winpro-ai-site.vercel.app",
   },
   {
     num: "05",
     title: "Performance & Ads",
-    image: "/images/services/performance.png",
+    image:
+      "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=1200",
     desc: "Data-first growth strategies with creative that converts.",
   },
   {
     num: "06",
     title: "UX/UI & WebGL",
-    image: "/images/services/ux_ui.png",
+    image:
+      "https://images.unsplash.com/photo-1551650975-87deedd944c3?auto=format&fit=crop&q=80&w=1200",
     desc: "Immersive digital architecture built for 2026 experiences.",
   },
 ];

@@ -5,66 +5,70 @@ import gsap from "gsap";
 
 export default function CustomCursor() {
   const cursorRef = useRef<HTMLDivElement>(null);
-  const glowRef = useRef<HTMLDivElement>(null);
+  const ringRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches) return;
 
     const cursor = cursorRef.current;
-    const glow = glowRef.current;
-    if (!cursor || !glow) return;
+    const ring = ringRef.current;
+    if (!cursor || !ring) return;
 
-    const mouse = { x: -100, y: -100 };
-    gsap.set([cursor, glow], { xPercent: -50, yPercent: -50, opacity: 0 });
+    gsap.set([cursor, ring], { x: 0, y: 0, xPercent: -50, yPercent: -50, opacity: 0 });
 
-    const moveCursor = (e: MouseEvent) => {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
-
-      gsap.to(cursor, { x: mouse.x, y: mouse.y, duration: 0.12, opacity: 1, ease: "power2.out" });
-      gsap.to(glow, { x: mouse.x, y: mouse.y, duration: 0.9, opacity: 0.55, ease: "power3.out" });
-    };
-
-    const onHoverEnter = () => {
-      gsap.to(cursor, { scale: 12, mixBlendMode: "difference", backgroundColor: "white", duration: 0.45, ease: "power3.out" });
-      gsap.to(glow, { scale: 0, opacity: 0, duration: 0.25, ease: "power2.out" });
-    };
-
-    const onHoverLeave = () => {
-      gsap.to(cursor, { scale: 1, mixBlendMode: "normal", backgroundColor: "#00BFFF", duration: 0.45, ease: "power3.out" });
-      gsap.to(glow, { scale: 1, opacity: 0.55, duration: 0.45, ease: "power3.out" });
-    };
-
-    window.addEventListener("mousemove", moveCursor);
-
-    // Bind hover handlers to interactive elements, including dynamically added ones.
-    const timer = window.setInterval(() => {
-      const interactive = document.querySelectorAll("a, button, [role='button'], .cursor-hover");
-      interactive.forEach((el) => {
-        const anyEl = el as any;
-        if (anyEl._cursor_bound) return;
-        el.addEventListener("mouseenter", onHoverEnter);
-        el.addEventListener("mouseleave", onHoverLeave);
-        anyEl._cursor_bound = true;
+    const move = (e: MouseEvent) => {
+      gsap.to(cursor, {
+        x: e.clientX,
+        y: e.clientY,
+        xPercent: -50,
+        yPercent: -50,
+        duration: 0.08,
+        opacity: 1,
+        ease: "power2.out",
       });
-    }, 900);
+      gsap.to(ring, {
+        x: e.clientX,
+        y: e.clientY,
+        xPercent: -50,
+        yPercent: -50,
+        duration: 0.35,
+        opacity: 0.85,
+        ease: "power3.out",
+      });
+    };
+
+    const onEnter = () => {
+      gsap.to(cursor, { scale: 0.5, opacity: 0.5, duration: 0.2 });
+      gsap.to(ring, { scale: 1.2, borderColor: "rgba(0,191,255,0.85)", duration: 0.25 });
+    };
+
+    const onLeave = () => {
+      gsap.to(cursor, { scale: 1, opacity: 1, duration: 0.2 });
+      gsap.to(ring, { scale: 1, borderColor: "rgba(0,191,255,0.35)", duration: 0.25 });
+    };
+
+    window.addEventListener("mousemove", move);
+
+    const timer = window.setInterval(() => {
+      document.querySelectorAll("a, button, [role='button'], .cursor-hover").forEach((el) => {
+        const anyEl = el as HTMLElement & { _c?: boolean };
+        if (anyEl._c) return;
+        anyEl._c = true;
+        el.addEventListener("mouseenter", onEnter);
+        el.addEventListener("mouseleave", onLeave);
+      });
+    }, 700);
 
     return () => {
-      window.removeEventListener("mousemove", moveCursor);
+      window.removeEventListener("mousemove", move);
       window.clearInterval(timer);
     };
   }, []);
 
   return (
-    <div className="hidden lg:block pointer-events-none z-[9999] fixed inset-0 overflow-hidden">
-      <div
-        ref={cursorRef}
-        className="w-[10px] h-[10px] bg-accent rounded-full absolute pointer-events-none"
-      />
-      <div
-        ref={glowRef}
-        className="w-[160px] h-[160px] bg-accent/30 blur-[90px] rounded-full absolute pointer-events-none"
-      />
+    <div className="pointer-events-none fixed inset-0 z-[9999] hidden overflow-hidden lg:block">
+      <div ref={ringRef} className="absolute h-9 w-9 rounded-full border border-accent/35 bg-transparent" />
+      <div ref={cursorRef} className="absolute h-1.5 w-1.5 rounded-full bg-accent" />
     </div>
   );
 }

@@ -5,10 +5,11 @@ import AwardsStats from "@/components/AwardsStats";
 import ServiceCards from "@/components/ServiceCards";
 import AboutTeaser from "@/components/AboutTeaser";
 import ContactFooter from "@/components/ContactFooter";
+import PageMain from "@/components/PageMain";
 
 export default function Home() {
   return (
-    <main className="bg-background text-foreground">
+    <PageMain variant="home">
       <Hero />
       <RecognitionBar />
       <WorkCarousel />
@@ -16,7 +17,6 @@ export default function Home() {
       <ServiceCards />
       <AboutTeaser />
       <ContactFooter />
-    </main>
+    </PageMain>
   );
 }
-
