@@ -34,31 +34,54 @@ export default function ContactFooter() {
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
-    const ctx = gsap.context(() => {
+    const scroller = document.documentElement;
 
-      gsap.fromTo(".cf-kicker",
+    const ctx = gsap.context(() => {
+      gsap.fromTo(
+        ".cf-kicker",
         { y: 20, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.8, ease: "expo.out", clearProps: "transform,opacity",
-          scrollTrigger: { trigger: ".cf-kicker", start: "top 90%", once: true } }
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.8,
+          ease: "expo.out",
+          clearProps: "transform,opacity",
+          scrollTrigger: { trigger: ".cf-kicker", scroller, start: "top 90%", once: true },
+        },
       );
 
-      // Title lines — each line individually triggered
       const titleLines = gsap.utils.toArray<HTMLElement>(".cf-title-line");
       titleLines.forEach((el, i) => {
-        gsap.fromTo(el,
+        gsap.fromTo(
+          el,
           { yPercent: 110, opacity: 0 },
-          { yPercent: 0, opacity: 1, duration: 1, ease: "expo.out", delay: i * 0.08, clearProps: "transform,opacity",
-            scrollTrigger: { trigger: el, start: "top 92%", once: true } }
+          {
+            yPercent: 0,
+            opacity: 1,
+            duration: 1,
+            ease: "expo.out",
+            delay: i * 0.08,
+            clearProps: "transform,opacity",
+            scrollTrigger: { trigger: el, scroller, start: "top 92%", once: true },
+          },
         );
       });
 
-      gsap.fromTo(".cf-contact-block",
+      gsap.fromTo(
+        ".cf-contact-block",
         { y: 36, opacity: 0 },
-        { y: 0, opacity: 1, duration: 0.9, ease: "expo.out", clearProps: "transform,opacity",
-          scrollTrigger: { trigger: ".cf-contact-block", start: "top 88%", once: true } }
+        {
+          y: 0,
+          opacity: 1,
+          duration: 0.9,
+          ease: "expo.out",
+          clearProps: "transform,opacity",
+          scrollTrigger: { trigger: ".cf-contact-block", scroller, start: "top 88%", once: true },
+        },
       );
 
-      gsap.fromTo(".cf-form-shell",
+      gsap.fromTo(
+        ".cf-form-shell",
         { y: 40, opacity: 0 },
         {
           y: 0,
@@ -68,18 +91,27 @@ export default function ContactFooter() {
           clearProps: "transform,opacity",
           scrollTrigger: {
             trigger: ".cf-form-shell",
+            scroller,
             start: "top 88%",
             once: true,
           },
-        }
+        },
       );
 
       const reveals = gsap.utils.toArray<HTMLElement>(".cf-reveal");
       reveals.forEach((el, i) => {
-        gsap.fromTo(el,
+        gsap.fromTo(
+          el,
           { y: 60, opacity: 0 },
-          { y: 0, opacity: 1, duration: 1, ease: "expo.out", delay: i * 0.07, clearProps: "transform,opacity",
-            scrollTrigger: { trigger: el, start: "top 90%", once: true } }
+          {
+            y: 0,
+            opacity: 1,
+            duration: 1,
+            ease: "expo.out",
+            delay: i * 0.07,
+            clearProps: "transform,opacity",
+            scrollTrigger: { trigger: el, scroller, start: "top 90%", once: true },
+          },
         );
       });
     }, footerRef);

@@ -6,7 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SplitType from "split-type";
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
-import { useInView } from "react-intersection-observer";
+import { scheduleScrollTriggerRefresh } from "@/lib/motion";
 
 const SERVICES = [
   {
@@ -54,33 +54,21 @@ const SERVICES = [
   },
 ];
 
-// Single service row — uses Intersection Observer for bulletproof reveal
 function ServiceRow({
   service,
-  index,
   onHover,
   onLeave,
-  isActive,
 }: {
   service: (typeof SERVICES)[0];
-  index: number;
   onHover: () => void;
   onLeave: () => void;
   isActive: boolean;
 }) {
-  const { ref, inView } = useInView({ threshold: 0.15, triggerOnce: true });
-
   return (
     <div
-      ref={ref}
       onMouseEnter={onHover}
       onMouseLeave={onLeave}
-      className="group relative border-b border-white/[0.06] py-10 md:py-14"
-      style={{
-        opacity: inView ? 1 : 0,
-        transform: inView ? "translateY(0)" : "translateY(48px)",
-        transition: `opacity 0.9s cubic-bezier(0.16,1,0.3,1) ${index * 80}ms, transform 0.9s cubic-bezier(0.16,1,0.3,1) ${index * 80}ms`,
-      }}
+      className="sc-service-row group relative border-b border-white/[0.06] py-10 md:py-14"
     >
       {/* Hover background */}
       <div className="absolute inset-0 bg-gradient-to-r from-accent/[0.04] to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
@@ -116,38 +104,94 @@ function ServiceRow({
 export default function ServiceCards() {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const followerRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const kickerRef = useRef<HTMLParagraphElement>(null);
   const subRef = useRef<HTMLParagraphElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
 
-  const { ref: headerRef, inView: headerInView } = useInView({ threshold: 0.2, triggerOnce: true });
-
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
-    if (!headingRef.current || !headerInView) return;
+    const scroller = document.documentElement;
+    if (!headingRef.current) return;
 
     const splits: SplitType[] = [];
     const split = new SplitType(headingRef.current, { types: "chars" });
     splits.push(split);
 
-    if (split.chars) {
-      gsap.fromTo(
-        split.chars,
-        { yPercent: 110, opacity: 0 },
-        {
-          yPercent: 0,
-          opacity: 1,
-          duration: 1,
-          stagger: 0.018,
-          ease: "expo.out",
-          clearProps: "transform,opacity",
-        }
-      );
-    }
+    const ctx = gsap.context(() => {
+      if (split.chars) {
+        gsap.fromTo(
+          split.chars,
+          { yPercent: 115, opacity: 0 },
+          {
+            yPercent: 0,
+            opacity: 1,
+            duration: 0.95,
+            stagger: 0.016,
+            ease: "expo.out",
+            clearProps: "transform,opacity",
+            scrollTrigger: {
+              trigger: headingRef.current,
+              scroller,
+              start: "top 82%",
+              once: true,
+            },
+          },
+        );
+      }
 
-    return () => splits.forEach((s) => s.revert());
-  }, [headerInView]);
+      gsap.from(".sc-header-kicker", {
+        y: 22,
+        opacity: 0,
+        duration: 0.75,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: ".sc-header",
+          scroller,
+          start: "top 88%",
+          once: true,
+        },
+      });
+
+      gsap.from(".sc-header-sub", {
+        y: 26,
+        opacity: 0,
+        duration: 0.85,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: ".sc-header",
+          scroller,
+          start: "top 85%",
+          once: true,
+        },
+      });
+
+      const rows = gsap.utils.toArray<HTMLElement>(".sc-service-row");
+      rows.forEach((row, i) => {
+        gsap.from(row, {
+          y: 52,
+          opacity: 0,
+          duration: 0.88,
+          ease: "power3.out",
+          delay: i * 0.05,
+          scrollTrigger: {
+            trigger: row,
+            scroller,
+            start: "top 91%",
+            once: true,
+          },
+        });
+      });
+    }, sectionRef);
+
+    scheduleScrollTriggerRefresh();
+
+    return () => {
+      splits.forEach((s) => s.revert());
+      ctx.revert();
+    };
+  }, []);
 
   useEffect(() => {
     const moveFollower = (e: MouseEvent) => {
@@ -178,17 +222,12 @@ export default function ServiceCards() {
         {/* Header */}
         <div
           ref={headerRef}
-          className="mb-16 flex flex-col items-start justify-between gap-10 md:flex-row md:items-end"
+          className="sc-header mb-16 flex flex-col items-start justify-between gap-10 md:flex-row md:items-end"
         >
           <div>
             <p
               ref={kickerRef}
-              className="mb-6 text-[10px] font-black uppercase tracking-[0.55em] text-accent"
-              style={{
-                opacity: headerInView ? 1 : 0,
-                transform: headerInView ? "translateY(0)" : "translateY(20px)",
-                transition: "opacity 0.8s cubic-bezier(0.16,1,0.3,1), transform 0.8s cubic-bezier(0.16,1,0.3,1)",
-              }}
+              className="sc-header-kicker mb-6 text-[10px] font-black uppercase tracking-[0.55em] text-accent"
             >
               Core Capabilities
             </p>
@@ -202,12 +241,7 @@ export default function ServiceCards() {
           </div>
           <p
             ref={subRef}
-            className="max-w-[38ch] text-base font-light leading-relaxed text-white/35 md:text-xl"
-            style={{
-              opacity: headerInView ? 1 : 0,
-              transform: headerInView ? "translateY(0)" : "translateY(24px)",
-              transition: "opacity 1s cubic-bezier(0.16,1,0.3,1) 0.15s, transform 1s cubic-bezier(0.16,1,0.3,1) 0.15s",
-            }}
+            className="sc-header-sub max-w-[38ch] text-base font-light leading-relaxed text-white/35 md:text-xl"
           >
             We bridge AI precision with cinematic strategy. Every service is built as a growth layer, not a one-off task.
           </p>
@@ -219,7 +253,6 @@ export default function ServiceCards() {
             <ServiceRow
               key={s.title}
               service={s}
-              index={i}
               onHover={() => setActiveIndex(i)}
               onLeave={() => setActiveIndex(null)}
               isActive={activeIndex === i}

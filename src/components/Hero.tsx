@@ -1,53 +1,17 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { Float, PointMaterial, Points } from "@react-three/drei";
+import { useEffect, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Link from "next/link";
 import { ArrowDown, ArrowRight, Play } from "lucide-react";
-import type { Points as PointsMesh } from "three";
-import { createSpherePoints } from "@/lib/sphere-points";
+import { getScroller, prefersReducedMotion, scheduleScrollTriggerRefresh } from "@/lib/motion";
 
-function ParticleField({ positions }: { positions: Float32Array }) {
-  const ref = useRef<PointsMesh>(null);
-
-  useFrame((_, delta) => {
-    if (!ref.current) return;
-    ref.current.rotation.x -= delta / 18;
-    ref.current.rotation.y -= delta / 24;
-  });
-
-  return (
-    <group rotation={[0, 0, Math.PI / 4]}>
-      <Points ref={ref} positions={positions} stride={3} frustumCulled={false}>
-        <PointMaterial
-          transparent
-          color="#00BFFF"
-          size={0.0042}
-          sizeAttenuation
-          depthWrite={false}
-          opacity={0.72}
-        />
-      </Points>
-    </group>
-  );
-}
-
-function HeroCanvas() {
-  const positions = useMemo(() => createSpherePoints(2200, 1.45), []);
-  return (
-    <Canvas camera={{ position: [0, 0, 1.5], fov: 50 }} dpr={[1, 1.5]}>
-      <Suspense fallback={null}>
-        <color attach="background" args={["#0A0A0A"]} />
-        <Float speed={1.05} rotationIntensity={0.2} floatIntensity={0.45}>
-          <ParticleField positions={positions} />
-        </Float>
-      </Suspense>
-    </Canvas>
-  );
-}
+const HeroScene = dynamic(() => import("@/components/hero/HeroScene"), {
+  ssr: false,
+  loading: () => null,
+});
 
 const FOCUS = [
   { label: "Brand systems", tag: "Strategy" },
@@ -58,86 +22,213 @@ const FOCUS = [
 
 export default function Hero() {
   const introRef = useRef<HTMLElement>(null);
+  const reelRef = useRef<HTMLElement>(null);
   const [expanded, setExpanded] = useState(false);
   const [canvasOn, setCanvasOn] = useState(false);
 
   useEffect(() => {
+    if (prefersReducedMotion()) return;
     setCanvasOn(true);
   }, []);
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
-    const scroller = document.documentElement;
+    const scroller = getScroller();
+    const reduced = prefersReducedMotion();
 
     const ctx = gsap.context(() => {
+      // ── Hero entrance ──
       const tl = gsap.timeline({
-        defaults: { ease: "expo.out" },
-        delay: 0.08,
-      });
-      tl.from(".hero-eyebrow", { opacity: 0, y: 22, duration: 0.75 }, 0)
-        .from(".hero-headline", { opacity: 0, y: 40, duration: 0.95 }, 0.1)
-        .from(".hero-sub", { opacity: 0, y: 26, duration: 0.8 }, 0.22)
-        .from(".hero-pills .hero-pill", { opacity: 0, y: 16, duration: 0.55, stagger: 0.06 }, 0.32)
-        .from(".hero-actions", { opacity: 0, y: 20, duration: 0.7 }, 0.42)
-        .from(".hero-stats", { opacity: 0, y: 14, duration: 0.6 }, 0.5)
-        .from(".hero-side-card", { opacity: 0, y: 36, duration: 0.9 }, 0.18)
-        .from(".hero-side-row", { opacity: 0, x: -12, duration: 0.5, stagger: 0.07 }, 0.45);
-
-      gsap.to(".hero-content-layer", {
-        opacity: 0.28,
-        y: -28,
-        ease: "none",
-        scrollTrigger: {
-          trigger: introRef.current,
-          scroller,
-          start: "top top",
-          end: "bottom top",
-          scrub: 1.1,
-        },
+        defaults: { ease: "power4.out" },
+        delay: reduced ? 0 : 0.06,
       });
 
-      gsap.fromTo(
-        ".hero-scroll-hint",
-        { opacity: 0.35, y: 0 },
-        {
-          opacity: 1,
-          y: 6,
-          duration: 1.6,
-          repeat: -1,
-          yoyo: true,
-          ease: "sine.inOut",
-        },
-      );
+      if (!reduced) {
+        tl.from(".hero-eyebrow", { opacity: 0, y: 20, duration: 0.7 }, 0)
+          .from(
+            ".hero-line-inner",
+            { yPercent: 100, duration: 0.95, stagger: 0.1 },
+            0.08,
+          )
+          .from(".hero-sub", { opacity: 0, y: 28, duration: 0.75 }, 0.35)
+          .from(
+            ".hero-pills .hero-pill",
+            { opacity: 0, y: 18, scale: 0.92, duration: 0.5, stagger: 0.055 },
+            0.42,
+          )
+          .from(".hero-actions", { opacity: 0, y: 22, duration: 0.65 }, 0.5)
+          .from(".hero-stats .hero-stat", { opacity: 0, y: 16, duration: 0.55, stagger: 0.08 }, 0.55)
+          .from(".hero-side-card", { opacity: 0, y: 40, rotateX: 4, duration: 0.85, ease: "expo.out" }, 0.15)
+          .from(".hero-side-row", { opacity: 0, x: -20, duration: 0.45, stagger: 0.08, ease: "power3.out" }, 0.5);
+      } else {
+        tl.set(
+          [
+            ".hero-eyebrow",
+            ".hero-line-inner",
+            ".hero-sub",
+            ".hero-pill",
+            ".hero-actions",
+            ".hero-stat",
+            ".hero-side-card",
+            ".hero-side-row",
+          ],
+          { clearProps: "all" },
+        );
+      }
+
+      // Scroll scrub: content + parallax orbs
+      if (!reduced) {
+        gsap.to(".hero-content-layer", {
+          opacity: 0.22,
+          y: -36,
+          ease: "none",
+          scrollTrigger: {
+            trigger: introRef.current,
+            scroller,
+            start: "top top",
+            end: "bottom top",
+            scrub: 1.05,
+          },
+        });
+
+        gsap.to(".hero-parallax-slow", {
+          yPercent: 14,
+          ease: "none",
+          scrollTrigger: {
+            trigger: introRef.current,
+            scroller,
+            start: "top top",
+            end: "bottom top",
+            scrub: 1.4,
+          },
+        });
+
+        gsap.to(".hero-parallax-fast", {
+          yPercent: -10,
+          ease: "none",
+          scrollTrigger: {
+            trigger: introRef.current,
+            scroller,
+            start: "top top",
+            end: "bottom top",
+            scrub: 0.75,
+          },
+        });
+
+        gsap.to(".hero-canvas-wrap", {
+          opacity: 0.15,
+          scale: 1.06,
+          ease: "none",
+          scrollTrigger: {
+            trigger: introRef.current,
+            scroller,
+            start: "top top",
+            end: "bottom top",
+            scrub: 1.2,
+          },
+        });
+      }
+
+      // Scroll hint
+      if (!reduced) {
+        gsap.fromTo(
+          ".hero-scroll-hint .hero-scroll-line",
+          { scaleY: 0.35, opacity: 0.4 },
+          {
+            scaleY: 1,
+            opacity: 1,
+            duration: 1.25,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut",
+          },
+        );
+      }
     }, introRef);
 
-    requestAnimationFrame(() => ScrollTrigger.refresh());
-    const t = window.setTimeout(() => ScrollTrigger.refresh(), 450);
+    const ctxReel = gsap.context(() => {
+      const reduced = prefersReducedMotion();
+      const scroller = getScroller();
+
+      gsap.from(".reel-kicker", {
+        opacity: 0,
+        y: 16,
+        duration: reduced ? 0 : 0.65,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: reelRef.current,
+          scroller,
+          start: "top 88%",
+          once: true,
+        },
+      });
+
+      gsap.from(".reel-title", {
+        opacity: 0,
+        y: 28,
+        duration: reduced ? 0 : 0.8,
+        ease: "expo.out",
+        scrollTrigger: {
+          trigger: reelRef.current,
+          scroller,
+          start: "top 86%",
+          once: true,
+        },
+      });
+
+      gsap.from(".reel-copy", {
+        opacity: 0,
+        y: 18,
+        duration: reduced ? 0 : 0.65,
+        ease: "power3.out",
+        scrollTrigger: {
+          trigger: reelRef.current,
+          scroller,
+          start: "top 84%",
+          once: true,
+        },
+      });
+
+      gsap.from(".reel-video-shell", {
+        opacity: 0,
+        y: 40,
+        duration: reduced ? 0 : 1,
+        ease: "expo.out",
+        scrollTrigger: {
+          trigger: reelRef.current,
+          scroller,
+          start: "top 78%",
+          once: true,
+        },
+      });
+    }, reelRef);
+
+    scheduleScrollTriggerRefresh();
 
     return () => {
-      window.clearTimeout(t);
       ctx.revert();
+      ctxReel.revert();
     };
   }, []);
 
   return (
     <>
       <section
+        id="hero-section"
         ref={introRef}
         className="relative flex min-h-[100svh] flex-col justify-center overflow-hidden bg-background px-4 pt-20 pb-12 md:px-8 md:pt-24 md:pb-16"
       >
-        {/* CSS atmosphere (always sharp; no WebGL dependency) */}
         <div className="pointer-events-none absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_120%_80%_at_50%_-20%,rgba(0,191,255,0.14),transparent_55%)]" />
-          <div className="absolute bottom-0 left-1/2 h-[min(60vh,520px)] w-[min(100%,900px)] -translate-x-1/2 bg-[radial-gradient(ellipse_at_center,rgba(212,175,119,0.07),transparent_65%)] blur-2xl" />
+          <div className="hero-parallax-slow absolute inset-0 bg-[radial-gradient(ellipse_120%_80%_at_50%_-20%,rgba(0,191,255,0.16),transparent_58%)]" />
+          <div className="hero-parallax-fast absolute bottom-0 left-1/2 h-[min(60vh,520px)] w-[min(100%,900px)] -translate-x-1/2 bg-[radial-gradient(ellipse_at_center,rgba(212,175,119,0.09),transparent_68%)] blur-2xl" />
           <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_0%,#0A0A0A_92%)]" />
         </div>
 
-        {/* WebGL particles — client-only, fixed buffer (no NaN) */}
-        <div className="pointer-events-none absolute inset-0 z-[1] opacity-[0.26] md:opacity-[0.32]">
-          {canvasOn ? <HeroCanvas /> : null}
+        <div className="hero-canvas-wrap pointer-events-none absolute inset-0 z-[1] opacity-[0.3] md:opacity-[0.36]">
+          {canvasOn ? <HeroScene heroId="hero-section" /> : null}
         </div>
 
-        <div className="pointer-events-none absolute inset-0 z-[2] bg-[radial-gradient(ellipse_85%_55%_at_50%_35%,transparent_0%,rgba(10,10,10,0.75)_58%,#0A0A0A_100%)]" />
+        <div className="pointer-events-none absolute inset-0 z-[2] bg-[radial-gradient(ellipse_85%_55%_at_50%_35%,transparent_0%,rgba(10,10,10,0.78)_58%,#0A0A0A_100%)]" />
 
         <div className="hero-content-layer _container relative z-10 mx-auto w-full max-w-[1240px]">
           <div className="grid min-h-[min(78vh,720px)] grid-cols-1 items-center gap-12 lg:grid-cols-12 lg:gap-10">
@@ -147,10 +238,16 @@ export default function Hero() {
               </p>
 
               <h1 className="hero-headline font-heading text-[2.1rem] font-black uppercase leading-[1.02] tracking-tight text-white sm:text-5xl md:text-6xl lg:text-[3.35rem] lg:leading-[1.05]">
-                Creative digital
-                <span className="block text-white/35">that actually </span>
-                <span className="bg-gradient-to-r from-white via-white to-accent bg-clip-text text-transparent">
-                  performs
+                <span className="hero-line block overflow-hidden pb-[0.06em]">
+                  <span className="hero-line-inner block">Creative digital</span>
+                </span>
+                <span className="hero-line block overflow-hidden pb-[0.06em]">
+                  <span className="hero-line-inner block text-white/35">that actually</span>
+                </span>
+                <span className="hero-line block overflow-hidden pb-[0.06em]">
+                  <span className="hero-line-inner block bg-gradient-to-r from-white via-white to-accent bg-clip-text text-transparent">
+                    performs
+                  </span>
                 </span>
               </h1>
 
@@ -193,22 +290,22 @@ export default function Hero() {
               </div>
 
               <dl className="hero-stats mt-10 flex flex-wrap gap-x-10 gap-y-3 border-t border-white/[0.07] pt-8 text-[10px] font-black uppercase tracking-[0.3em] text-white/25">
-                <div>
+                <div className="hero-stat">
                   <dt className="text-white/15">Awards</dt>
                   <dd className="mt-1 text-white/70">12+</dd>
                 </div>
-                <div>
+                <div className="hero-stat">
                   <dt className="text-white/15">Retention</dt>
                   <dd className="mt-1 text-accent/90">95%</dd>
                 </div>
-                <div>
+                <div className="hero-stat">
                   <dt className="text-white/15">Campaigns</dt>
                   <dd className="mt-1 text-white/70">200+</dd>
                 </div>
               </dl>
             </div>
 
-            <aside className="hero-side-card lg:col-span-5">
+            <aside className="hero-side-card lg:col-span-5" style={{ perspective: "1200px" }}>
               <div className="relative overflow-hidden rounded-3xl border border-white/[0.1] bg-gradient-to-br from-white/[0.06] to-transparent p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.04)] backdrop-blur-md md:p-8">
                 <div className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-accent/15 blur-3xl" />
                 <p className="mb-6 text-[9px] font-black uppercase tracking-[0.45em] text-accent">Focus areas</p>
@@ -240,25 +337,28 @@ export default function Hero() {
         <div className="hero-scroll-hint pointer-events-none absolute bottom-6 left-1/2 z-10 hidden -translate-x-1/2 md:block">
           <div className="flex flex-col items-center gap-2 text-[9px] font-black uppercase tracking-[0.4em] text-white/30">
             <span>Scroll</span>
-            <div className="h-10 w-px bg-gradient-to-b from-accent/50 to-transparent" />
+            <div className="hero-scroll-line h-10 w-px origin-top bg-gradient-to-b from-accent/60 to-transparent" />
           </div>
         </div>
       </section>
 
-      <section className="hero-reel-block relative border-t border-white/5 bg-background px-4 py-14 md:px-[5vw] md:py-20">
+      <section
+        ref={reelRef}
+        className="hero-reel-block relative border-t border-white/5 bg-background px-4 py-14 md:px-[5vw] md:py-20"
+      >
         <div className="_container mx-auto mb-8 flex flex-col gap-3 text-center md:flex-row md:items-end md:justify-between md:text-left">
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.45em] text-accent">Showreel</p>
-            <h2 className="mt-2 text-2xl font-black uppercase tracking-tight text-white md:text-3xl">
+            <p className="reel-kicker text-[10px] font-black uppercase tracking-[0.45em] text-accent">Showreel</p>
+            <h2 className="reel-title mt-2 text-2xl font-black uppercase tracking-tight text-white md:text-3xl">
               Motion <span className="text-white/25 italic">&amp;</span> craft
             </h2>
           </div>
-          <p className="max-w-md text-sm text-white/40 md:text-base">
+          <p className="reel-copy max-w-md text-sm text-white/40 md:text-base">
             A short reel — hover for colour, tap to expand on desktop.
           </p>
         </div>
 
-        <div className="group relative mx-auto max-w-6xl overflow-hidden rounded-2xl border border-white/[0.08] bg-black/50 md:rounded-3xl">
+        <div className="reel-video-shell group relative mx-auto max-w-6xl overflow-hidden rounded-2xl border border-white/[0.08] bg-black/50 md:rounded-3xl">
           <div className="pointer-events-none absolute inset-0 z-10 grid grid-cols-4 grid-rows-2 opacity-30">
             {Array.from({ length: 8 }).map((_, i) => (
               <div key={i} className="border-[0.5px] border-white/[0.06]" />
