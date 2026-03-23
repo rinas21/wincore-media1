@@ -2,9 +2,15 @@
 
 import { useEffect, useRef } from "react";
 import Image from "next/image";
+import dynamic from "next/dynamic";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SplitType from "split-type";
+
+const AboutScene = dynamic(() => import("@/components/about/AboutScene"), {
+  ssr: false,
+  loading: () => null,
+});
 
 const team = [
   {
@@ -129,6 +135,38 @@ export default function AboutTeaser() {
       // ── Gallery subtle parallax ──
       gsap.to("[data-about-shift]", {
         yPercent: -8,
+        scale: 1.03,
+        ease: "none",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          scroller,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: true,
+        },
+      });
+
+      // ── Watermark drift (cinematic depth) ──
+      gsap.to("[data-watermark]", {
+        yPercent: 8,
+        xPercent: 6,
+        opacity: 0.55,
+        filter: "blur(0.5px)",
+        ease: "none",
+        scrollTrigger: {
+          trigger: sectionRef.current,
+          scroller,
+          start: "top top",
+          end: "bottom top",
+          scrub: true,
+        },
+      });
+
+      // ── Ambient glow pulse with scroll ──
+      gsap.to(".abt-scene-glow", {
+        scale: 1.18,
+        opacity: 0.95,
+        yPercent: -5,
         ease: "none",
         scrollTrigger: {
           trigger: sectionRef.current,
@@ -154,13 +192,16 @@ export default function AboutTeaser() {
       className="relative overflow-hidden border-t border-white/5 bg-background pb-[18vw] pt-[15vw]"
       aria-label="About"
     >
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute left-[-10rem] top-24 h-72 w-72 rounded-full bg-accent/10 blur-3xl" />
+      <div className="pointer-events-none absolute inset-0 z-0">
+        <div className="absolute inset-0">
+          <AboutScene aboutId="about" />
+        </div>
+        <div className="abt-scene-glow absolute left-[-10rem] top-24 h-72 w-72 rounded-full bg-accent/10 blur-3xl opacity-80" />
       </div>
 
       <div
         data-watermark
-        className="pointer-events-none absolute left-[-8vw] top-1/2 -translate-y-1/2 select-none whitespace-nowrap text-[36vw] font-black uppercase italic text-white/[0.02]"
+        className="pointer-events-none absolute left-[-8vw] top-1/2 -translate-y-1/2 select-none whitespace-nowrap text-[36vw] font-black uppercase italic text-white/[0.02] z-[1]"
       >
         Studio
       </div>

@@ -6,6 +6,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Image from "next/image";
 import ProjectModal, { type Project } from "@/components/ProjectModal";
 import { ArrowRight } from "lucide-react";
+import { prefersReducedMotion } from "@/lib/motion";
 
 const PROJECTS: Project[] = [
   {
@@ -13,7 +14,7 @@ const PROJECTS: Project[] = [
     title: "Brand Campaign for a local bank",
     category: "Branding / Strategy",
     image:
-      "https://images.unsplash.com/photo-1601597111158-2fcee29ac902?auto=format&fit=crop&q=80&w=1600",
+      "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=1600",
     tags: ["Strategy", "Visual Identity", "UX"],
   },
   {
@@ -68,8 +69,8 @@ export default function WorkCarousel() {
         start: "top top",
         end: () => "+=" + String(scrollDistance()),
         pin: true,
-        scrub: 1,
-        anticipatePin: 1,
+        scrub: 1.3,
+        anticipatePin: 0.7,
         invalidateOnRefresh: true,
         onUpdate(self) {
           if (progressRef.current) {
@@ -102,24 +103,26 @@ export default function WorkCarousel() {
       if (!media) return;
 
       gsap.set(card, { transformPerspective: 1000 });
-      const toRX = gsap.quickTo(card, "rotationX", { duration: 0.4, ease: "power3.out" });
-      const toRY = gsap.quickTo(card, "rotationY", { duration: 0.4, ease: "power3.out" });
-      const toMX = gsap.quickTo(media, "x", { duration: 0.6, ease: "power3.out" });
-      const toMY = gsap.quickTo(media, "y", { duration: 0.6, ease: "power3.out" });
-      const toMS = gsap.quickTo(media, "scale", { duration: 0.8, ease: "power3.out" });
+      const reduced = prefersReducedMotion();
+      const toRX = gsap.quickTo(card, "rotationX", { duration: reduced ? 0 : 0.5, ease: "power3.out" });
+      const toRY = gsap.quickTo(card, "rotationY", { duration: reduced ? 0 : 0.5, ease: "power3.out" });
+      const toMX = gsap.quickTo(media, "x", { duration: reduced ? 0 : 0.65, ease: "power3.out" });
+      const toMY = gsap.quickTo(media, "y", { duration: reduced ? 0 : 0.65, ease: "power3.out" });
+      const toMS = gsap.quickTo(media, "scale", { duration: reduced ? 0 : 0.8, ease: "power3.out" });
 
       const onMove = (e: MouseEvent) => {
+        if (reduced) return;
         const r = card.getBoundingClientRect();
         const px = (e.clientX - r.left) / r.width;
         const py = (e.clientY - r.top) / r.height;
-        toRX((py - 0.5) * -6);
-        toRY((px - 0.5) * 7);
-        toMX((px - 0.5) * 12);
-        toMY((py - 0.5) * 10);
-        toMS(1.04);
+        toRX((py - 0.5) * -4);
+        toRY((px - 0.5) * 5);
+        toMX((px - 0.5) * 8);
+        toMY((py - 0.5) * 7);
+        toMS(1.02);
         if (shine) {
           shine.style.opacity = "1";
-          shine.style.background = `radial-gradient(400px circle at ${px * 100}% ${py * 100}%, rgba(0,191,255,0.14), transparent 50%)`;
+          shine.style.background = `radial-gradient(320px circle at ${px * 100}% ${py * 100}%, rgba(0,191,255,0.11), transparent 55%)`;
         }
       };
       const onLeave = () => {

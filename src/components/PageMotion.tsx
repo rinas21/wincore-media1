@@ -15,6 +15,7 @@ export default function PageMotion({ children }: PageMotionProps) {
     if (!rootRef.current) return;
 
     gsap.registerPlugin(ScrollTrigger);
+    const scroller = document.documentElement;
 
     const ctx = gsap.context(() => {
       const sections = gsap.utils.toArray<HTMLElement>("[data-page-motion]");
@@ -38,6 +39,7 @@ export default function PageMotion({ children }: PageMotionProps) {
             trigger: section,
             start: index === 0 ? "top 95%" : "top 88%",
             once: true,
+            scroller,
           },
         });
 
@@ -50,6 +52,7 @@ export default function PageMotion({ children }: PageMotionProps) {
             start: "top bottom",
             end: "bottom top",
             scrub: true,
+            scroller,
           },
         });
       });

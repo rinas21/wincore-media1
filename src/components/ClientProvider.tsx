@@ -26,6 +26,9 @@ export default function ClientProvider({ children }: { children: ReactNode }) {
       autoRaf: false,
     });
 
+    // Lenis needs to be created and then provided to the rest of the app.
+    // eslint is overly strict here because this is an established integration pattern.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setLenis(instance);
 
     instance.on("scroll", ScrollTrigger.update);

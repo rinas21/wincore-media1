@@ -10,26 +10,39 @@ import { createSpherePoints } from "@/lib/sphere-points";
 function CameraParallax({ heroId }: { heroId: string }) {
   const { camera } = useThree();
   const target = useRef({ x: 0, y: 0 });
+  const smooth = useRef({ x: 0, y: 0 });
 
   useEffect(() => {
     const hero = () => document.getElementById(heroId);
-    const onMove = (e: MouseEvent) => {
+    const onMove = (e: PointerEvent) => {
       const el = hero();
       if (!el) return;
       const r = el.getBoundingClientRect();
-      if (e.clientY < r.top || e.clientY > r.bottom) return;
+
+      const isOutside =
+        e.clientY < r.top || e.clientY > r.bottom || e.clientX < r.left || e.clientX > r.right;
+      if (isOutside) {
+        target.current.x = 0;
+        target.current.y = 0;
+        return;
+      }
       target.current.x = ((e.clientX - r.left) / Math.max(r.width, 1)) * 2 - 1;
       target.current.y = -((e.clientY - r.top) / Math.max(r.height, 1)) * 2 + 1;
     };
-    window.addEventListener("mousemove", onMove, { passive: true });
-    return () => window.removeEventListener("mousemove", onMove);
+    window.addEventListener("pointermove", onMove, { passive: true });
+    return () => window.removeEventListener("pointermove", onMove);
   }, [heroId]);
 
   useFrame(() => {
-    const tx = target.current.x * 0.16;
-    const ty = target.current.y * 0.11;
-    camera.position.x += (tx - camera.position.x) * 0.06;
-    camera.position.y += (ty - camera.position.y) * 0.06;
+    // Damped pointer motion to avoid jittery camera changes.
+    smooth.current.x += (target.current.x - smooth.current.x) * 0.06;
+    smooth.current.y += (target.current.y - smooth.current.y) * 0.06;
+
+    const tx = smooth.current.x * 0.06;
+    const ty = smooth.current.y * 0.045;
+    // eslint-disable-next-line react-hooks/immutability
+    camera.position.x += (tx - camera.position.x) * 0.05;
+    camera.position.y += (ty - camera.position.y) * 0.05;
     camera.lookAt(0, 0, 0);
   });
 
@@ -42,7 +55,7 @@ function ParticleLayer({
   size,
   speed,
   opacity = 0.62,
-  additive = true,
+  additive = false,
 }: {
   positions: Float32Array;
   color: string;
@@ -68,6 +81,7 @@ function ParticleLayer({
           size={size}
           sizeAttenuation
           depthWrite={false}
+          alphaTest={0.03}
           opacity={opacity}
           blending={additive ? THREE.AdditiveBlending : THREE.NormalBlending}
         />
@@ -77,13 +91,13 @@ function ParticleLayer({
 }
 
 export default function HeroScene({ heroId }: { heroId: string }) {
-  const outer = useMemo(() => createSpherePoints(2000, 1.45), []);
-  const inner = useMemo(() => createSpherePoints(900, 0.72), []);
+  const outer = useMemo(() => createSpherePoints(1600, 1.3), []);
+  const inner = useMemo(() => createSpherePoints(780, 0.72), []);
 
   return (
     <Canvas
-      camera={{ position: [0, 0, 1.55], fov: 48 }}
-      dpr={[1, 1.75]}
+      camera={{ position: [0, 0, 1.6], fov: 42 }}
+      dpr={[1, 1.2]}
       gl={{ alpha: false, antialias: true, powerPreference: "high-performance" }}
     >
       <Suspense fallback={null}>
@@ -92,15 +106,16 @@ export default function HeroScene({ heroId }: { heroId: string }) {
         <ParticleLayer
           positions={outer}
           color="#00BFFF"
-          size={0.004}
-          speed={{ x: 1 / 17, y: 1 / 22 }}
+          size={0.0028}
+          speed={{ x: 1 / 45, y: 1 / 60 }}
+          opacity={0.28}
         />
         <ParticleLayer
           positions={inner}
           color="#D4AF77"
-          size={0.0026}
-          speed={{ x: -1 / 14, y: 1 / 18 }}
-          opacity={0.45}
+          size={0.0022}
+          speed={{ x: -1 / 40, y: 1 / 50 }}
+          opacity={0.2}
           additive={false}
         />
       </Suspense>

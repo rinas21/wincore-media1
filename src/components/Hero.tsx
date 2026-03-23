@@ -6,7 +6,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Link from "next/link";
 import { ArrowDown, ArrowRight, Play } from "lucide-react";
-import { getScroller, prefersReducedMotion, scheduleScrollTriggerRefresh } from "@/lib/motion";
+import { getScroller, scheduleScrollTriggerRefresh } from "@/lib/motion";
 
 const HeroScene = dynamic(() => import("@/components/hero/HeroScene"), {
   ssr: false,
@@ -24,17 +24,14 @@ export default function Hero() {
   const introRef = useRef<HTMLElement>(null);
   const reelRef = useRef<HTMLElement>(null);
   const [expanded, setExpanded] = useState(false);
-  const [canvasOn, setCanvasOn] = useState(false);
-
-  useEffect(() => {
-    if (prefersReducedMotion()) return;
-    setCanvasOn(true);
-  }, []);
+  const canvasOn = true;
 
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
     const scroller = getScroller();
-    const reduced = prefersReducedMotion();
+    // Hero must always animate for the intended cinematic look.
+    const reduced = false;
+    const dur = (seconds: number) => (reduced ? seconds * 0.45 : seconds);
 
     const ctx = gsap.context(() => {
       // ── Hero entrance ──
@@ -43,68 +40,27 @@ export default function Hero() {
         delay: reduced ? 0 : 0.06,
       });
 
-      if (!reduced) {
-        tl.from(".hero-eyebrow", { opacity: 0, y: 20, duration: 0.7 }, 0)
-          .from(
-            ".hero-line-inner",
-            { yPercent: 100, duration: 0.95, stagger: 0.1 },
-            0.08,
-          )
-          .from(".hero-sub", { opacity: 0, y: 28, duration: 0.75 }, 0.35)
-          .from(
-            ".hero-pills .hero-pill",
-            { opacity: 0, y: 18, scale: 0.92, duration: 0.5, stagger: 0.055 },
-            0.42,
-          )
-          .from(".hero-actions", { opacity: 0, y: 22, duration: 0.65 }, 0.5)
-          .from(".hero-stats .hero-stat", { opacity: 0, y: 16, duration: 0.55, stagger: 0.08 }, 0.55)
-          .from(".hero-side-card", { opacity: 0, y: 40, rotateX: 4, duration: 0.85, ease: "expo.out" }, 0.15)
-          .from(".hero-side-row", { opacity: 0, x: -20, duration: 0.45, stagger: 0.08, ease: "power3.out" }, 0.5);
-      } else {
-        tl.set(
-          [
-            ".hero-eyebrow",
-            ".hero-line-inner",
-            ".hero-sub",
-            ".hero-pill",
-            ".hero-actions",
-            ".hero-stat",
-            ".hero-side-card",
-            ".hero-side-row",
-          ],
-          { clearProps: "all" },
-        );
-      }
+      // Entrance should always animate so the hero doesn't render "clumped"
+      // if reduced-motion is enabled at the OS level.
+      tl.from(".hero-eyebrow", { opacity: 0, y: 20, duration: dur(0.7) }, 0)
+        .from(".hero-line-inner", { yPercent: 100, duration: dur(0.95), stagger: 0.1 }, 0.08)
+        .from(".hero-sub", { opacity: 0, y: 28, duration: dur(0.75) }, 0.35)
+        .from(
+          ".hero-pills .hero-pill",
+          { opacity: 0, y: 18, scale: 0.92, duration: dur(0.5), stagger: 0.055 },
+          0.42,
+        )
+        .from(".hero-actions", { opacity: 0, y: 22, duration: dur(0.65) }, 0.5)
+        .from(".hero-stats .hero-stat", { opacity: 0, y: 16, duration: dur(0.55), stagger: 0.08 }, 0.55)
+        .from(".hero-side-card", { opacity: 0, y: 18, scale: 0.985, duration: dur(0.5), ease: "power3.out" }, 0.15)
+        .from(".hero-side-row", { opacity: 0, y: 10, duration: dur(0.3), stagger: 0.05, ease: "power3.out" }, 0.45)
+        .from(".hero-side-cta", { opacity: 0, y: 8, duration: dur(0.3), ease: "power3.out" }, 0.35);
 
       // Scroll scrub: content + parallax orbs
       if (!reduced) {
         gsap.to(".hero-content-layer", {
-          opacity: 0.22,
-          y: -36,
-          ease: "none",
-          scrollTrigger: {
-            trigger: introRef.current,
-            scroller,
-            start: "top top",
-            end: "bottom top",
-            scrub: 1.05,
-          },
-        });
-
-        gsap.to(".hero-parallax-slow", {
-          yPercent: 14,
-          ease: "none",
-          scrollTrigger: {
-            trigger: introRef.current,
-            scroller,
-            start: "top top",
-            end: "bottom top",
-            scrub: 1.4,
-          },
-        });
-
-        gsap.to(".hero-parallax-fast", {
-          yPercent: -10,
+          opacity: 0.24,
+          y: -8,
           ease: "none",
           scrollTrigger: {
             trigger: introRef.current,
@@ -115,17 +71,42 @@ export default function Hero() {
           },
         });
 
-        gsap.to(".hero-canvas-wrap", {
-          opacity: 0.15,
-          scale: 1.06,
+        gsap.to(".hero-parallax-slow", {
+          yPercent: 3,
           ease: "none",
           scrollTrigger: {
             trigger: introRef.current,
             scroller,
             start: "top top",
             end: "bottom top",
-            scrub: 1.2,
+            scrub: 1.8,
           },
+        });
+
+        gsap.to(".hero-parallax-fast", {
+          yPercent: -2,
+          ease: "none",
+          scrollTrigger: {
+            trigger: introRef.current,
+            scroller,
+            start: "top top",
+            end: "bottom top",
+            scrub: 1.1,
+          },
+        });
+
+        gsap.to(".hero-canvas-wrap", {
+          opacity: 0.2,
+          scale: 1.005,
+          ease: "none",
+          scrollTrigger: {
+            trigger: introRef.current,
+            scroller,
+            start: "top top",
+            end: "bottom top",
+            scrub: 0.75,
+          },
+          immediateRender: false,
         });
       }
 
@@ -143,11 +124,61 @@ export default function Hero() {
             ease: "sine.inOut",
           },
         );
+
+        // Ambient motion layer for the hero content block.
+        // Keeps the section feeling "alive" after the entrance timeline finishes.
+        // Animate only the decorative glow (not the text box)
+        // to avoid clipping inside the hero's `overflow-hidden`.
+        gsap.fromTo(
+          ".hero-why-glow",
+          { y: 0, scale: 1, opacity: 1 },
+          {
+            y: -10,
+            scale: 1.08,
+            opacity: 0.9,
+            duration: 4.6,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut",
+          },
+        );
+
+        gsap.to(".hero-pills .hero-pill", {
+          y: (_i, el) => (el.classList.contains("hero-pill-even") ? -3 : 3),
+          duration: 2.3,
+          repeat: -1,
+          yoyo: true,
+          ease: "sine.inOut",
+          stagger: 0.08,
+        });
+
+        gsap.fromTo(
+          ".hero-performs",
+          {
+            backgroundPositionX: "0%",
+          },
+          {
+            backgroundPositionX: "100%",
+            duration: 4.2,
+            repeat: -1,
+            yoyo: true,
+            ease: "sine.inOut",
+          },
+        );
+
+        gsap.to(".hero-stats .hero-stat", {
+          y: (_i, el) => (el.classList.contains("hero-stat-even") ? 2 : -2),
+          duration: 2.6,
+          repeat: -1,
+          yoyo: true,
+          ease: "sine.inOut",
+          stagger: 0.1,
+        });
       }
     }, introRef);
 
     const ctxReel = gsap.context(() => {
-      const reduced = prefersReducedMotion();
+      const reduced = false;
       const scroller = getScroller();
 
       gsap.from(".reel-kicker", {
@@ -245,7 +276,7 @@ export default function Hero() {
                   <span className="hero-line-inner block text-white/35">that actually</span>
                 </span>
                 <span className="hero-line block overflow-hidden pb-[0.06em]">
-                  <span className="hero-line-inner block bg-gradient-to-r from-white via-white to-accent bg-clip-text text-transparent">
+                  <span className="hero-line-inner hero-performs block bg-gradient-to-r from-white via-white to-accent bg-[length:200%_100%] bg-clip-text text-transparent">
                     performs
                   </span>
                 </span>
@@ -257,10 +288,12 @@ export default function Hero() {
               </p>
 
               <div className="hero-pills mt-8 flex flex-wrap gap-2">
-                {["Branding", "Motion", "WebGL", "AI dev", "Performance"].map((p) => (
+                {["Branding", "Motion", "WebGL", "AI dev", "Performance"].map((p, i) => (
                   <span
                     key={p}
-                    className="hero-pill rounded-full border border-white/[0.1] bg-white/[0.04] px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.28em] text-white/45"
+                    className={`hero-pill rounded-full border border-white/[0.1] bg-white/[0.04] px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.28em] text-white/45 ${
+                      i % 2 === 0 ? "hero-pill-even" : ""
+                    }`}
                   >
                     {p}
                   </span>
@@ -290,7 +323,7 @@ export default function Hero() {
               </div>
 
               <dl className="hero-stats mt-10 flex flex-wrap gap-x-10 gap-y-3 border-t border-white/[0.07] pt-8 text-[10px] font-black uppercase tracking-[0.3em] text-white/25">
-                <div className="hero-stat">
+                <div className="hero-stat hero-stat-even">
                   <dt className="text-white/15">Awards</dt>
                   <dd className="mt-1 text-white/70">12+</dd>
                 </div>
@@ -298,17 +331,17 @@ export default function Hero() {
                   <dt className="text-white/15">Retention</dt>
                   <dd className="mt-1 text-accent/90">95%</dd>
                 </div>
-                <div className="hero-stat">
+                <div className="hero-stat hero-stat-even">
                   <dt className="text-white/15">Campaigns</dt>
                   <dd className="mt-1 text-white/70">200+</dd>
                 </div>
               </dl>
             </div>
 
-            <aside className="hero-side-card lg:col-span-5" style={{ perspective: "1200px" }}>
-              <div className="relative overflow-hidden rounded-3xl border border-white/[0.1] bg-gradient-to-br from-white/[0.06] to-transparent p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.04)] backdrop-blur-md md:p-8">
-                <div className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-accent/15 blur-3xl" />
-                <p className="mb-6 text-[9px] font-black uppercase tracking-[0.45em] text-accent">Focus areas</p>
+            <aside className="hero-side-card lg:col-span-5 lg:self-start">
+              <div className="relative overflow-hidden rounded-3xl border border-white/[0.1] bg-gradient-to-br from-white/[0.08] to-black/[0.18] p-6 shadow-[0_0_0_1px_rgba(255,255,255,0.04)] backdrop-blur-md md:p-8">
+                <div className="hero-why-glow pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-accent/15 blur-3xl" />
+                <p className="mb-6 text-[9px] font-black uppercase tracking-[0.45em] text-accent">Why Wincore</p>
                 <ul className="space-y-0">
                   {FOCUS.map((item) => (
                     <li
@@ -322,13 +355,15 @@ export default function Hero() {
                     </li>
                   ))}
                 </ul>
-                <Link
-                  href="/about"
-                  className="mt-6 inline-flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.35em] text-accent transition-opacity hover:opacity-80"
-                >
-                  Why Wincore
-                  <ArrowRight size={14} />
-                </Link>
+                <div className="hero-side-cta mt-6 border-t border-white/[0.08] pt-6">
+                  <Link
+                    href="/about"
+                    className="cursor-hover inline-flex w-full items-center justify-between gap-3 rounded-full border border-white/[0.12] bg-white/[0.04] px-4 py-3 text-[10px] font-black uppercase tracking-[0.28em] text-white/90 transition-colors hover:border-accent/50 hover:bg-accent/15 hover:text-accent"
+                  >
+                    <span>Our approach</span>
+                    <ArrowRight size={16} strokeWidth={2.5} />
+                  </Link>
+                </div>
               </div>
             </aside>
           </div>

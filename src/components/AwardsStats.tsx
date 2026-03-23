@@ -37,7 +37,7 @@ const stats = [
     label: "Years in the Game",
     desc: "A decade of digital authority, craft, and measurable outcomes.",
     accent: "from-accent/[0.05] to-secondary/[0.03]",
-    image: "https://images.unsplash.com/photo-1508919895503-4244ae99f946?auto=format&fit=crop&q=80&w=800",
+    image: "https://images.unsplash.com/photo-1549417229-aa67d3263c09?auto=format&fit=crop&q=80&w=800",
   },
 ];
 
