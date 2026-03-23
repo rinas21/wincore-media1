@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useEffect, useRef } from "react";
 import type { ComponentType } from "react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   ArrowUpRight,
   Bot,
@@ -14,10 +13,7 @@ import {
   Sparkles,
   Video,
 } from "lucide-react";
-
-if (typeof window !== "undefined") {
-  gsap.registerPlugin(ScrollTrigger);
-}
+import { registerGsapPlugins, getScroller, prefersReducedMotion } from "@/lib/motion";
 
 type ServiceItem = {
   title: string;
@@ -90,13 +86,9 @@ export default function ServicesPageContent() {
   const glowRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-
-    const scroller = document.documentElement;
-
-    const reduced =
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    registerGsapPlugins();
+    const scroller = getScroller();
+    const reduced = prefersReducedMotion();
 
     const ctx = gsap.context(() => {
       // --- Hero: entrance on load (does not depend on scroll) ---

@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import Image from "next/image";
 import { X } from "lucide-react";
+import Link from "next/link";
 
 export type Project = {
   id: number;
@@ -26,31 +27,46 @@ export default function ProjectModal({
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!modalRef.current) return;
+    const modalEl = modalRef.current;
+    const contentEl = contentRef.current;
+    if (!modalEl) return;
+
+    const onEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
 
     if (isOpen) {
       document.body.style.overflow = "hidden";
-      gsap.to(modalRef.current, {
+      window.addEventListener("keydown", onEsc);
+      gsap.to(modalEl, {
         opacity: 1,
         pointerEvents: "auto",
         duration: 0.45,
         ease: "power2.out",
       });
       gsap.fromTo(
-        contentRef.current,
+        contentEl,
         { y: 100, opacity: 0, scale: 0.92 },
         { y: 0, opacity: 1, scale: 1, duration: 0.75, ease: "power4.out", delay: 0.1 },
       );
     } else {
       document.body.style.overflow = "";
-      gsap.to(modalRef.current, {
+      window.removeEventListener("keydown", onEsc);
+      gsap.to(modalEl, {
         opacity: 0,
         pointerEvents: "none",
         duration: 0.45,
         ease: "power2.out",
       });
     }
-  }, [isOpen]);
+
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", onEsc);
+      gsap.killTweensOf(modalEl);
+      if (contentEl) gsap.killTweensOf(contentEl);
+    };
+  }, [isOpen, onClose]);
 
   if (!project) return null;
 
@@ -61,8 +77,12 @@ export default function ProjectModal({
       role="dialog"
       aria-modal="true"
       aria-label={`Project: ${project.title}`}
+      onMouseDown={(e) => {
+        if (e.target === modalRef.current) onClose();
+      }}
     >
       <button
+        type="button"
         onClick={onClose}
         className="absolute top-6 right-6 md:top-10 md:right-10 z-[2001] w-12 h-12 rounded-full border border-white/10 flex items-center justify-center hover:bg-white hover:text-black transition-all group"
         aria-label="Close project modal"
@@ -124,12 +144,13 @@ export default function ProjectModal({
               </div>
             </div>
 
-            <a
-              href="#contact"
+            <Link
+              href="/contact"
               className="mt-12 inline-flex items-center justify-center rounded-full bg-accent px-10 py-4 text-[11px] font-black uppercase tracking-[0.35em] text-white hover:scale-[1.02] transition-transform"
+              onClick={onClose}
             >
               Start a project
-            </a>
+            </Link>
           </div>
         </div>
       </div>

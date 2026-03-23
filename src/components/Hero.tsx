@@ -3,18 +3,19 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Link from "next/link";
 import {
   ArrowDown, ArrowRight, Play,
   Trophy, Users, Zap,
   Palette, Box, Globe, Sparkles,
 } from "lucide-react";
-import { getScroller, scheduleScrollTriggerRefresh } from "@/lib/motion";
+import {
+  registerGsapPlugins,
+  getScroller,
+  scheduleScrollTriggerRefresh,
+  prefersReducedMotion,
+} from "@/lib/motion";
 import { useLenis } from "@/context/LenisContext";
-
-// Register once at module level — safe in Next.js
-gsap.registerPlugin(ScrollTrigger);
 
 const HeroScene = dynamic(() => import("@/components/hero/HeroScene"), {
   ssr: false,
@@ -57,6 +58,10 @@ export default function Hero() {
   const [expanded, setExpanded] = useState(false);
   const lenis = useLenis();
 
+  useEffect(() => {
+    registerGsapPlugins();
+  }, []);
+
   // ─────────────────────────────────────────────────────────────────────────
   // STEP 1 — useLayoutEffect: set initial hidden states BEFORE first paint
   //          This prevents the "everything visible at once" flash.
@@ -96,10 +101,38 @@ export default function Hero() {
   // STEP 2 — Entrance timeline (independent of Lenis — fires on mount)
   // ─────────────────────────────────────────────────────────────────────────
   useEffect(() => {
+    const reduced = prefersReducedMotion();
     let cleanupMagnetic: (() => void) | undefined;
     let cleanupCardTilt: (() => void) | undefined;
 
     const ctx = gsap.context(() => {
+      if (reduced) {
+        gsap.set(".hero-line-inner", { yPercent: 0 });
+        gsap.set([
+          ".hero-eyebrow",
+          ".hero-sub",
+          ".hero-kpi-strip",
+          ".hero-kpi-card",
+          ".hero-outcome-chip",
+          ".hero-action-btn",
+          ".hero-side-card",
+          ".hero-why-header",
+          ".hero-why-row",
+          ".hero-side-row",
+          ".hero-side-cta",
+          ".hero-approach-chip",
+          ".hero-approach-title",
+          ".hero-approach-arrow-wrap",
+          ".hero-scroll-hint",
+        ], { autoAlpha: 1, x: 0, y: 0, clearProps: "transform,filter,clipPath" });
+
+        if (!hasCountedRef.current) {
+          hasCountedRef.current = true;
+          startCountUp();
+        }
+        return;
+      }
+
       const tl = gsap.timeline({
         delay: 0.1,
         defaults: { ease: "expo.out" },
@@ -123,6 +156,19 @@ export default function Hero() {
         autoAlpha: 1, y: 0, duration: 0.85,
       }, 0.45);
 
+      // — Three.js layer settles in with subtle cinematic bloom
+      tl.fromTo(".hero-canvas-wrap", {
+        autoAlpha: 0,
+        scale: 1.08,
+        filter: "blur(14px)",
+      }, {
+        autoAlpha: 1,
+        scale: 1,
+        filter: "blur(0px)",
+        duration: 1.25,
+        ease: "power3.out",
+      }, 0.12);
+
       // — KPI strip enters as one clear section
       tl.to(".hero-kpi-strip", {
         autoAlpha: 1,
@@ -132,8 +178,8 @@ export default function Hero() {
       }, 0.72);
 
       tl.to(".hero-kpi-card", {
-        autoAlpha: 1, y: 0,
-        duration: 0.62,
+        autoAlpha: 1, y: 0, scale: 1,
+        duration: 0.68,
         stagger: 0.08,
         ease: "power3.out",
       }, 0.78);
@@ -292,6 +338,12 @@ export default function Hero() {
 
     }, introRef);
 
+    if (reduced) {
+      return () => {
+        ctx.revert();
+      };
+    }
+
     const approachBtn = introRef.current?.querySelector<HTMLElement>(".hero-approach-btn");
     if (approachBtn) {
       const xTo = gsap.quickTo(approachBtn, "x", { duration: 0.45, ease: "power3.out" });
@@ -374,7 +426,30 @@ export default function Hero() {
   // ─────────────────────────────────────────────────────────────────────────
   useEffect(() => {
     if (!lenis) return;
+    const reduced = prefersReducedMotion();
     const scroller = getScroller();
+
+    if (reduced) {
+      const ctx = gsap.context(() => {
+        gsap.set(
+          [
+            ".hero-content-layer",
+            ".hero-left-col",
+            ".hero-right-col",
+            ".hero-kpi-strip",
+            ".hero-kpi-card",
+            ".hero-outcome-chip",
+            ".hero-side-row",
+            ".hero-why-row",
+            ".hero-approach-btn",
+            ".hero-canvas-wrap",
+          ],
+          { clearProps: "transform,filter,opacity" },
+        );
+      }, introRef);
+      scheduleScrollTriggerRefresh();
+      return () => ctx.revert();
+    }
 
     const ctx = gsap.context(() => {
       // hero content fades on scroll
@@ -429,7 +504,7 @@ export default function Hero() {
       });
 
       gsap.to(".hero-kpi-card", {
-        yPercent: (i) => (i % 2 === 0 ? -3.5 : 3.5),
+        yPercent: (i) => (i % 2 === 0 ? -2.2 : 2.2),
         rotate: (i) => (i === 0 ? -0.45 : i === 1 ? 0.45 : 0),
         transformOrigin: "50% 50%",
         ease: "none",
@@ -444,7 +519,7 @@ export default function Hero() {
       });
 
       gsap.to(".hero-outcome-chip", {
-        yPercent: (i) => (i % 2 === 0 ? -4 : 4),
+        yPercent: (i) => (i % 2 === 0 ? -2 : 2),
         ease: "none",
         stagger: 0.03,
         scrollTrigger: {
@@ -457,7 +532,7 @@ export default function Hero() {
       });
 
       gsap.to(".hero-kpi-strip", {
-        yPercent: -8,
+        yPercent: -4.5,
         ease: "none",
         scrollTrigger: {
           trigger: introRef.current,
@@ -566,8 +641,9 @@ export default function Hero() {
 
       // WebGL canvas fades out
       gsap.to(".hero-canvas-wrap", {
-        opacity: 0.04,
-        scale: 1.025,
+        opacity: 0.08,
+        scale: 1.05,
+        rotation: 0.3,
         ease: "none",
         immediateRender: false,
         scrollTrigger: {
@@ -669,7 +745,7 @@ export default function Hero() {
                 <div className="hero-why-glow pointer-events-none absolute -right-12 -top-12 h-56 w-56 rounded-full bg-accent/12 blur-[90px]" />
 
                 <header className="hero-why-header mb-10 flex items-center gap-6 md:mb-12">
-                  <p className="text-[12px] md:text-[13px] font-black uppercase tracking-[0.5em] text-accent whitespace-nowrap">Why Wincore</p>
+                  <p className="text-[12px] md:text-[13px] font-black uppercase tracking-[0.3em] text-accent whitespace-nowrap">Why Wincore</p>
                   <div className="h-[1px] flex-1 bg-accent/20" />
                 </header>
 
@@ -735,19 +811,19 @@ export default function Hero() {
             </aside>
           </div>
 
-          <div className="hero-kpi-strip mt-12 md:mt-14 lg:mt-16">
-            <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-5">
-              <article className="hero-kpi-card group relative overflow-visible rounded-3xl border border-white/[0.11] bg-gradient-to-b from-white/[0.08] to-white/[0.02] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] md:p-8 lg:p-10 lg:col-span-4 [transform-style:preserve-3d]">
+          <div className="hero-kpi-strip mt-14 md:mt-[4.5rem] lg:mt-20">
+            <div className="grid grid-cols-1 gap-5 md:gap-6 lg:grid-cols-12 lg:gap-6">
+              <article className="hero-kpi-card group relative overflow-visible rounded-3xl border border-white/[0.11] bg-gradient-to-b from-white/[0.08] to-white/[0.02] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] md:p-8 lg:p-9 lg:col-span-4 [transform-style:preserve-3d]">
                 <div className="hero-metric-sweep pointer-events-none absolute inset-y-0 left-[-34%] w-[24%] -skew-x-12 bg-gradient-to-r from-transparent via-accent/25 to-transparent" />
-                <div className="mb-6 flex items-center justify-between">
-                  <p className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.32em] text-white/35">Outcomes</p>
-                  <span className="h-1.5 w-1.5 rounded-full bg-accent/80" aria-hidden />
+                <div className="mb-6 md:mb-7 flex items-center justify-between">
+                  <p className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-white/35">Outcomes</p>
+                  <span className="h-2 w-2 rounded-full bg-accent/80" aria-hidden />
                 </div>
-                <div className="grid grid-cols-2 gap-3 md:gap-3.5">
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-3.5">
                   {OUTCOMES.map((p) => (
                     <span
                       key={p}
-                      className="hero-outcome-chip inline-flex min-h-11 md:min-h-12 items-center justify-center rounded-xl border border-white/[0.13] bg-white/[0.04] px-4 py-2.5 text-[10px] md:text-[11px] font-black uppercase tracking-[0.22em] text-white/60"
+                      className="hero-outcome-chip inline-flex min-h-12 items-center justify-center rounded-xl border border-white/[0.13] bg-white/[0.04] px-4 py-3 text-center text-[10px] md:text-[11px] font-black uppercase tracking-[0.12em] leading-tight text-white/60"
                     >
                       {p}
                     </span>
@@ -755,33 +831,33 @@ export default function Hero() {
                 </div>
               </article>
 
-              <article className="hero-kpi-card group relative overflow-visible rounded-3xl border border-white/[0.11] bg-gradient-to-b from-white/[0.08] to-white/[0.02] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] md:p-8 lg:p-10 lg:col-span-4 [transform-style:preserve-3d]">
+              <article className="hero-kpi-card group relative overflow-visible rounded-3xl border border-white/[0.11] bg-gradient-to-b from-white/[0.08] to-white/[0.02] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] md:p-8 lg:p-9 lg:col-span-4 [transform-style:preserve-3d]">
                 <div className="hero-metric-sweep pointer-events-none absolute inset-y-0 left-[-34%] w-[24%] -skew-x-12 bg-gradient-to-r from-transparent via-secondary/20 to-transparent" />
-                <div className="mb-6 flex items-end justify-between gap-4">
+                <div className="mb-6 md:mb-7 flex flex-col gap-3">
                   <div className="min-w-0 flex-1">
-                    <p className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.32em] text-white/35">Actions</p>
+                    <p className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-white/35">Actions</p>
                     <p className="mt-2 text-[13px] md:text-[14px] leading-relaxed text-white/45">Choose a path and we will turn it into a high-performing launch.</p>
                   </div>
-                  <span className="hidden text-[8px] font-black uppercase tracking-[0.3em] text-white/20 sm:inline whitespace-nowrap ml-2">Fast response</span>
+                  <span className="hidden text-[8px] font-black uppercase tracking-[0.2em] text-white/20 sm:block whitespace-nowrap">Fast response</span>
                 </div>
-                <div className="grid grid-cols-1 gap-3">
+                <div className="grid grid-cols-1 gap-3.5">
                   <Link
                     href="/contact"
-                    className="hero-action-btn cursor-hover inline-flex min-h-12 md:min-h-13 items-center justify-center gap-2 rounded-xl border border-accent/45 bg-accent px-5 md:px-6 py-3 text-[10px] md:text-[11px] font-black uppercase tracking-[0.24em] text-[#0A0A0A] transition-transform hover:scale-[1.01] active:scale-[0.98]"
+                    className="hero-action-btn cursor-hover inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-accent/45 bg-accent px-5 py-3.5 text-[10px] md:text-[11px] font-black uppercase tracking-[0.12em] text-[#0A0A0A] transition-transform hover:scale-[1.01] active:scale-[0.98]"
                   >
                     Start a project
-                    <ArrowRight size={16} strokeWidth={2.5} />
+                    <ArrowRight size={14} strokeWidth={2.5} />
                   </Link>
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <Link
                       href="/works"
-                      className="hero-action-btn cursor-hover inline-flex min-h-12 md:min-h-13 items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/[0.04] px-4 md:px-5 py-3 text-[10px] md:text-[11px] font-black uppercase tracking-[0.24em] text-white/90 transition-colors hover:border-accent/50 hover:text-accent"
+                      className="hero-action-btn cursor-hover inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/[0.04] px-4 py-3.5 text-[10px] md:text-[11px] font-black uppercase tracking-[0.12em] text-white/90 transition-colors hover:border-accent/50 hover:text-accent"
                     >
                       View work
                     </Link>
                     <Link
                       href="/services"
-                      className="hero-action-btn cursor-hover inline-flex min-h-12 md:min-h-13 items-center justify-center gap-2 rounded-xl border border-white/15 bg-transparent px-4 md:px-5 py-3 text-[10px] md:text-[11px] font-black uppercase tracking-[0.22em] text-white/60 transition-colors hover:border-white/30 hover:text-white/92"
+                      className="hero-action-btn cursor-hover inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/15 bg-transparent px-4 py-3.5 text-[10px] md:text-[11px] font-black uppercase tracking-[0.12em] text-white/60 transition-colors hover:border-white/30 hover:text-white/92"
                     >
                       Services
                     </Link>
@@ -789,20 +865,20 @@ export default function Hero() {
                 </div>
               </article>
 
-              <article className="hero-kpi-card group relative overflow-visible rounded-3xl border border-white/[0.11] bg-gradient-to-b from-white/[0.08] to-white/[0.02] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] md:p-8 lg:p-10 lg:col-span-4 [transform-style:preserve-3d]">
+              <article className="hero-kpi-card group relative overflow-visible rounded-3xl border border-white/[0.11] bg-gradient-to-b from-white/[0.08] to-white/[0.02] p-6 shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] md:p-8 lg:p-9 lg:col-span-4 [transform-style:preserve-3d]">
                 <div className="hero-metric-sweep pointer-events-none absolute inset-y-0 left-[-34%] w-[24%] -skew-x-12 bg-gradient-to-r from-transparent via-accent/20 to-transparent" />
-                <p className="mb-6 text-[10px] md:text-[11px] font-black uppercase tracking-[0.32em] text-white/35">Performance Snapshot</p>
-                <dl className="space-y-3">
+                <p className="mb-6 md:mb-7 text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-white/35">Performance Snapshot</p>
+                <dl className="space-y-3.5">
                   {KPI_STATS.map((stat, i) => (
-                    <div key={stat.label} className="hero-stat relative flex items-center justify-between rounded-xl border border-white/[0.09] bg-white/[0.02] px-4 md:px-5 py-3.5 md:py-4 transition-colors duration-500 group-hover:border-white/14\">
+                    <div key={stat.label} className="hero-stat relative flex items-center justify-between rounded-xl border border-white/[0.09] bg-white/[0.02] px-4 py-3.5 transition-colors duration-500 group-hover:border-white/14">
                       <div className="flex items-center gap-3 min-w-0 flex-1">
-                        <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em] text-white/20 shrink-0">{String(i + 1).padStart(2, "0")}</span>
+                        <span className="text-[9px] font-black uppercase tracking-[0.16em] text-white/20 shrink-0">{String(i + 1).padStart(2, "0")}</span>
                         <stat.icon className={`${stat.color} opacity-70 shrink-0`} size={16} />
-                        <dt className="text-[11px] md:text-[12px] font-bold uppercase tracking-[0.16em] text-white/45 truncate">{stat.label}</dt>
+                        <dt className="text-[11px] md:text-[12px] font-bold uppercase tracking-[0.1em] text-white/45 leading-tight">{stat.label}</dt>
                       </div>
-                      <dd className="flex items-baseline gap-1 shrink-0 ml-2">
-                        <span className="stat-value text-2xl md:text-3xl font-black tracking-tight text-white" data-target={stat.value}>0</span>
-                        <span className={`text-xs md:text-sm font-black ${stat.color}`}>{stat.suffix}</span>
+                      <dd className="flex items-baseline gap-1.5 shrink-0 ml-3">
+                        <span className="stat-value text-[1.9rem] md:text-[2.1rem] font-black tracking-tight text-white" data-target={stat.value}>0</span>
+                        <span className={`text-[0.9rem] font-black ${stat.color}`}>{stat.suffix}</span>
                       </dd>
                     </div>
                   ))}

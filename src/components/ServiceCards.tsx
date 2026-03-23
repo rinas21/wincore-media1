@@ -2,11 +2,15 @@
 
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SplitType from "split-type";
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
-import { scheduleScrollTriggerRefresh } from "@/lib/motion";
+import {
+  registerGsapPlugins,
+  getScroller,
+  scheduleScrollTriggerRefresh,
+  prefersReducedMotion,
+} from "@/lib/motion";
 
 const SERVICES = [
   {
@@ -111,8 +115,9 @@ export default function ServiceCards() {
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-    const scroller = document.documentElement;
+    registerGsapPlugins();
+    const scroller = getScroller();
+    const reduced = prefersReducedMotion();
     if (!headingRef.current) return;
 
     const splits: SplitType[] = [];
@@ -123,11 +128,11 @@ export default function ServiceCards() {
       if (split.chars) {
         gsap.fromTo(
           split.chars,
-          { yPercent: 115, opacity: 0 },
+          { yPercent: reduced ? 0 : 115, opacity: reduced ? 1 : 0 },
           {
             yPercent: 0,
             opacity: 1,
-            duration: 0.95,
+            duration: reduced ? 0 : 0.95,
             stagger: 0.016,
             ease: "expo.out",
             clearProps: "transform,opacity",
@@ -142,9 +147,9 @@ export default function ServiceCards() {
       }
 
       gsap.from(".sc-header-kicker", {
-        y: 22,
-        opacity: 0,
-        duration: 0.75,
+        y: reduced ? 0 : 22,
+        opacity: reduced ? 1 : 0,
+        duration: reduced ? 0 : 0.75,
         ease: "power3.out",
         scrollTrigger: {
           trigger: ".sc-header",
@@ -155,9 +160,9 @@ export default function ServiceCards() {
       });
 
       gsap.from(".sc-header-sub", {
-        y: 26,
-        opacity: 0,
-        duration: 0.85,
+        y: reduced ? 0 : 26,
+        opacity: reduced ? 1 : 0,
+        duration: reduced ? 0 : 0.85,
         ease: "power3.out",
         scrollTrigger: {
           trigger: ".sc-header",
@@ -170,9 +175,9 @@ export default function ServiceCards() {
       const rows = gsap.utils.toArray<HTMLElement>(".sc-service-row");
       rows.forEach((row, i) => {
         gsap.from(row, {
-          y: 52,
-          opacity: 0,
-          duration: 0.88,
+          y: reduced ? 0 : 52,
+          opacity: reduced ? 1 : 0,
+          duration: reduced ? 0 : 0.88,
           ease: "power3.out",
           delay: i * 0.05,
           scrollTrigger: {
@@ -194,18 +199,22 @@ export default function ServiceCards() {
   }, []);
 
   useEffect(() => {
-    const moveFollower = (e: MouseEvent) => {
-      if (!followerRef.current) return;
-      gsap.to(followerRef.current, {
-        x: e.clientX,
-        y: e.clientY,
-        duration: 1.4,
-        ease: "power4.out",
-        overwrite: "auto",
-      });
+    if (prefersReducedMotion()) return;
+    if (typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches) return;
+
+    const el = followerRef.current;
+    if (!el) return;
+
+    const xTo = gsap.quickTo(el, "x", { duration: 1.05, ease: "power3.out" });
+    const yTo = gsap.quickTo(el, "y", { duration: 1.05, ease: "power3.out" });
+
+    const moveFollower = (e: PointerEvent) => {
+      xTo(e.clientX);
+      yTo(e.clientY);
     };
-    window.addEventListener("mousemove", moveFollower);
-    return () => window.removeEventListener("mousemove", moveFollower);
+
+    window.addEventListener("pointermove", moveFollower, { passive: true });
+    return () => window.removeEventListener("pointermove", moveFollower);
   }, []);
 
   return (

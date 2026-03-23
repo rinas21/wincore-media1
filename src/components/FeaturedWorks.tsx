@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import Image from "next/image";
 import gsap from "gsap";
 import { ArrowUpRight } from "lucide-react";
-import { registerGsapPlugins, getScroller } from "@/lib/motion";
+import { registerGsapPlugins, getScroller, scheduleScrollTriggerRefresh, prefersReducedMotion } from "@/lib/motion";
 
 interface Project {
   id: number;
@@ -58,35 +58,45 @@ export default function FeaturedWorks() {
 
   useEffect(() => {
     registerGsapPlugins();
+    const reduced = prefersReducedMotion();
+    const cleanups: Array<() => void> = [];
     const ctx = gsap.context(() => {
       const cards = gsap.utils.toArray<HTMLElement>(".project-card");
       const scroller = getScroller();
 
-      // Horizontal scroll section
-      const totalWidth = cards.length * 70;
+      const container = containerRef.current;
+      const trigger = triggerRef.current;
+      if (!container || !trigger) return;
 
-      gsap.to(containerRef.current, {
-        xPercent: -totalWidth,
-        ease: "none",
-        scrollTrigger: {
-          trigger: triggerRef.current,
-          start: "top top",
-          end: () => `+=${(containerRef.current?.offsetWidth || 0) * 1.2}`,
-          scrub: 1,
-          pin: true,
-          scroller,
-        },
-      });
+      const getTravel = () => Math.max(0, container.scrollWidth - window.innerWidth);
+
+      if (!reduced) {
+        gsap.to(container, {
+          x: () => -getTravel(),
+          ease: "none",
+          scrollTrigger: {
+            trigger,
+            start: "top top",
+            end: () => `+=${getTravel()}`,
+            scrub: 1,
+            pin: true,
+            invalidateOnRefresh: true,
+            scroller,
+          },
+        });
+      } else {
+        gsap.set(container, { x: 0, clearProps: "transform" });
+      }
 
       // Intro title animation
       gsap.from(".works-heading, .works-kicker", {
-        y: 40,
-        opacity: 0,
-        duration: 1,
+        y: reduced ? 0 : 40,
+        opacity: reduced ? 1 : 0,
+        duration: reduced ? 0 : 1,
         stagger: 0.1,
         ease: "power3.out",
         scrollTrigger: {
-          trigger: triggerRef.current,
+          trigger,
           start: "top 75%",
           scroller,
           once: true,
@@ -98,10 +108,11 @@ export default function FeaturedWorks() {
         const image = card.querySelector(".project-image") as HTMLElement;
         const overlay = card.querySelector(".project-overlay") as HTMLElement;
 
-        card.addEventListener("mousemove", (e: MouseEvent) => {
+        const onMove = (e: PointerEvent) => {
+          if (reduced) return;
           const rect = card.getBoundingClientRect();
-          const x = (e.clientX - rect.left) / rect.width;
-          const y = (e.clientY - rect.top) / rect.height;
+          const x = (e.clientX - rect.left) / Math.max(rect.width, 1);
+          const y = (e.clientY - rect.top) / Math.max(rect.height, 1);
 
           gsap.to(image, {
             x: (x - 0.5) * 36,
@@ -117,9 +128,9 @@ export default function FeaturedWorks() {
             opacity: 1,
             duration: 0.25,
           });
-        });
+        };
 
-        card.addEventListener("mouseleave", () => {
+        const onLeave = () => {
           gsap.to(image, {
             x: 0,
             y: 0,
@@ -134,11 +145,23 @@ export default function FeaturedWorks() {
             opacity: 0,
             duration: 0.25,
           });
+        };
+
+        card.addEventListener("pointermove", onMove);
+        card.addEventListener("pointerleave", onLeave);
+        cleanups.push(() => {
+          card.removeEventListener("pointermove", onMove);
+          card.removeEventListener("pointerleave", onLeave);
         });
       });
     }, triggerRef);
 
-    return () => ctx.revert();
+    scheduleScrollTriggerRefresh();
+
+    return () => {
+      cleanups.forEach((fn) => fn());
+      ctx.revert();
+    };
   }, []);
 
   return (

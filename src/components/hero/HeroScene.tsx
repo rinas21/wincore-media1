@@ -56,6 +56,7 @@ function ParticleLayer({
   speed,
   opacity = 0.62,
   additive = false,
+  pulse = false,
 }: {
   positions: Float32Array;
   color: string;
@@ -63,13 +64,20 @@ function ParticleLayer({
   speed: { x: number; y: number };
   opacity?: number;
   additive?: boolean;
+  pulse?: boolean;
 }) {
   const ref = useRef<PointsMesh>(null);
+  const elapsed = useRef(0);
 
   useFrame((_, delta) => {
     if (!ref.current) return;
+    elapsed.current += delta;
     ref.current.rotation.x -= delta * speed.x;
     ref.current.rotation.y -= delta * speed.y;
+    if (pulse) {
+      const s = 1 + Math.sin(elapsed.current * 0.55) * 0.018;
+      ref.current.scale.set(s, s, s);
+    }
   });
 
   return (
@@ -93,11 +101,12 @@ function ParticleLayer({
 export default function HeroScene({ heroId }: { heroId: string }) {
   const outer = useMemo(() => createSpherePoints(1600, 1.3), []);
   const inner = useMemo(() => createSpherePoints(780, 0.72), []);
+  const halo = useMemo(() => createSpherePoints(480, 1.72), []);
 
   return (
     <Canvas
-      camera={{ position: [0, 0, 1.6], fov: 42 }}
-      dpr={[1, 1.2]}
+      camera={{ position: [0, 0, 1.55], fov: 40 }}
+      dpr={[1, 1.35]}
       gl={{ alpha: false, antialias: true, powerPreference: "high-performance" }}
     >
       <Suspense fallback={null}>
@@ -117,6 +126,14 @@ export default function HeroScene({ heroId }: { heroId: string }) {
           speed={{ x: -1 / 40, y: 1 / 50 }}
           opacity={0.2}
           additive={false}
+          pulse
+        />
+        <ParticleLayer
+          positions={halo}
+          color="#6ECFF6"
+          size={0.0018}
+          speed={{ x: 1 / 65, y: -1 / 70 }}
+          opacity={0.14}
         />
       </Suspense>
     </Canvas>

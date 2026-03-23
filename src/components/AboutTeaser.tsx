@@ -4,8 +4,13 @@ import { useEffect, useRef } from "react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SplitType from "split-type";
+import {
+  registerGsapPlugins,
+  getScroller,
+  scheduleScrollTriggerRefresh,
+  prefersReducedMotion,
+} from "@/lib/motion";
 
 const AboutScene = dynamic(() => import("@/components/about/AboutScene"), {
   ssr: false,
@@ -48,8 +53,9 @@ export default function AboutTeaser() {
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-    const scroller = document.documentElement;
+    registerGsapPlugins();
+    const scroller = getScroller();
+    const reduced = prefersReducedMotion();
     const splits: SplitType[] = [];
 
     const ctx = gsap.context(() => {
@@ -60,9 +66,9 @@ export default function AboutTeaser() {
         splits.push(split);
         if (split.chars) {
           gsap.from(split.chars, {
-            yPercent: 110,
-            opacity: 0,
-            duration: 1.1,
+            yPercent: reduced ? 0 : 110,
+            opacity: reduced ? 1 : 0,
+            duration: reduced ? 0 : 1.1,
             stagger: 0.018,
             ease: "expo.out",
             immediateRender: false,
@@ -78,21 +84,21 @@ export default function AboutTeaser() {
 
       // ── Kicker ──
       gsap.from(".abt-kicker", {
-        y: 20, opacity: 0, duration: 0.8, ease: "expo.out",
+        y: reduced ? 0 : 20, opacity: reduced ? 1 : 0, duration: reduced ? 0 : 0.8, ease: "expo.out",
         immediateRender: false,
         scrollTrigger: { trigger: ".abt-kicker", scroller, start: "top 90%", once: true },
       });
 
       // ── Lead paragraph ──
       gsap.from(".abt-lead", {
-        y: 28, opacity: 0, filter: "blur(8px)", duration: 1, ease: "expo.out",
+        y: reduced ? 0 : 28, opacity: reduced ? 1 : 0, filter: reduced ? "blur(0px)" : "blur(8px)", duration: reduced ? 0 : 1, ease: "expo.out",
         immediateRender: false,
         scrollTrigger: { trigger: ".abt-lead", scroller, start: "top 88%", once: true },
       });
 
       // ── Rule ──
       gsap.from(".abt-rule", {
-        scaleX: 0, transformOrigin: "left", duration: 1.1, ease: "expo.out",
+        scaleX: reduced ? 1 : 0, transformOrigin: "left", duration: reduced ? 0 : 1.1, ease: "expo.out",
         immediateRender: false,
         scrollTrigger: { trigger: ".abt-rule", scroller, start: "top 90%", once: true },
       });
@@ -101,7 +107,7 @@ export default function AboutTeaser() {
       const statCards = gsap.utils.toArray<HTMLElement>(".abt-stat-card");
       statCards.forEach((card, i) => {
         gsap.from(card, {
-          y: 40, opacity: 0, scale: 0.97, duration: 0.9, delay: i * 0.08, ease: "expo.out",
+          y: reduced ? 0 : 40, opacity: reduced ? 1 : 0, scale: reduced ? 1 : 0.97, duration: reduced ? 0 : 0.9, delay: i * 0.08, ease: "expo.out",
           immediateRender: false,
           scrollTrigger: { trigger: card, scroller, start: "top 90%", once: true },
         });
@@ -112,7 +118,7 @@ export default function AboutTeaser() {
           const target = Number(numEl.dataset.target ?? 0);
           const proxy = { val: 0 };
           gsap.to(proxy, {
-            val: target, duration: 1.8, ease: "power2.out",
+            val: target, duration: reduced ? 0 : 1.8, ease: "power2.out",
             immediateRender: false,
             scrollTrigger: { trigger: card, scroller, start: "top 85%", once: true },
             onUpdate() { numEl.textContent = Math.round(proxy.val).toString(); },
@@ -124,9 +130,9 @@ export default function AboutTeaser() {
       const photoCards = gsap.utils.toArray<HTMLElement>(".abt-photo-card");
       photoCards.forEach((card, i) => {
         gsap.from(card, {
-          y: 50, opacity: 0,
-          clipPath: "inset(16% 0 0 0 round 1.25rem)",
-          duration: 1.1, delay: i * 0.07, ease: "expo.out",
+          y: reduced ? 0 : 50, opacity: reduced ? 1 : 0,
+          clipPath: reduced ? "inset(0% 0 0 0 round 1.25rem)" : "inset(16% 0 0 0 round 1.25rem)",
+          duration: reduced ? 0 : 1.1, delay: i * 0.07, ease: "expo.out",
           immediateRender: false,
           scrollTrigger: { trigger: card, scroller, start: "top 88%", once: true },
         });
@@ -134,8 +140,8 @@ export default function AboutTeaser() {
 
       // ── Gallery subtle parallax ──
       gsap.to("[data-about-shift]", {
-        yPercent: -8,
-        scale: 1.03,
+        yPercent: reduced ? 0 : -8,
+        scale: reduced ? 1 : 1.03,
         ease: "none",
         scrollTrigger: {
           trigger: sectionRef.current,
@@ -148,10 +154,10 @@ export default function AboutTeaser() {
 
       // ── Watermark drift (cinematic depth) ──
       gsap.to("[data-watermark]", {
-        yPercent: 8,
-        xPercent: 6,
+        yPercent: reduced ? 0 : 8,
+        xPercent: reduced ? 0 : 6,
         opacity: 0.55,
-        filter: "blur(0.5px)",
+        filter: reduced ? "blur(0px)" : "blur(0.5px)",
         ease: "none",
         scrollTrigger: {
           trigger: sectionRef.current,
@@ -164,9 +170,9 @@ export default function AboutTeaser() {
 
       // ── Ambient glow pulse with scroll ──
       gsap.to(".abt-scene-glow", {
-        scale: 1.18,
+        scale: reduced ? 1 : 1.18,
         opacity: 0.95,
-        yPercent: -5,
+        yPercent: reduced ? 0 : -5,
         ease: "none",
         scrollTrigger: {
           trigger: sectionRef.current,
@@ -177,6 +183,8 @@ export default function AboutTeaser() {
         },
       });
     }, sectionRef);
+
+    scheduleScrollTriggerRefresh();
 
     return () => {
       splits.forEach((s) => s.revert());

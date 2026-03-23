@@ -3,7 +3,12 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import {
+  registerGsapPlugins,
+  getScroller,
+  scheduleScrollTriggerRefresh,
+  prefersReducedMotion,
+} from "@/lib/motion";
 
 function useColomboTime() {
   const [time, setTime] = useState<string>("");
@@ -33,17 +38,18 @@ export default function ContactFooter() {
   const footerRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-    const scroller = document.documentElement;
+    registerGsapPlugins();
+    const scroller = getScroller();
+    const reduced = prefersReducedMotion();
 
     const ctx = gsap.context(() => {
       gsap.fromTo(
         ".cf-kicker",
-        { y: 20, opacity: 0 },
+        { y: reduced ? 0 : 20, opacity: reduced ? 1 : 0 },
         {
           y: 0,
           opacity: 1,
-          duration: 0.8,
+          duration: reduced ? 0 : 0.8,
           ease: "expo.out",
           clearProps: "transform,opacity",
           scrollTrigger: { trigger: ".cf-kicker", scroller, start: "top 90%", once: true },
@@ -54,11 +60,11 @@ export default function ContactFooter() {
       titleLines.forEach((el, i) => {
         gsap.fromTo(
           el,
-          { yPercent: 110, opacity: 0 },
+          { yPercent: reduced ? 0 : 110, opacity: reduced ? 1 : 0 },
           {
             yPercent: 0,
             opacity: 1,
-            duration: 1,
+            duration: reduced ? 0 : 1,
             ease: "expo.out",
             delay: i * 0.08,
             clearProps: "transform,opacity",
@@ -69,11 +75,11 @@ export default function ContactFooter() {
 
       gsap.fromTo(
         ".cf-contact-block",
-        { y: 36, opacity: 0 },
+        { y: reduced ? 0 : 36, opacity: reduced ? 1 : 0 },
         {
           y: 0,
           opacity: 1,
-          duration: 0.9,
+          duration: reduced ? 0 : 0.9,
           ease: "expo.out",
           clearProps: "transform,opacity",
           scrollTrigger: { trigger: ".cf-contact-block", scroller, start: "top 88%", once: true },
@@ -82,11 +88,11 @@ export default function ContactFooter() {
 
       gsap.fromTo(
         ".cf-form-shell",
-        { y: 40, opacity: 0 },
+        { y: reduced ? 0 : 40, opacity: reduced ? 1 : 0 },
         {
           y: 0,
           opacity: 1,
-          duration: 1,
+          duration: reduced ? 0 : 1,
           ease: "expo.out",
           clearProps: "transform,opacity",
           scrollTrigger: {
@@ -102,11 +108,11 @@ export default function ContactFooter() {
       reveals.forEach((el, i) => {
         gsap.fromTo(
           el,
-          { y: 60, opacity: 0 },
+          { y: reduced ? 0 : 60, opacity: reduced ? 1 : 0 },
           {
             y: 0,
             opacity: 1,
-            duration: 1,
+            duration: reduced ? 0 : 1,
             ease: "expo.out",
             delay: i * 0.07,
             clearProps: "transform,opacity",
@@ -115,6 +121,9 @@ export default function ContactFooter() {
         );
       });
     }, footerRef);
+
+    scheduleScrollTriggerRefresh();
+
     return () => ctx.revert();
   }, []);
 

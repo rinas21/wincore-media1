@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
+import { prefersReducedMotion } from "@/lib/motion";
 
 const items = [
   "Most Awarded Creative & AI Agency",
@@ -20,6 +21,12 @@ export default function RecognitionBar() {
     const track = trackRef.current;
     const measure = measureRef.current;
     if (!track || !measure) return;
+    const reduced = prefersReducedMotion();
+
+    if (reduced) {
+      gsap.set(track, { x: 0 });
+      return;
+    }
 
     const run = () => {
       tweenRef.current?.kill();

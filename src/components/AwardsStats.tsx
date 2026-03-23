@@ -3,8 +3,13 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SplitType from "split-type";
+import {
+  registerGsapPlugins,
+  getScroller,
+  scheduleScrollTriggerRefresh,
+  prefersReducedMotion,
+} from "@/lib/motion";
 
 const stats = [
   {
@@ -45,8 +50,9 @@ export default function AwardsStats() {
   const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-    const scroller = document.documentElement;
+    registerGsapPlugins();
+    const scroller = getScroller();
+    const reduced = prefersReducedMotion();
     const splits: SplitType[] = [];
 
     const ctx = gsap.context(() => {
@@ -58,11 +64,11 @@ export default function AwardsStats() {
         if (split.chars) {
           gsap.fromTo(
             split.chars,
-            { yPercent: 110, opacity: 0 },
+            { yPercent: reduced ? 0 : 110, opacity: reduced ? 1 : 0 },
             {
               yPercent: 0,
               opacity: 1,
-              duration: 1,
+              duration: reduced ? 0 : 1,
               stagger: 0.018,
               ease: "expo.out",
               clearProps: "transform,opacity",
@@ -74,17 +80,17 @@ export default function AwardsStats() {
 
       gsap.fromTo(
         ".aw-kicker",
-        { y: 20, opacity: 0 },
+        { y: reduced ? 0 : 20, opacity: reduced ? 1 : 0 },
         {
-          y: 0, opacity: 1, duration: 0.8, ease: "expo.out", clearProps: "transform,opacity",
+          y: 0, opacity: 1, duration: reduced ? 0 : 0.8, ease: "expo.out", clearProps: "transform,opacity",
           scrollTrigger: { trigger: ".aw-kicker", scroller, start: "top 90%", once: true },
         }
       );
       gsap.fromTo(
         ".aw-body",
-        { y: 22, opacity: 0 },
+        { y: reduced ? 0 : 22, opacity: reduced ? 1 : 0 },
         {
-          y: 0, opacity: 1, duration: 1, ease: "expo.out", clearProps: "transform,opacity",
+          y: 0, opacity: 1, duration: reduced ? 0 : 1, ease: "expo.out", clearProps: "transform,opacity",
           scrollTrigger: { trigger: ".aw-body", scroller, start: "top 90%", once: true },
         }
       );
@@ -98,7 +104,7 @@ export default function AwardsStats() {
         const proxy = { val: 0 };
         gsap.to(proxy, {
           val: target,
-          duration: 1.8,
+          duration: reduced ? 0 : 1.8,
           ease: "power2.out",
           scrollTrigger: {
             trigger: card,
@@ -114,11 +120,11 @@ export default function AwardsStats() {
         // Subtle fade-in on each card
         gsap.fromTo(
           card,
-          { opacity: 0, y: 30 },
+          { opacity: reduced ? 1 : 0, y: reduced ? 0 : 30 },
           {
             opacity: 1,
             y: 0,
-            duration: 0.9,
+            duration: reduced ? 0 : 0.9,
             ease: "expo.out",
             clearProps: "transform,opacity",
             scrollTrigger: {
@@ -131,6 +137,8 @@ export default function AwardsStats() {
         );
       });
     }, sectionRef);
+
+    scheduleScrollTriggerRefresh();
 
     return () => {
       splits.forEach((s) => s.revert());

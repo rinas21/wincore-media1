@@ -3,8 +3,13 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { ArrowUpRight, Clock, Mail, MapPin } from "lucide-react";
+import {
+  registerGsapPlugins,
+  getScroller,
+  scheduleScrollTriggerRefresh,
+  prefersReducedMotion,
+} from "@/lib/motion";
 
 function useColomboTime() {
   const [time, setTime] = useState("");
@@ -36,20 +41,21 @@ export default function ContactPageContent() {
   const [sent, setSent] = useState(false);
 
   useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-    const scroller = document.documentElement;
+    registerGsapPlugins();
+    const scroller = getScroller();
+    const reduced = prefersReducedMotion();
 
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({ defaults: { ease: "expo.out" }, delay: 0.05 });
-      tl.from(".cp-eyebrow", { opacity: 0, y: 16, duration: 0.65 }, 0)
-        .from(".cp-title", { opacity: 0, y: 32, duration: 0.85 }, 0.08)
-        .from(".cp-lead", { opacity: 0, y: 20, duration: 0.7 }, 0.18)
-        .from(".cp-card", { opacity: 0, y: 36, duration: 0.75, stagger: 0.1 }, 0.22);
+      tl.from(".cp-eyebrow", { opacity: reduced ? 1 : 0, y: reduced ? 0 : 16, duration: reduced ? 0 : 0.65 }, 0)
+        .from(".cp-title", { opacity: reduced ? 1 : 0, y: reduced ? 0 : 32, duration: reduced ? 0 : 0.85 }, 0.08)
+        .from(".cp-lead", { opacity: reduced ? 1 : 0, y: reduced ? 0 : 20, duration: reduced ? 0 : 0.7 }, 0.18)
+        .from(".cp-card", { opacity: reduced ? 1 : 0, y: reduced ? 0 : 36, duration: reduced ? 0 : 0.75, stagger: 0.1 }, 0.22);
 
       gsap.from(".cp-form-field", {
-        opacity: 0,
-        y: 20,
-        duration: 0.55,
+        opacity: reduced ? 1 : 0,
+        y: reduced ? 0 : 20,
+        duration: reduced ? 0 : 0.55,
         stagger: 0.05,
         ease: "power2.out",
         scrollTrigger: {
@@ -61,9 +67,9 @@ export default function ContactPageContent() {
       });
 
       gsap.from(".cp-footer-row", {
-        opacity: 0,
-        y: 16,
-        duration: 0.6,
+        opacity: reduced ? 1 : 0,
+        y: reduced ? 0 : 16,
+        duration: reduced ? 0 : 0.6,
         scrollTrigger: {
           trigger: ".cp-footer-row",
           scroller,
@@ -73,10 +79,9 @@ export default function ContactPageContent() {
       });
     }, rootRef);
 
-    requestAnimationFrame(() => ScrollTrigger.refresh());
-    const t = setTimeout(() => ScrollTrigger.refresh(), 400);
+    scheduleScrollTriggerRefresh();
+
     return () => {
-      clearTimeout(t);
       ctx.revert();
     };
   }, []);

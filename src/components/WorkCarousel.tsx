@@ -6,7 +6,12 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Image from "next/image";
 import ProjectModal, { type Project } from "@/components/ProjectModal";
 import { ArrowRight } from "lucide-react";
-import { prefersReducedMotion } from "@/lib/motion";
+import {
+  registerGsapPlugins,
+  getScroller,
+  scheduleScrollTriggerRefresh,
+  prefersReducedMotion,
+} from "@/lib/motion";
 
 const PROJECTS: Project[] = [
   {
@@ -49,101 +54,164 @@ export default function WorkCarousel() {
   const trackRef = useRef<HTMLDivElement>(null);
   const progressRef = useRef<HTMLDivElement>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [useHorizontal, setUseHorizontal] = useState(false);
 
   useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-    const scroller = document.documentElement;
+    if (typeof window === "undefined") return;
+
+    const reduceMq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const coarseMq = window.matchMedia("(pointer: coarse)");
+
+    const updateMode = () => {
+      const shouldHorizontal = !reduceMq.matches && !coarseMq.matches && window.innerWidth >= 1024;
+      setUseHorizontal(shouldHorizontal);
+    };
+
+    updateMode();
+    window.addEventListener("resize", updateMode);
+    reduceMq.addEventListener("change", updateMode);
+    coarseMq.addEventListener("change", updateMode);
+
+    return () => {
+      window.removeEventListener("resize", updateMode);
+      reduceMq.removeEventListener("change", updateMode);
+      coarseMq.removeEventListener("change", updateMode);
+    };
+  }, []);
+
+  useEffect(() => {
+    registerGsapPlugins();
+    const scroller = getScroller();
+    const reduced = prefersReducedMotion();
 
     const track = trackRef.current;
     const pin = pinRef.current;
-    if (!track || !pin) return;
+    const section = sectionRef.current;
+    if (!track || !pin || !section) return;
 
     const scrollDistance = () => Math.max(0, track.scrollWidth - window.innerWidth);
+    const cleanupTilt: Array<() => void> = [];
 
-    const tween = gsap.to(track, {
-      x: () => -scrollDistance(),
-      ease: "none",
-      scrollTrigger: {
-        trigger: pin,
-        scroller,
-        start: "top top",
-        end: () => "+=" + String(scrollDistance()),
-        pin: true,
-        scrub: 1.3,
-        anticipatePin: 0.7,
-        invalidateOnRefresh: true,
-        onUpdate(self) {
-          if (progressRef.current) {
-            progressRef.current.style.transform = `scaleX(${self.progress})`;
+    const ctx = gsap.context(() => {
+      if (useHorizontal && !reduced) {
+        gsap.to(track, {
+          x: () => -scrollDistance(),
+          ease: "none",
+          scrollTrigger: {
+            trigger: pin,
+            scroller,
+            start: "top top",
+            end: () => "+=" + String(scrollDistance()),
+            pin: true,
+            scrub: 1.2,
+            anticipatePin: 0.7,
+            invalidateOnRefresh: true,
+            onUpdate(self) {
+              if (progressRef.current) {
+                progressRef.current.style.transform = `scaleX(${self.progress})`;
+              }
+            },
+          },
+        });
+      } else {
+        gsap.set(track, { x: 0, clearProps: "transform" });
+        if (progressRef.current) {
+          progressRef.current.style.transform = "scaleX(1)";
+        }
+      }
+
+      const headingBlock = section.querySelector<HTMLElement>(".wc-heading-block");
+      if (headingBlock) {
+        gsap.from(headingBlock, {
+          y: reduced ? 0 : 32,
+          opacity: reduced ? 1 : 0,
+          duration: reduced ? 0 : 0.9,
+          ease: "expo.out",
+          scrollTrigger: {
+            trigger: section,
+            scroller,
+            start: "top 88%",
+            once: true,
+          },
+        });
+      }
+
+      const cards = gsap.utils.toArray<HTMLElement>(".wc-tilt");
+      if (!useHorizontal || reduced) {
+        cards.forEach((card, i) => {
+          gsap.from(card, {
+            y: 26,
+            opacity: 0,
+            duration: 0.6,
+            ease: "power3.out",
+            delay: i * 0.05,
+            scrollTrigger: {
+              trigger: card,
+              scroller,
+              start: "top 88%",
+              once: true,
+            },
+          });
+        });
+        return;
+      }
+
+      cards.forEach((card) => {
+        const media = card.querySelector(".wc-media") as HTMLElement | null;
+        const shine = card.querySelector(".wc-shine") as HTMLElement | null;
+        if (!media) return;
+
+        gsap.set(card, { transformPerspective: 1000 });
+        const toRX = gsap.quickTo(card, "rotationX", { duration: reduced ? 0 : 0.5, ease: "power3.out" });
+        const toRY = gsap.quickTo(card, "rotationY", { duration: reduced ? 0 : 0.5, ease: "power3.out" });
+        const toMX = gsap.quickTo(media, "x", { duration: reduced ? 0 : 0.65, ease: "power3.out" });
+        const toMY = gsap.quickTo(media, "y", { duration: reduced ? 0 : 0.65, ease: "power3.out" });
+        const toMS = gsap.quickTo(media, "scale", { duration: reduced ? 0 : 0.8, ease: "power3.out" });
+
+        const onMove = (e: PointerEvent) => {
+          if (reduced) return;
+          const r = card.getBoundingClientRect();
+          const px = (e.clientX - r.left) / Math.max(r.width, 1);
+          const py = (e.clientY - r.top) / Math.max(r.height, 1);
+          toRX((py - 0.5) * -4);
+          toRY((px - 0.5) * 5);
+          toMX((px - 0.5) * 8);
+          toMY((py - 0.5) * 7);
+          toMS(1.02);
+          if (shine) {
+            shine.style.opacity = "1";
+            shine.style.background = `radial-gradient(320px circle at ${px * 100}% ${py * 100}%, rgba(0,191,255,0.11), transparent 55%)`;
           }
-        },
-      },
-    });
+        };
+
+        const onLeave = () => {
+          toRX(0);
+          toRY(0);
+          toMX(0);
+          toMY(0);
+          toMS(1);
+          if (shine) shine.style.opacity = "0";
+        };
+
+        card.addEventListener("pointermove", onMove);
+        card.addEventListener("pointerleave", onLeave);
+        cleanupTilt.push(() => {
+          card.removeEventListener("pointermove", onMove);
+          card.removeEventListener("pointerleave", onLeave);
+        });
+      });
+    }, section);
 
     const ro = new ResizeObserver(() => ScrollTrigger.refresh());
     ro.observe(track);
-
-    gsap.from(".wc-heading-block", {
-      y: 32,
-      opacity: 0,
-      duration: 0.9,
-      ease: "expo.out",
-      scrollTrigger: {
-        trigger: sectionRef.current,
-        scroller,
-        start: "top 88%",
-        once: true,
-      },
-    });
-
-    const cards = gsap.utils.toArray<HTMLElement>(".wc-tilt");
-    cards.forEach((card) => {
-      const media = card.querySelector(".wc-media") as HTMLElement | null;
-      const shine = card.querySelector(".wc-shine") as HTMLElement | null;
-      if (!media) return;
-
-      gsap.set(card, { transformPerspective: 1000 });
-      const reduced = prefersReducedMotion();
-      const toRX = gsap.quickTo(card, "rotationX", { duration: reduced ? 0 : 0.5, ease: "power3.out" });
-      const toRY = gsap.quickTo(card, "rotationY", { duration: reduced ? 0 : 0.5, ease: "power3.out" });
-      const toMX = gsap.quickTo(media, "x", { duration: reduced ? 0 : 0.65, ease: "power3.out" });
-      const toMY = gsap.quickTo(media, "y", { duration: reduced ? 0 : 0.65, ease: "power3.out" });
-      const toMS = gsap.quickTo(media, "scale", { duration: reduced ? 0 : 0.8, ease: "power3.out" });
-
-      const onMove = (e: MouseEvent) => {
-        if (reduced) return;
-        const r = card.getBoundingClientRect();
-        const px = (e.clientX - r.left) / r.width;
-        const py = (e.clientY - r.top) / r.height;
-        toRX((py - 0.5) * -4);
-        toRY((px - 0.5) * 5);
-        toMX((px - 0.5) * 8);
-        toMY((py - 0.5) * 7);
-        toMS(1.02);
-        if (shine) {
-          shine.style.opacity = "1";
-          shine.style.background = `radial-gradient(320px circle at ${px * 100}% ${py * 100}%, rgba(0,191,255,0.11), transparent 55%)`;
-        }
-      };
-      const onLeave = () => {
-        toRX(0);
-        toRY(0);
-        toMX(0);
-        toMY(0);
-        toMS(1);
-        if (shine) shine.style.opacity = "0";
-      };
-      card.addEventListener("mousemove", onMove);
-      card.addEventListener("mouseleave", onLeave);
-    });
-
-    requestAnimationFrame(() => ScrollTrigger.refresh());
+    scheduleScrollTriggerRefresh();
 
     return () => {
       ro.disconnect();
-      tween.kill();
+      cleanupTilt.forEach((fn) => fn());
+      ctx.revert();
     };
-  }, []);
+  }, [useHorizontal]);
 
   return (
     <section
@@ -182,17 +250,22 @@ export default function WorkCarousel() {
         </div>
       </div>
 
-      <div ref={pinRef} className="relative z-[1] h-[min(82vh,860px)] w-full overflow-hidden">
-        <div ref={trackRef} className="flex h-full w-max will-change-transform">
+      <div
+        ref={pinRef}
+        className={`relative z-[1] w-full ${useHorizontal ? "h-[min(82vh,860px)] overflow-hidden" : "h-auto overflow-visible pb-8"}`}
+      >
+        <div ref={trackRef} className={useHorizontal ? "flex h-full w-max will-change-transform" : "grid grid-cols-1 gap-6 px-4 sm:px-6 md:px-10"}>
           {PROJECTS.map((project, i) => (
             <div
               key={project.id}
-              className="box-border flex h-full w-[100vw] max-w-[100vw] flex-shrink-0 items-stretch px-4 pb-10 pt-4 sm:px-6 md:px-10 md:pb-14"
+              className={useHorizontal
+                ? "box-border flex h-full w-[100vw] max-w-[100vw] flex-shrink-0 items-stretch px-4 pb-10 pt-4 sm:px-6 md:px-10 md:pb-14"
+                : "box-border flex h-[min(68vh,560px)] w-full items-stretch"}
             >
               <button
                 type="button"
                 onClick={() => setSelectedProject(project)}
-                className="wc-tilt group relative mx-auto h-full w-full max-w-6xl overflow-hidden rounded-2xl border border-white/[0.12] bg-[#0d0d0d] text-left shadow-[0_24px_80px_-24px_rgba(0,0,0,0.85)] md:rounded-3xl"
+                className="wc-tilt group relative mx-auto h-full w-full max-w-6xl overflow-hidden rounded-2xl border border-white/[0.12] bg-[#0d0d0d] text-left shadow-[0_24px_80px_-24px_rgba(0,0,0,0.85)] md:rounded-3xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/50"
               >
                 <div className="wc-media absolute inset-0">
                   <Image

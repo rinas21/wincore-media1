@@ -5,9 +5,9 @@ import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { PointMaterial, Points } from "@react-three/drei";
 import type { Points as PointsMesh } from "three";
 import * as THREE from "three";
-import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { createSpherePoints } from "@/lib/sphere-points";
+import { registerGsapPlugins, getScroller, prefersReducedMotion } from "@/lib/motion";
 
 function ParticleLayer({
   positions,
@@ -57,19 +57,20 @@ function ScrollReactiveScene({ aboutId }: { aboutId: string }) {
   const inner = useMemo(() => createSpherePoints(520, 0.75), []);
 
   useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
+    registerGsapPlugins();
 
     const el = document.getElementById(aboutId);
     if (!el) return;
+    const reduced = prefersReducedMotion();
 
     const st = ScrollTrigger.create({
       trigger: el,
       start: "top top",
       end: "bottom top",
-      scrub: true,
-      scroller: document.documentElement,
+      scrub: reduced ? false : true,
+      scroller: getScroller(),
       onUpdate: (self) => {
-        progressRef.current = self.progress;
+        progressRef.current = reduced ? 0 : self.progress;
       },
     });
 

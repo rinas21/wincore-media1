@@ -19,24 +19,34 @@ export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const lenis = useLenis();
   const lastScrollRef = useRef(0);
+  const isHiddenRef = useRef(false);
 
   useEffect(() => {
-    if (!lenis) return;
+    const headerEl = headerRef.current;
+    if (!lenis || !headerEl) return;
+
+    const yTo = gsap.quickTo(headerEl, "yPercent", {
+      duration: 0.45,
+      ease: "power2.inOut",
+    });
 
     const onScroll = (instance: Lenis) => {
       const y = instance.scroll;
       const prev = lastScrollRef.current;
-      if (y > prev && y > 120) {
-        gsap.to(headerRef.current, { yPercent: -100, duration: 0.45, ease: "power2.inOut" });
-      } else {
-        gsap.to(headerRef.current, { yPercent: 0, duration: 0.45, ease: "power2.inOut" });
+      const shouldHide = y > prev && y > 120;
+
+      if (shouldHide !== isHiddenRef.current) {
+        yTo(shouldHide ? -100 : 0);
+        isHiddenRef.current = shouldHide;
       }
+
       lastScrollRef.current = y;
     };
 
     lenis.on("scroll", onScroll);
     return () => {
       lenis.off("scroll", onScroll);
+      gsap.killTweensOf(headerEl);
     };
   }, [lenis]);
 
