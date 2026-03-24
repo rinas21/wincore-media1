@@ -56,7 +56,7 @@ export default function PageMotion({ children }: PageMotionProps) {
       // autoAlpha:0 guarantees visibility:hidden (no paint) + opacity:0.
       const hiddenState = {
         autoAlpha: 0,
-        y: 48,
+        y: 16,
       };
 
       // Apply hidden state immediately so elements are invisible on first paint.
@@ -79,7 +79,7 @@ export default function PageMotion({ children }: PageMotionProps) {
           // already-resolved clearProps on a previous scroll.
           {
             autoAlpha: 0,
-            y: 48,
+            y: 16,
           },
           {
             autoAlpha: 1,

@@ -125,9 +125,8 @@ export default function AboutScene({ aboutId }: { aboutId: string }) {
     <Canvas
       camera={{ position: [0, 0, 1.9], fov: 44 }}
       dpr={[1, 1.2]}
-      gl={{ alpha: false, antialias: true, powerPreference: "high-performance" }}
+      gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}
     >
-      <color attach="background" args={["#ffffff"]} />
       <ScrollReactiveScene aboutId={aboutId} />
     </Canvas>
   );

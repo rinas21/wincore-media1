@@ -209,7 +209,7 @@ export default function WorkCarousel() {
         Archive
       </div>
 
-      <div className="wc-heading-block _container relative z-10 py-20">
+      <div className="wc-heading-block _container relative z-10 py-16">
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div className="max-w-2xl">
             <span className="mb-4 inline-block text-[10px] font-black uppercase tracking-[0.5em] text-accent">Selected Archives</span>
@@ -255,7 +255,7 @@ export default function WorkCarousel() {
                   loading={i === 0 ? undefined : "lazy"}
                 />
                 <div className="wc-shine pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500" />
-                <div className="absolute inset-0 bg-gradient-to-t from-white via-white/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/5 to-transparent" />
                 
                 <div className="absolute bottom-14 left-8 right-8 z-10 sm:bottom-16 sm:left-12 sm:right-12 md:left-14 md:right-14">
                   <span className="text-accent uppercase tracking-[0.5em] font-black text-[10px] mb-4 block">

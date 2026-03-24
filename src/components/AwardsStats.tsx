@@ -164,7 +164,7 @@ export default function AwardsStats() {
   return (
     <section
       ref={sectionRef}
-      className="relative overflow-visible border-t border-black/5 bg-background pb-[min(12rem,18vw)] pt-[min(12rem,18vw)] md:pb-[min(14rem,16vw)] md:pt-[min(14rem,16vw)]"
+      className="relative overflow-visible border-t border-black/5 bg-background pb-20 pt-20 md:pb-28 md:pt-28"
       aria-label="Awards and stats"
     >
       {/* Ambient glows */}
@@ -179,7 +179,7 @@ export default function AwardsStats() {
               Track Record
             </span>
             <h2
-              className="aw-heading text-[12vw] font-black uppercase leading-[0.8] tracking-tighter md:text-[7vw]"
+              className="aw-heading pb-1 text-[12vw] font-black uppercase leading-[0.9] tracking-tighter md:text-[7vw]"
               style={{ perspective: "800px" }}
             >
               Outcomes<br />
@@ -204,8 +204,8 @@ export default function AwardsStats() {
                 {/* Dynamic Shine Trail */}
                 <div className="absolute inset-0 z-0 bg-gradient-to-tr from-accent/[0.03] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
                 
-                {/* Subtle Background Image Context */}
-                <div className="absolute inset-0 z-0 opacity-[0.06] mix-blend-multiply grayscale contrast-125 transition-all duration-[1.5s] group-hover:opacity-[0.2] group-hover:grayscale-[40%] group-hover:scale-105">
+                {/* Background Image Context - increased visibility */}
+                <div className="absolute inset-0 z-0 opacity-[0.14] mix-blend-multiply transition-all duration-[1.5s] group-hover:opacity-[0.25] group-hover:scale-105">
                   <Image
                     src={stat.image}
                     alt=""

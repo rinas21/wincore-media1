@@ -121,7 +121,7 @@ export default function WorksHero() {
             <span className="text-[11px] font-black uppercase tracking-[0.5em] text-black/40">Selected Archive 2024</span>
           </span>
           
-          <h1 className="font-heading text-[16vw] sm:text-[14vw] md:text-[10vw] lg:text-[9vw] font-black uppercase leading-[0.82] tracking-tighter text-foreground">
+          <h1 className="font-heading text-[16vw] sm:text-[14vw] md:text-[10vw] lg:text-[9vw] font-black uppercase leading-[0.9] tracking-tighter text-foreground">
             World-class <br />
             <span className="text-black/15 italic font-light tracking-[-0.08em] hover:text-black transition-colors duration-1000 cursor-default">creativity</span>
           </h1>

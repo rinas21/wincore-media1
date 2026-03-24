@@ -221,7 +221,7 @@ export default function ServiceCards() {
     <section
       id="services"
       ref={sectionRef}
-      className="relative overflow-hidden border-t border-black/5 bg-background py-[12vw] md:py-[9vw]"
+      className="relative overflow-hidden border-t border-black/5 bg-background py-16 md:py-24"
       aria-label="Capabilities"
     >
       {/* Right-side accent glow */}
@@ -242,7 +242,7 @@ export default function ServiceCards() {
             </p>
             <h2
               ref={headingRef}
-              className="text-[14vw] font-black uppercase leading-[0.8] tracking-tight text-foreground md:text-[7.4vw]"
+              className="pb-1 text-[14vw] font-black uppercase leading-[0.9] tracking-tight text-foreground md:text-[7.4vw]"
             >
               Building<br />
               <span className="text-black/[0.08] italic">Impact</span>

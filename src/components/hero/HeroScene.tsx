@@ -107,10 +107,9 @@ export default function HeroScene({ heroId }: { heroId: string }) {
     <Canvas
       camera={{ position: [0, 0, 1.55], fov: 40 }}
       dpr={[1, 1.35]}
-      gl={{ alpha: false, antialias: true, powerPreference: "high-performance" }}
+      gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}
     >
       <Suspense fallback={null}>
-        <color attach="background" args={["#ffffff"]} />
         <CameraParallax heroId={heroId} />
         <ParticleLayer
           positions={outer}

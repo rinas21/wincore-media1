@@ -730,7 +730,7 @@ export default function Hero() {
       <section
         id="hero-section"
         ref={introRef}
-        className="relative flex min-h-[100svh] flex-col justify-center bg-background px-5 pt-16 pb-12 sm:px-6 md:px-10 md:pt-20 md:pb-14 lg:px-12"
+        className="relative flex min-h-[100svh] flex-col justify-center bg-background px-5 pt-16 pb-8 sm:px-6 md:px-10 md:pt-20 md:pb-10 lg:px-12"
       >
         {/* tftl-style soft top wash + floating tip badges */}
         <div
@@ -749,7 +749,7 @@ export default function Hero() {
           <HeroScene heroId="hero-section" />
         </div>
 
-        <div className="pointer-events-none absolute inset-0 z-[2] bg-[radial-gradient(ellipse_85%_55%_at_50%_35%,transparent_0%,rgba(255,255,255,0.4)_58%,white_100%)]" />
+        <div className="pointer-events-none absolute inset-0 z-[2] bg-[radial-gradient(ellipse_85%_55%_at_50%_35%,transparent_0%,rgba(255,255,255,0.2)_70%,rgba(255,255,255,0.8)_100%)]" />
 
         <div className="hero-content-layer _container relative z-10 mx-auto w-full max-w-[1240px]">
           <div className="grid min-h-[min(78vh,820px)] grid-cols-1 items-start gap-10 md:gap-12 lg:grid-cols-12 lg:gap-12 lg:items-center">

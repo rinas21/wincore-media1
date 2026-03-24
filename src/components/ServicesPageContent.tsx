@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef } from "react";
 import type { ComponentType } from "react";
 import gsap from "gsap";
+import ScrollTrigger from "gsap/ScrollTrigger";
 import {
   ArrowUpRight,
   Bot,
@@ -243,13 +244,13 @@ export default function ServicesPageContent() {
 
       <div className="_container relative z-10">
         <header className="svc-intro mb-16 md:mb-20">
-          <div className="relative rounded-2xl border border-black/10 bg-white px-8 py-10 shadow-[0_1px_0_rgba(0,0,0,0.04)] md:px-12 md:py-14 lg:px-14 lg:py-16">
+          <div className="relative rounded-2xl bg-white px-8 py-10 shadow-xl shadow-black/8 md:px-12 md:py-14 lg:px-14 lg:py-16 overflow-hidden transition-shadow duration-500 hover:shadow-2xl hover:shadow-black/12">
             <div className="absolute left-0 top-0 h-full w-px bg-gradient-to-b from-accent/80 via-accent/20 to-transparent md:left-6" />
             <div className="pl-4 md:pl-8">
-              <p className="svc-kicker mb-5 text-[10px] font-black uppercase tracking-[0.55em] text-accent">
+              <p className="svc-kicker mb-5 text-[10px] font-black uppercase tracking-[0.55em] text-accent leading-[1.45] pb-1">
                 Services
               </p>
-              <h1 className="font-heading text-3xl font-black uppercase leading-[1.06] tracking-tight text-foreground sm:text-4xl md:text-5xl lg:text-[2.85rem] lg:leading-[1.08]">
+              <h1 className="font-heading text-3xl font-black uppercase leading-[1.15] tracking-tight text-foreground sm:text-4xl md:text-5xl lg:text-[2.85rem] lg:leading-[1.18]">
                 <span className="svc-title-line block">
                   Built to scale{" "}
                   <span className="text-secondary italic">modern</span> brands.
@@ -262,7 +263,7 @@ export default function ServicesPageContent() {
                 Wincore Agency delivers digital-first branding, motion, performance, and immersive
                 web. One partner, one bar for quality.
               </p>
-              <div className="svc-meta-row mt-8 flex flex-wrap gap-6 border-t border-black/8 pt-6 text-[10px] font-black uppercase tracking-[0.35em] text-foreground/40">
+              <div className="svc-meta-row mt-10 flex flex-wrap gap-8 pt-10 text-[10px] font-black uppercase tracking-[0.35em] text-foreground/40 leading-[1.5]">
                 <span>Colombo &amp; remote</span>
                 <span className="text-accent/90">WebGL · AI · Motion</span>
                 <span>Strategy-led delivery</span>
@@ -271,11 +272,11 @@ export default function ServicesPageContent() {
           </div>
         </header>
 
-        <div className="mb-10 flex items-end justify-between gap-4">
-          <h2 className="text-xl font-black uppercase tracking-tight text-foreground md:text-2xl">
+        <div className="mb-12 flex items-end justify-between gap-4">
+          <h2 className="text-2xl font-black uppercase tracking-tight text-foreground md:text-3xl leading-[1.1]">
             Capabilities
           </h2>
-          <span className="hidden text-[9px] font-black uppercase tracking-[0.4em] text-foreground/35 sm:inline">
+          <span className="hidden text-[10px] font-black uppercase tracking-[0.4em] text-foreground/35 sm:inline leading-[1.4]">
             06 disciplines
           </span>
         </div>
@@ -286,32 +287,32 @@ export default function ServicesPageContent() {
             return (
               <article
                 key={service.title}
-                className="svc-card group relative flex flex-col rounded-2xl border border-black/10 bg-gradient-to-b from-muted/90 to-white px-8 py-10 transition-[border-color,box-shadow] duration-500 hover:border-accent/40 hover:shadow-[0_0_0_1px_rgba(0,191,255,0.12)] md:min-h-[300px] md:px-9 md:py-11 lg:px-10 lg:py-12"
+                className="svc-card group relative flex flex-col rounded-2xl bg-white px-9 py-12 shadow-lg shadow-black/8 transition-all duration-500 hover:shadow-2xl hover:shadow-black/15 hover:scale-[1.02] md:min-h-[320px] md:px-11 md:py-14 lg:px-12 lg:py-16 overflow-visible isolate"
                 style={{ transformStyle: "preserve-3d" }}
               >
-                <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-accent/[0.04] via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-                <div className="pointer-events-none absolute inset-0 rounded-2xl bg-[radial-gradient(ellipse_at_top_right,rgba(0,191,255,0.12),transparent_60%)] opacity-0 transition-opacity duration-700 group-hover:opacity-100" />
-                <div className="relative mb-5 flex items-start justify-between gap-3">
-                  <span className="text-[9px] font-black uppercase tracking-[0.35em] text-foreground/40">
+                <div className="pointer-events-none absolute inset-0 rounded-2xl bg-gradient-to-br from-accent/[0.03] via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                <div className="pointer-events-none absolute inset-0 rounded-2xl bg-[radial-gradient(ellipse_at_top_right,rgba(0,191,255,0.08),transparent_60%)] opacity-0 transition-opacity duration-700 group-hover:opacity-100" />
+                <div className="relative mb-7 flex items-start justify-between gap-4">
+                  <span className="text-[10px] font-black uppercase tracking-[0.35em] text-foreground/40 leading-[1.3]">
                     {String(index + 1).padStart(2, "0")}
                   </span>
-                  <div className="rounded-xl border border-black/10 bg-white p-2.5 text-accent transition-all duration-500 group-hover:scale-110 group-hover:bg-accent group-hover:text-white group-hover:shadow-[0_8px_16px_rgba(0,191,255,0.25)] group-hover:border-accent">
-                    <Icon size={20} />
+                  <div className="rounded-xl bg-white p-3.5 text-accent shadow-md shadow-black/8 transition-all duration-500 group-hover:scale-110 group-hover:bg-accent group-hover:text-white group-hover:shadow-lg group-hover:shadow-accent/40">
+                    <Icon size={22} />
                   </div>
                 </div>
-                <h3 className="relative mb-2 text-[15px] font-bold leading-snug tracking-tight text-foreground md:text-base">
+                <h3 className="relative mb-3 text-[17px] font-bold leading-[1.3] tracking-tight text-foreground md:text-lg">
                   {service.title}
                 </h3>
-                <p className="relative mb-4 flex-1 text-[13px] leading-relaxed text-foreground/55 md:text-sm">
+                <p className="relative mb-6 flex-1 text-[14px] leading-[1.6] text-foreground/55 md:text-base">
                   {service.summary}
                 </p>
-                <ul className="relative mb-4 space-y-1.5 border-t border-black/8 pt-4">
+                <ul className="relative mb-6 space-y-2 pt-6">
                   {service.outcomes.map((outcome) => (
                     <li
                       key={outcome}
-                      className="flex items-center gap-2 text-[11px] text-foreground/60 md:text-xs"
+                      className="flex items-center gap-2.5 text-[12px] text-foreground/60 md:text-sm leading-[1.5]"
                     >
-                      <span className="h-1 w-1 shrink-0 rounded-full bg-accent/80" aria-hidden />
+                      <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent/80" aria-hidden />
                       {outcome}
                     </li>
                   ))}
@@ -321,13 +322,13 @@ export default function ServicesPageContent() {
                     href={service.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="relative inline-flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.3em] text-accent hover:opacity-90"
+                    className="relative inline-flex items-center gap-2.5 text-[10px] font-black uppercase tracking-[0.3em] text-accent hover:opacity-90 leading-[1.4]"
                   >
                     WinPro AI
-                    <ArrowUpRight size={12} />
+                    <ArrowUpRight size={14} />
                   </a>
                 ) : (
-                  <span className="relative text-[9px] font-black uppercase tracking-[0.25em] text-foreground/35">
+                  <span className="relative text-[10px] font-black uppercase tracking-[0.25em] text-foreground/35 leading-[1.4]">
                     Strategy-led
                   </span>
                 )}
@@ -336,48 +337,48 @@ export default function ServicesPageContent() {
           })}
         </div>
 
-        <div className="svc-process relative mb-20 overflow-hidden rounded-2xl border border-black/10 bg-white px-8 py-10 shadow-[0_1px_0_rgba(0,0,0,0.04)] md:px-12 md:py-14">
+        <div className="svc-process relative mb-20 overflow-hidden overflow-visible isolate rounded-2xl bg-white px-9 py-12 shadow-xl shadow-black/8 transition-shadow duration-500 hover:shadow-2xl hover:shadow-black/12 md:px-14 md:py-16 lg:px-16 lg:py-18">
           <div className="svc-process-inner relative">
             <div className="pointer-events-none absolute right-0 top-0 h-40 w-40 rounded-full bg-secondary/[0.06] blur-3xl" />
-            <div className="relative mb-10 flex flex-col gap-3 border-b border-black/8 pb-8 md:flex-row md:items-end md:justify-between">
-              <h3 className="text-xl font-black uppercase tracking-tight text-foreground md:text-2xl">
+            <div className="relative mb-12 flex flex-col gap-4 pb-10 md:flex-row md:items-end md:justify-between">
+              <h3 className="text-2xl font-black uppercase tracking-tight text-foreground md:text-3xl leading-[1.1]">
                 How we <span className="text-secondary/90 italic">work</span>
               </h3>
-              <span className="text-[9px] font-black uppercase tracking-[0.4em] text-foreground/35">
+              <span className="text-[10px] font-black uppercase tracking-[0.4em] text-foreground/35 leading-[1.4]">
                 Discover → Design → Deploy
               </span>
             </div>
-            <div className="relative grid grid-cols-1 gap-10 md:grid-cols-3 md:gap-8">
+            <div className="relative grid grid-cols-1 gap-12 md:grid-cols-3 md:gap-10">
               {PROCESS.map((phase) => (
                 <article key={phase.step} className="svc-phase">
-                  <p className="mb-2 text-[9px] font-black uppercase tracking-[0.35em] text-accent/90">
+                  <p className="mb-3 text-[10px] font-black uppercase tracking-[0.35em] text-accent/90 leading-[1.4]">
                     {phase.step}
                   </p>
-                  <h4 className="mb-2 text-lg font-bold text-foreground">{phase.title}</h4>
-                  <p className="text-[13px] leading-relaxed text-foreground/55 md:text-sm">{phase.text}</p>
+                  <h4 className="mb-3 text-lg font-bold text-foreground leading-[1.25]">{phase.title}</h4>
+                  <p className="text-[14px] leading-[1.6] text-foreground/55 md:text-base">{phase.text}</p>
                 </article>
               ))}
             </div>
           </div>
         </div>
 
-        <div className="svc-cta relative overflow-hidden rounded-2xl border border-accent/30 bg-gradient-to-br from-accent/[0.09] via-transparent to-secondary/[0.05]">
+        <div className="svc-cta relative overflow-hidden overflow-visible isolate rounded-2xl bg-gradient-to-br from-accent/[0.09] via-transparent to-secondary/[0.05] shadow-lg shadow-accent/25 transition-shadow duration-500 hover:shadow-xl hover:shadow-accent/35">
           <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_80%_20%,rgba(0,191,255,0.12),transparent_60%)]" />
-          <div className="svc-cta-inner relative flex flex-col items-start justify-between gap-8 px-8 py-10 md:flex-row md:items-center md:px-12 md:py-14 lg:px-14 lg:py-16">
+          <div className="svc-cta-inner relative flex flex-col items-start justify-between gap-10 px-9 py-12 md:flex-row md:items-center md:px-14 md:py-16 lg:px-16 lg:py-18">
             <div>
-              <p className="mb-2 text-[9px] font-black uppercase tracking-[0.45em] text-accent">
+              <p className="mb-3 text-[10px] font-black uppercase tracking-[0.45em] text-accent leading-[1.4]">
                 Next step
               </p>
-              <p className="text-xl font-black uppercase leading-tight tracking-tight text-foreground md:text-2xl">
+              <p className="text-2xl font-black uppercase leading-[1.15] tracking-tight text-foreground md:text-3xl">
                 Tell us what you&apos;re building — we&apos;ll scope it.
               </p>
             </div>
             <Link
               href="/contact"
-              className="relative inline-flex shrink-0 items-center gap-3 rounded-full bg-accent px-10 py-3.5 text-[10px] font-black uppercase tracking-[0.35em] text-white transition-transform hover:scale-[1.02] active:scale-[0.98]"
+              className="relative inline-flex shrink-0 items-center gap-3 rounded-full bg-accent px-12 py-4 text-[11px] font-black uppercase tracking-[0.35em] text-white transition-transform hover:scale-[1.02] active:scale-[0.98] leading-[1.3]"
             >
               Contact
-              <ArrowUpRight size={16} />
+              <ArrowUpRight size={18} />
             </Link>
           </div>
         </div>

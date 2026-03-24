@@ -92,7 +92,7 @@ export default function BrandWall() {
       <div className="_container relative z-10">
         <div className="mb-16 md:mb-24 text-center max-w-4xl mx-auto">
           <span className="mb-6 inline-block text-[11px] font-black uppercase tracking-[0.8em] text-accent/60">Legacy Partners</span>
-          <h2 className="font-heading text-6xl md:text-8xl lg:text-9xl font-black uppercase leading-[0.85] tracking-tighter text-foreground">
+          <h2 className="pb-1 font-heading text-6xl md:text-8xl lg:text-9xl font-black uppercase leading-[0.92] tracking-tighter text-foreground">
             Driven by the <br />
             <span className="text-black/15 italic font-light">standard setters</span>
           </h2>

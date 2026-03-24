@@ -140,7 +140,7 @@ export default function ContactFooter() {
           <span className="cf-kicker mb-6 text-[11px] font-black uppercase tracking-[0.5em] text-accent">
             Let&apos;s Build Together
           </span>
-          <h2 className="mb-14 text-[16vw] font-black uppercase leading-[0.75] tracking-tighter md:text-[14vw]">
+          <h2 className="mb-14 pb-1 text-[16vw] font-black uppercase leading-[0.9] tracking-tighter md:text-[14vw]">
             <span className="block overflow-hidden">
               <span className="cf-title-line block text-foreground">GOT A</span>
             </span>
@@ -220,8 +220,8 @@ export default function ContactFooter() {
                 </span>
               </div>
 
-              <div className="cf-company-shell mt-3 overflow-hidden">
-                <p className="cf-company-name text-left font-black uppercase leading-[0.78] tracking-tight text-black/90 text-[clamp(2.4rem,10vw,8.5rem)]">
+              <div className="cf-company-shell mt-3 overflow-visible">
+                <p className="cf-company-name text-left font-black uppercase leading-[0.9] tracking-tight text-black/90 text-[clamp(2.4rem,10vw,8.5rem)]">
                   WINCORE MEDIA
                 </p>
               </div>
