@@ -105,16 +105,15 @@ export default function ContactFooter() {
       });
 
       gsap.fromTo(
-        ".cf-company-name",
-        { yPercent: reduced ? 0 : 105, opacity: reduced ? 1 : 0 },
+        ".cf-main-logo",
+        { y: 60, opacity: 0 },
         {
-          yPercent: 0,
+          y: 0,
           opacity: 1,
-          duration: reduced ? 0 : 1.05,
+          duration: 1.5,
           ease: "expo.out",
-          clearProps: "transform,opacity",
           scrollTrigger: {
-            trigger: ".cf-company-shell",
+            trigger: ".cf-main-logo",
             scroller,
             start: "top 92%",
             once: true,
@@ -132,115 +131,115 @@ export default function ContactFooter() {
     <footer
       ref={footerRef}
       id="contact"
-      className="relative overflow-hidden bg-background pb-16 pt-20 md:pb-24 md:pt-28"
+      className="relative overflow-hidden bg-background pb-12 pt-24 md:pb-16 md:pt-32"
     >
+      {/* Decorative dynamic element */}
+      <div className="pointer-events-none absolute right-[-10vw] top-0 h-[60vw] w-[60vw] rounded-full bg-accent/[0.03] blur-[120px]" />
+
       <div className="_container relative z-10">
         {/* ── Main Contact Section ── */}
-        <div className="mb-16 flex flex-col items-center justify-center text-center md:mb-24">
-          <span className="cf-kicker mb-6 text-[11px] font-black uppercase leading-[1.4] tracking-[0.44em] text-accent">
-            Let&apos;s Build Together
+        <div className="mb-24 flex flex-col items-center justify-center text-center md:mb-40">
+          <span className="cf-kicker mb-10 text-[11px] font-black uppercase leading-[1.4] tracking-[0.5em] text-accent">
+            Secure your advantage
           </span>
-          <h2 className="mb-14 pb-1 text-[16vw] font-black uppercase leading-[0.96] tracking-tighter md:text-[14vw]">
-            <span className="block overflow-hidden">
-              <span className="cf-title-line block text-foreground">GOT A</span>
-            </span>
-            <span className="block overflow-hidden flex items-center justify-center gap-4">
-              <span className="cf-title-line block italic text-transparent [-webkit-text-stroke:2px_rgba(0,0,0,0.8)] md:[-webkit-text-stroke:4px_rgba(0,0,0,0.8)]">
-                VISION?
+          <h2 className="mb-20 pb-1 text-[10vw] font-black uppercase leading-[0.92] tracking-tighter md:text-[8vw]">
+            <div className="overflow-hidden">
+              <span className="cf-title-line block text-foreground">Next-Gen</span>
+            </div>
+            <div className="flex items-center justify-center gap-6 overflow-hidden">
+              <span className="cf-title-line block italic text-transparent [-webkit-text-stroke:1px_rgba(0,0,0,0.15)] md:[-webkit-text-stroke:2px_rgba(0,0,0,0.15)]">
+                Impact
               </span>
-            </span>
+            </div>
           </h2>
 
-          <div className="cf-contact-block relative z-20">
-            <a
-              href="mailto:hello@wincore.media"
-              className="group relative flex items-center gap-6 overflow-hidden rounded-full bg-white/70 py-5 pl-10 pr-5 shadow-[0_8px_28px_rgba(0,0,0,0.06)] backdrop-blur-xl transition-all duration-500 hover:bg-white/90 hover:shadow-[0_14px_36px_rgba(0,191,255,0.14)]"
-            >
-              <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-accent/20 to-transparent transition-transform duration-500 group-hover:translate-x-0" />
-              <span className="relative z-10 text-sm font-bold uppercase tracking-widest text-black/90 transition-colors group-hover:text-foreground md:text-xl">
-                hello@wincore.media
-              </span>
-              <div className="relative z-10 flex h-14 w-14 items-center justify-center rounded-full bg-accent text-white transition-transform duration-500 group-hover:scale-110 group-hover:bg-foreground">
-                <svg
-                  width="24"
-                  height="24"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M5 12h14"></path>
-                  <path d="m12 5 7 7-7 7"></path>
-                </svg>
-              </div>
-            </a>
-          </div>
         </div>
 
-        <nav
-          className="cf-reveal mb-12 flex flex-wrap items-center justify-center gap-x-10 gap-y-4 pb-12 md:justify-between"
-          aria-label="Footer"
-        >
-          <Link href="/" className="text-[10px] font-black uppercase tracking-[0.45em] text-black/35 transition-colors hover:text-accent">
-            Home
+        {/* ── Massive Brand Centerpiece ── */}
+        <div className="cf-reveal mb-20 md:mb-32">
+          <Link href="/" className="group cf-main-logo flex flex-col items-start transition-transform hover:scale-[1.01]">
+            <span className="text-7xl font-[1000] tracking-[-0.05em] text-foreground md:text-[11rem] lg:text-[13rem] leading-[0.8]">WINCOR</span>
+            <div className="flex items-center gap-4 mt-4">
+              <div className="h-px w-24 bg-accent/40" />
+              <span className="text-xs font-black uppercase tracking-[0.6em] text-accent group-hover:tracking-[0.8em] transition-all duration-700">
+                Agency
+              </span>
+            </div>
           </Link>
-          <Link href="/works" className="text-[10px] font-black uppercase tracking-[0.45em] text-black/35 transition-colors hover:text-accent">
-            Works
-          </Link>
-          <Link href="/services" className="text-[10px] font-black uppercase tracking-[0.45em] text-black/35 transition-colors hover:text-accent">
-            Services
-          </Link>
-          <Link href="/about" className="text-[10px] font-black uppercase tracking-[0.45em] text-black/35 transition-colors hover:text-accent">
-            About
-          </Link>
-          <Link href="/contact" className="text-[10px] font-black uppercase tracking-[0.45em] text-black/35 transition-colors hover:text-accent">
-            Contact
-          </Link>
-        </nav>
+        </div>
 
-        {/* ── Secondary Footer ── */}
-        <div className="cf-reveal pt-12 md:pt-16">
-          <div className="grid grid-cols-1 gap-10 md:grid-cols-12 md:gap-8">
-            <div className="md:col-span-7 flex flex-col gap-6">
-              <Link href="/" className="cursor-hover flex flex-col items-start">
-                <span className="text-4xl font-black tracking-tighter text-foreground">WINCOR</span>
-                <span className="text-[11px] font-bold uppercase tracking-[0.4em] text-accent -mt-1">
-                  Agency
-                </span>
-              </Link>
+        {/* ── Corporate Footer Grid ── */}
+        <div className="cf-reveal border-t border-black/[0.05] pt-14 md:pt-20">
+          <div className="grid grid-cols-1 gap-12 sm:grid-cols-2 md:grid-cols-12 md:gap-x-8 md:gap-y-0">
 
-              <div className="flex items-center gap-4">
-                <span className="text-[10px] font-black uppercase tracking-[0.4em] text-black/20">
-                  Time in Colombo:
-                </span>
-                <span className="text-lg font-black italic tracking-widest text-accent/80">
-                  {colomboTime || "--:--"}
-                </span>
+            {/* Col 1 — Tagline + Location */}
+            <div className="sm:col-span-2 md:col-span-4 flex flex-col gap-6">
+              <p className="max-w-[30ch] text-[13px] font-medium leading-[1.7] text-black/40">
+                Colombo&apos;s AI Native studio. Cinematic strategy for global outliers since 2014.
+              </p>
+              <div className="flex flex-col gap-1.5">
+                <span className="text-[9px] font-black uppercase tracking-[0.5em] text-black/20">Operating from</span>
+                <div className="flex items-baseline gap-4">
+                  <span className="text-base font-black italic tracking-tight text-foreground/60">Colombo, SL</span>
+                  <span className="font-mono text-sm font-bold tabular-nums text-accent">{colomboTime || "--:--"}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Col 2 — Spacer on md */}
+            <div className="hidden md:block md:col-span-1" />
+
+            {/* Col 3 — Navigation */}
+            <nav className="md:col-span-3 flex flex-col gap-5" aria-label="Footer navigation">
+              <span className="text-[9px] font-black uppercase tracking-[0.55em] text-black/20">Navigate</span>
+              {[
+                { label: "Our Works", href: "/works" },
+                { label: "Core Services", href: "/services" },
+                { label: "The Studio", href: "/about" },
+                { label: "Start a Project", href: "/contact" },
+              ].map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="group relative w-fit text-[13px] font-bold uppercase tracking-[0.28em] text-black/45 transition-colors duration-200 hover:text-foreground"
+                >
+                  {link.label}
+                  <span className="absolute -bottom-0.5 left-0 h-px w-0 bg-accent transition-all duration-300 group-hover:w-full" />
+                </Link>
+              ))}
+            </nav>
+
+            {/* Col 4 — Direct Line + Legal */}
+            <div className="md:col-span-4 flex flex-col items-start gap-10 md:items-end md:text-right">
+              <div className="cf-contact-block flex flex-col gap-2 md:items-end">
+                <span className="text-[9px] font-black uppercase tracking-[0.55em] text-black/20">Direct Line</span>
+                <a
+                  href="mailto:hello@wincore.media"
+                  className="group relative text-xl font-black tracking-tight text-foreground/80 transition-colors hover:text-accent md:text-2xl lg:text-3xl"
+                >
+                  hello@wincore.media
+                  <span className="absolute -bottom-1 left-0 h-[2px] w-0 bg-accent transition-all duration-500 group-hover:w-full md:left-auto md:right-0" />
+                </a>
               </div>
 
-              <div className="cf-company-shell mt-3 overflow-visible">
-                <p className="cf-company-name text-left font-black uppercase leading-[0.96] tracking-tight text-black/90 text-[clamp(2.4rem,10vw,8.5rem)]">
-                  WINCORE MEDIA
+              <div className="flex flex-col gap-2 md:items-end">
+                <span className="text-[9px] font-black uppercase tracking-[0.55em] text-black/20">Legal</span>
+                <p className="text-[11px] font-medium leading-[1.8] tracking-[0.08em] text-black/30">
+                  © {new Date().getFullYear()} WINCORE MEDIA (PVT) LTD.<br />
+                  All rights reserved.
                 </p>
               </div>
             </div>
 
-            <div className="md:col-span-5 flex flex-col items-start gap-8 md:items-end md:justify-end">
-              <p className="text-left text-[11px] font-bold uppercase tracking-[0.5em] text-black/30 md:text-right">
-                Sri Lanka&apos;s AI Native <br />
-                Digital Experience Studio®
-              </p>
-              <div className="text-left text-[10px] font-black uppercase tracking-[0.5em] text-black/10 md:text-right">
-                © {new Date().getFullYear()} WINCORE MEDIA. <br />
-                All rights reserved.
-              </div>
-            </div>
+          </div>
+
+          {/* Bottom micro-bar */}
+          <div className="mt-16 flex items-center justify-between pb-4">
+            <span className="text-[9px] font-black uppercase tracking-[0.5em] text-black/15">Sri Lanka&apos;s AI Native Digital Studio®</span>
+            <span className="text-[9px] font-black uppercase tracking-[0.5em] text-black/15">Est. 2014</span>
           </div>
         </div>
       </div>
     </footer>
   );
 }
-

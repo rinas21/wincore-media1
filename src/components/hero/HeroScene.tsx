@@ -106,7 +106,7 @@ export default function HeroScene({ heroId }: { heroId: string }) {
   return (
     <Canvas
       camera={{ position: [0, 0, 1.55], fov: 40 }}
-      dpr={[1, 1.35]}
+      dpr={[1, 2]}
       gl={{ alpha: true, antialias: true, powerPreference: "high-performance" }}
     >
       <Suspense fallback={null}>

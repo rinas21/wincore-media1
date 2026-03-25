@@ -189,9 +189,9 @@ export default function ProjectModal({
 
         {/* Copy + meta — scrolls independently on short viewports */}
         <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto">
-          <div className="flex flex-1 flex-col gap-10 px-8 pb-14 pt-[5rem] sm:gap-11 sm:px-12 sm:pb-16 sm:pt-[4.75rem] lg:gap-12 lg:px-16 lg:pb-20 lg:pt-20">
+          <div className="flex flex-1 flex-col gap-10 px-10 pb-16 pt-[5.5rem] sm:gap-11 sm:px-14 sm:pb-20 sm:pt-[5.5rem] lg:gap-12 lg:px-24 lg:pb-24 lg:pt-24">
             <header className="stagger-item space-y-4">
-              <p className="text-[11px] font-black uppercase tracking-[0.32em] text-accent">
+              <p className="text-[12.5px] font-black uppercase tracking-[0.32em] text-accent">
                 Case study · {project.category}
               </p>
               <h2 className="break-words text-[1.85rem] font-black uppercase leading-[1.08] tracking-tight text-foreground sm:text-[2.1rem] lg:text-[2.25rem]">
@@ -199,7 +199,7 @@ export default function ProjectModal({
               </h2>
             </header>
 
-            <div className="stagger-item space-y-5 text-[16px] font-light leading-[1.65] text-foreground/75 sm:text-[17px] lg:leading-[1.7]">
+            <div className="stagger-item space-y-4 text-[16px] font-light leading-[1.6] text-foreground/75 sm:text-[17px] lg:leading-[1.65]">
               {bodyCopy.map((para, i) => (
                 <p key={i} className="max-w-prose">
                   {para}
@@ -211,7 +211,7 @@ export default function ProjectModal({
               {project.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="inline-flex items-center rounded-full border border-black/10 bg-black/[0.03] px-4 py-2.5 text-[10px] font-bold uppercase tracking-wider text-foreground/85 sm:px-5 sm:py-2.5"
+                  className="inline-flex items-center rounded-full border border-black/10 bg-black/[0.03] px-5 py-3 text-[11.5px] font-bold uppercase tracking-wider text-foreground/85 sm:px-6 sm:py-3"
                 >
                   {tag}
                 </span>
@@ -227,38 +227,48 @@ export default function ProjectModal({
               ].map(({ icon: Icon, label, value }) => (
                 <div
                   key={label}
-                  className="meta-item rounded-2xl border border-black/8 bg-black/[0.02] px-6 py-8 sm:px-7 sm:py-9 md:px-8 md:py-10"
+                  className="meta-item group/meta relative overflow-hidden rounded-3xl border border-black/[0.06] bg-gradient-to-br from-white via-white/80 to-black/[0.02] p-7 transition-all duration-500 hover:border-accent/30 hover:shadow-[0_24px_48px_rgba(0,0,0,0.04)] sm:p-9"
                 >
-                  <div className="mb-3.5 flex items-center gap-2.5 text-[10px] font-black uppercase tracking-[0.18em] text-foreground/50">
-                    <Icon className="h-4 w-4 shrink-0 text-accent" aria-hidden />
-                    {label}
+                  {/* Subtle Accent Glow */}
+                  <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-accent/5 blur-2xl transition-opacity group-hover/meta:opacity-100" />
+                  
+                  <div className="relative z-10">
+                    <div className="mb-6 flex items-center gap-4">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/5 text-accent transition-colors group-hover/meta:bg-accent group-hover/meta:text-white">
+                        <Icon size={18} />
+                      </div>
+                      <span className="text-[11.5px] font-black uppercase tracking-[0.25em] text-black/30 group-hover/meta:text-accent/80 transition-colors">
+                        {label}
+                      </span>
+                    </div>
+                    
+                    <p className="text-[1.1rem] font-bold leading-tight tracking-tight text-foreground/90 sm:text-xl">
+                      {value}
+                    </p>
                   </div>
-                  <p className="break-words text-[15px] font-medium leading-snug text-foreground sm:text-base">
-                    {value}
-                  </p>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="stagger-item mt-auto flex flex-col gap-4 border-t border-black/8 bg-background/95 px-8 py-10 sm:flex-row sm:gap-5 sm:px-12 sm:py-12 lg:px-16 lg:py-12">
+          <div className="stagger-item mt-auto flex flex-col gap-5 border-t border-black/8 bg-background/95 px-10 pb-16 pt-10 sm:flex-row sm:gap-6 sm:px-14 sm:pb-20 sm:pt-12 lg:px-24 lg:pb-16 lg:pt-14">
             <Link
               href="/contact"
-              className="group relative inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-accent px-8 py-4 text-[10px] font-black uppercase tracking-[0.28em] text-white transition-transform hover:scale-[1.01] active:scale-[0.99] sm:py-5"
+              className="group relative inline-flex flex-[1.4] items-center justify-center gap-3 rounded-2xl bg-accent px-8 py-5 text-[12.5px] font-black uppercase tracking-[0.32em] text-white transition-all hover:scale-[1.01] hover:shadow-[0_12px_36px_rgba(0,191,255,0.18)] active:scale-[0.99] sm:py-6"
               onClick={onClose}
             >
               <span className="relative z-10">Start a project</span>
-              <ArrowRight className="relative z-10 h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+              <ArrowRight className="relative z-10 h-5 w-5 transition-transform group-hover:translate-x-1" />
             </Link>
 
             <a
               href={project.link}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl border border-black/12 bg-background px-8 py-4 text-[10px] font-black uppercase tracking-[0.28em] text-foreground/75 transition-colors hover:border-accent/40 hover:text-foreground sm:py-5"
+              className="inline-flex flex-1 items-center justify-center gap-3 rounded-2xl border border-black/15 bg-background px-8 py-5 text-[12.5px] font-black uppercase tracking-[0.32em] text-foreground transition-all hover:border-accent/40 hover:bg-black/[0.01] sm:py-6"
             >
               Live site
-              <ExternalLink className="h-4 w-4 opacity-60" />
+              <ExternalLink className="h-5 w-5 opacity-70" />
             </a>
           </div>
         </div>

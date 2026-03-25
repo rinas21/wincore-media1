@@ -741,7 +741,7 @@ export default function Hero() {
           <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_0%,white_92%)]" />
         </div>
 
-        <div className="hero-canvas-wrap pointer-events-none absolute inset-0 z-[1] opacity-[0.2] md:opacity-[0.25]">
+        <div className="hero-canvas-wrap pointer-events-none absolute inset-0 z-[1] opacity-[0.34] md:opacity-[0.4]">
           <HeroScene heroId="hero-section" />
         </div>
 

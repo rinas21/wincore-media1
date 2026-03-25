@@ -199,19 +199,20 @@ export default function AwardsStats() {
               className="aw-card-wrapper perspective-[2000px]"
             >
               <div
-                className="aw-card group relative min-h-[340px] md:min-h-[460px] overflow-hidden rounded-[3rem] border border-black/[0.06] bg-gradient-to-br from-white via-white/80 to-black/[0.01] px-12 py-14 shadow-[0_45px_100px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.8)] backdrop-blur-3xl transition-all duration-700 hover:border-accent/30 hover:shadow-[0_60px_120px_rgba(0,191,255,0.06)] will-change-transform md:px-16 md:py-16 lg:px-24 lg:py-24"
+                className="aw-card group relative min-h-[340px] md:min-h-[460px] overflow-hidden rounded-[3rem] border border-black/[0.06] bg-gradient-to-br from-white via-white/80 to-black/[0.01] px-12 py-14 shadow-[0_45px_100px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.8)] backdrop-blur-2xl transition-all duration-700 hover:border-accent/30 hover:shadow-[0_60px_120px_rgba(0,191,255,0.06)] will-change-transform md:px-16 md:py-16 lg:px-24 lg:py-24 transform-gpu"
               >
                 {/* Dynamic Shine Trail */}
                 <div className="absolute inset-0 z-0 bg-gradient-to-tr from-accent/[0.03] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
                 
-                {/* Background Image Context - increased visibility */}
-                <div className="absolute inset-0 z-0 opacity-[0.14] mix-blend-multiply transition-all duration-[1.5s] group-hover:opacity-[0.25] group-hover:scale-105">
+                {/* Background Image Context - increased visibility and removed muddy blend */}
+                <div className="absolute inset-0 z-0 opacity-[0.25] transition-all duration-[1.5s] group-hover:opacity-[0.45] group-hover:scale-105">
                   <Image
                     src={stat.image}
                     alt=""
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 1400px"
+                    priority={i < 2}
                   />
                 </div>
 
@@ -222,11 +223,11 @@ export default function AwardsStats() {
                   {/* Indicator Header */}
                   <div className="mb-14 flex items-center justify-between">
                     <div className="flex items-center gap-6">
-                      <span className="text-[10px] font-black uppercase tracking-[0.6em] text-black/15">
+                      <span className="text-[11px] font-black uppercase tracking-[0.6em] text-black/15">
                         {String(i + 1).padStart(2, "0")} <span className="text-black/5 mx-2">/</span> {stats.length}
                       </span>
                       <div className="h-[2px] w-12 bg-accent/20" />
-                      <span className="text-[10px] font-black uppercase tracking-[0.5em] text-accent/80">
+                      <span className="text-[11px] font-black uppercase tracking-[0.55em] text-accent/80">
                         {stat.label}
                       </span>
                     </div>
@@ -241,7 +242,7 @@ export default function AwardsStats() {
                       <div className="absolute -left-12 -top-12 text-[14rem] font-black text-transparent [-webkit-text-stroke:1px_rgba(0,0,0,0.08)] select-none leading-none md:text-[18rem]">
                         {stat.value}
                       </div>
-                      <div className="flex items-baseline relative z-10 transition-transform duration-700 group-hover:scale-105">
+                      <div className="flex items-baseline relative z-10 transition-transform duration-700 group-hover:scale-105 will-change-transform">
                         <span className="aw-num text-[7rem] md:text-[10rem] lg:text-[12rem] font-black leading-none tracking-tighter text-foreground" data-target={stat.value}>
                           0
                         </span>

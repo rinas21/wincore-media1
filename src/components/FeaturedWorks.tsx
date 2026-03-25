@@ -202,7 +202,8 @@ export default function FeaturedWorks() {
                 alt={project.title}
                 fill
                 className="object-cover"
-                sizes="(max-width: 768px) 100vw, 600px"
+                sizes="(max-width: 768px) 100vw, 800px"
+                quality={100}
               />
             </div>
 
@@ -227,7 +228,8 @@ export default function FeaturedWorks() {
             </div>
 
             {/* Bottom info for when not hovered */}
-            <div className="absolute -bottom-1 left-0 z-20 w-full p-9 sm:p-10 text-foreground transition-opacity duration-300 group-hover:opacity-0 bg-gradient-to-t from-white via-white/80 to-transparent">
+            {/* Initial info layer — more subtle gradient for better clarity */}
+            <div className="absolute -bottom-1 left-0 z-20 w-full p-9 sm:p-10 text-foreground transition-all duration-300 group-hover:opacity-0 bg-gradient-to-t from-white/95 via-white/40 to-transparent">
               <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.3em] text-black/40">
                 {project.category}
               </p>

@@ -257,93 +257,86 @@ export default function AboutTeaser() {
       id="about"
       ref={sectionRef}
       data-chapter="custom"
-      className="relative overflow-hidden bg-background pb-20 pt-20"
+      className="relative overflow-hidden bg-background py-28 md:py-36"
       aria-label="About"
     >
+      {/* Ambient glow */}
       <div className="pointer-events-none absolute inset-0 z-0">
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 opacity-30">
           <AboutScene aboutId="about" />
         </div>
-        <div className="abt-scene-glow absolute left-[-10rem] top-24 h-72 w-72 rounded-full bg-accent/10 blur-3xl opacity-80" />
-      </div>
-
-      <div
-        data-watermark
-        className="pointer-events-none absolute left-[-8vw] top-1/2 -translate-y-1/2 select-none whitespace-nowrap text-[36vw] font-black uppercase italic text-black/[0.02] z-[1]"
-      >
-        Studio
+        <div className="abt-scene-glow absolute left-[-8rem] top-16 h-96 w-96 rounded-full bg-accent/8 blur-[100px]" />
+        <div className="abt-scene-glow absolute right-[-4rem] bottom-0 h-64 w-64 rounded-full bg-accent/5 blur-[80px]" />
       </div>
 
       <div className="chapter-inner _container relative z-10">
-        <div className="grid grid-cols-1 items-start gap-14 lg:grid-cols-12 lg:gap-10">
-          <div className="lg:col-span-5">
-            <p className="abt-kicker mb-8 text-[11px] font-black uppercase leading-[1.4] tracking-[0.44em] text-secondary">
-              About
-            </p>
 
-            <h2 className="abt-heading mb-7 pb-1 text-[11.5vw] font-black uppercase leading-[0.98] tracking-tighter md:text-[5.4vw]">
+        {/* ── Section Header ── */}
+        <div className="mb-20 md:mb-28">
+          <p className="abt-kicker mb-6 text-[11px] font-black uppercase leading-[1.4] tracking-[0.5em] text-accent">
+            The Studio
+          </p>
+          <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+            <h2 className="abt-heading pb-1 text-[13vw] font-black uppercase leading-[0.95] tracking-tighter text-foreground md:text-[6.5vw]">
               Colombo-based.<br />
               <span className="text-black/15 italic">Globally delivered.</span>
             </h2>
-
-            <p className="abt-lead max-w-[52ch] text-lg font-light leading-relaxed text-black/60 md:text-xl">
-              10+ years turning numbers into stories. A tight team of strategists, designers,
-              filmmakers, and builders creating high-end digital work with measurable outcomes.
+            <p className="abt-lead max-w-[42ch] text-base font-light leading-[1.75] text-black/50 lg:text-lg lg:text-right">
+              10+ years turning ambitious ideas into measurable outcomes — a tight team of strategists,
+              designers, filmmakers, and builders.
             </p>
-
-            <div className="abt-rule mt-7 h-px w-full max-w-md bg-gradient-to-r from-accent via-black/[0.08] to-transparent" />
-
-            <div className="abt-stats mt-7 grid grid-cols-1 gap-4 sm:grid-cols-2">
-              {stats.map((item) => (
-                <article
-                  key={item.label}
-                  className="abt-stat-card rounded-2xl bg-white/70 px-6 py-8 shadow-sm shadow-black/5 sm:px-7 sm:py-9"
-                >
-                  <p className="mb-3 text-[10px] font-black uppercase leading-[1.4] tracking-[0.3em] text-black/40">
-                    {item.label}
-                  </p>
-                  <div className="flex items-baseline gap-1">
-                    <span className="abt-counter text-5xl font-black leading-none text-foreground md:text-6xl" data-target={item.value}>
-                      0
-                    </span>
-                    <span className="text-3xl font-bold text-accent md:text-4xl">{item.suffix}</span>
-                  </div>
-                </article>
-              ))}
-            </div>
           </div>
+        </div>
 
-          <div data-about-shift className="abt-gallery grid grid-cols-2 gap-4 md:gap-5 lg:col-span-7">
-            {team.map((member, index) => (
-              <article
-                key={member.name}
-                className={`abt-photo-card group relative overflow-hidden bg-muted/40 shadow-lg shadow-black/8 ${
-                  index === 0
-                    ? "col-span-2 h-[250px] rounded-[1.5rem] md:h-[300px]"
-                    : "h-[215px] rounded-[1.3rem] md:h-[250px]"
-                }`}
-              >
+        {/* ── Stats Bar ── */}
+        <div className="abt-rule mb-20 flex flex-col gap-8 border-t border-black/[0.06] pt-10 sm:flex-row sm:items-center sm:gap-0 md:mb-28">
+          {stats.map((item, i) => (
+            <article key={item.label} className={`abt-stat-card flex items-baseline gap-3 ${i < stats.length - 1 ? "sm:pr-16 sm:mr-16 sm:border-r sm:border-black/[0.06]" : ""}`}>
+              <span className="abt-counter text-6xl font-black leading-none tracking-tighter text-foreground md:text-7xl" data-target={item.value}>
+                0
+              </span>
+              <div className="flex flex-col">
+                <span className="text-2xl font-black text-accent">{item.suffix}</span>
+                <span className="text-[10px] font-black uppercase tracking-[0.42em] text-black/30">{item.label}</span>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        {/* ── Team Grid ── */}
+        <div data-about-shift className="grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
+          {team.map((member, index) => (
+            <article
+              key={member.name}
+              className={`abt-photo-card group relative overflow-hidden rounded-[2rem] bg-black/5 shadow-[0_20px_60px_rgba(0,0,0,0.06)] transform-gpu transition-all duration-700 hover:shadow-[0_32px_80px_rgba(0,0,0,0.1)] ${
+                index === 0 ? "col-span-2 row-span-1" : ""
+              }`}
+              style={{ aspectRatio: index === 0 ? "2/1" : "3/4" }}
+            >
+              <div className="absolute inset-0">
                 <Image
                   src={member.image}
                   alt={member.name}
                   fill
-                  sizes="(max-width: 768px) 100vw, 600px"
-                  quality={90}
+                  sizes="(max-width: 768px) 50vw, 25vw"
+                  quality={95}
                   loading="lazy"
-                  className="object-cover transition-all duration-[1200ms] group-hover:scale-[1.03]"
+                  className="object-cover object-center transition-transform duration-[1800ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] group-hover:scale-105"
                 />
+              </div>
 
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/8 to-transparent" />
-                <div className="absolute inset-0 flex translate-y-4 flex-col justify-end p-5 transition-transform duration-500 group-hover:translate-y-0 md:p-6">
-                  <p className="text-lg font-bold text-white md:text-xl">{member.name}</p>
-                  <p className="text-[10px] font-black uppercase leading-[1.35] tracking-[0.3em] text-accent opacity-0 transition-opacity delay-100 group-hover:opacity-100">
-                    {member.role}
-                  </p>
-                </div>
-              </article>
-            ))}
-          </div>
+              {/* Permanent subtle gradient */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+
+              {/* Name + Role — always visible at bottom */}
+              <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7">
+                <p className="text-base font-black italic tracking-tight text-white md:text-xl">{member.name}</p>
+                <p className="mt-0.5 text-[9px] font-black uppercase tracking-[0.45em] text-accent/90">{member.role}</p>
+              </div>
+            </article>
+          ))}
         </div>
+
       </div>
     </section>
   );

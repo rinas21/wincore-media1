@@ -142,6 +142,8 @@ export default function WorkCarousel() {
                   opacity,
                   transformPerspective: 1200,
                   rotateY: (cardCenter - center) * 0.02,
+                  translateZ: 0,
+                  backfaceVisibility: "hidden",
                 });
               });
             },
@@ -206,11 +208,11 @@ export default function WorkCarousel() {
         Archive
       </div>
 
-      <div className="wc-heading-block _container relative z-10 py-16">
-        <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+      <div className="wc-heading-block _container relative z-10 py-24 md:py-32">
+        <div className="flex flex-col gap-10 md:flex-row md:items-end md:justify-between">
           <div className="max-w-2xl">
-            <span className="mb-4 inline-block text-[10px] font-black uppercase leading-[1.35] tracking-[0.42em] text-accent">Selected Archives</span>
-            <h2 className="font-heading text-4xl md:text-5xl lg:text-6xl font-black uppercase leading-[1.02] tracking-tighter text-foreground">
+            <span className="mb-6 inline-block text-[10px] font-black uppercase leading-[1.35] tracking-[0.42em] text-accent">Selected Archives</span>
+            <h2 className="font-heading text-4xl md:text-5xl lg:text-7xl font-black uppercase leading-[1.02] tracking-tighter text-foreground">
               Works that <br />
               <span className="text-black/30 italic">rewrite the rules</span>
             </h2>
@@ -239,31 +241,31 @@ export default function WorkCarousel() {
               <button
                 type="button"
                 onClick={() => setSelectedProject(project)}
-                className="wc-tilt group relative h-[70vh] w-full max-w-7xl overflow-hidden rounded-[2.5rem] bg-white text-left shadow-xl shadow-black/10 transition-transform duration-500"
+                className="wc-tilt group relative h-[70vh] w-full max-w-7xl overflow-hidden rounded-[3rem] border border-black/[0.08] bg-white text-left shadow-[0_45px_100px_rgba(0,0,0,0.08)] transition-all duration-500 hover:border-accent/30"
               >
                 <Image
                   src={project.image}
                   alt={project.title}
                   fill
                   className="object-cover transition-transform duration-1000 group-hover:scale-[1.03] saturate-[1.05]"
-                  sizes="100vw"
-                  quality={90}
+                  sizes="(max-width: 1024px) 100vw, 1400px"
+                  quality={100}
                   priority={i === 0}
                   loading={i === 0 ? undefined : "lazy"}
                 />
                 <div className="wc-shine pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500" />
-                <div className="absolute inset-0 bg-gradient-to-t from-white/75 via-white/0 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent opacity-60 pointer-events-none" />
                 
-                <div className="absolute bottom-14 left-8 right-8 z-10 sm:bottom-16 sm:left-12 sm:right-12 md:left-14 md:right-14">
-                  <span className="mb-4 block text-[10px] font-black uppercase leading-[1.35] tracking-[0.4em] text-accent">
+                <div className="absolute bottom-12 left-10 right-10 z-10 sm:bottom-16 sm:left-14 sm:right-14 md:bottom-20 md:left-16 md:right-16 lg:bottom-24 lg:left-24 lg:right-24">
+                  <span className="mb-6 block text-[11px] font-black uppercase leading-[1.35] tracking-[0.45em] text-accent">
                     {project.category}
                   </span>
-                  <h3 className="text-3xl md:text-6xl font-black uppercase leading-[0.96] tracking-tighter text-foreground transition-transform group-hover:translate-x-2">
+                  <h3 className="text-3xl md:text-6xl font-black uppercase leading-[0.96] tracking-tighter text-white transition-transform group-hover:translate-x-2 drop-shadow-lg">
                     {project.title}
                   </h3>
                   <div className="mt-8 flex items-center gap-3">
-                    <span className="h-px w-12 bg-black/20" />
-                    <p className="text-[10px] font-black uppercase leading-[1.35] tracking-[0.3em] text-black/45 transition-colors group-hover:text-accent">View Project</p>
+                    <span className="h-px w-12 bg-white/40" />
+                    <p className="text-[12px] font-black uppercase leading-[1.35] tracking-[0.34em] text-white/75 transition-colors group-hover:text-accent">View Project</p>
                   </div>
                 </div>
               </button>
