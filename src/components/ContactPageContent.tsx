@@ -4,15 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import SplitType from "split-type";
-import {
-  ArrowUpRight,
-  CheckCircle2,
-  Clock3,
-  Mail,
-  MapPin,
-  Sparkles,
-  AlertCircle,
-} from "lucide-react";
+import { ArrowUpRight, MapPin, Clock, Mail } from "lucide-react";
 import {
   registerGsapPlugins,
   getScroller,
@@ -31,516 +23,338 @@ const NAV_LINKS = [
 
 function useColomboTime() {
   const [time, setTime] = useState("");
-
   useEffect(() => {
-    const update = () => {
+    const update = () =>
       setTime(
         new Intl.DateTimeFormat("en-LK", {
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-          hour12: false,
-          timeZone: "Asia/Colombo",
-        }).format(new Date()),
+          hour: "2-digit", minute: "2-digit", second: "2-digit",
+          hour12: false, timeZone: "Asia/Colombo",
+        }).format(new Date())
       );
-    };
-
     update();
     const id = window.setInterval(update, 1000);
     return () => window.clearInterval(id);
   }, []);
-
   return time;
 }
 
 export default function ContactPageContent() {
-  const rootRef = useRef<HTMLElement>(null);
-  const formRef = useRef<HTMLFormElement>(null);
+  const rootRef    = useRef<HTMLElement>(null);
+  const formRef    = useRef<HTMLFormElement>(null);
+  const curtainRef = useRef<HTMLDivElement>(null);
   const colomboTime = useColomboTime();
-
   const [submitState, setSubmitState] = useState<SubmitState>("idle");
-  const [feedback, setFeedback] = useState("");
+  const [feedback,    setFeedback   ] = useState("");
 
+  /* ── GSAP entrance ── */
   useEffect(() => {
     registerGsapPlugins();
     const scroller = getScroller();
-    const reduced = prefersReducedMotion();
-    let split: SplitType | null = null;
+    const reduced  = prefersReducedMotion();
+    const splits: SplitType[] = [];
 
     const ctx = gsap.context(() => {
       if (reduced) {
-        gsap.set(
-          [
-            ".contact-kicker",
-            ".contact-title",
-            ".contact-lead",
-            ".contact-meta-item",
-            ".contact-card",
-            ".contact-form-wrap",
-            ".contact-footer",
-          ],
-          { autoAlpha: 1, y: 0 },
-        );
+        gsap.set(".ct-reveal, .ct-line, .ct-fade", { autoAlpha: 1, y: 0, clipPath: "inset(0 0 0% 0)" });
         return;
       }
 
-      gsap.set(
-        [
-          ".contact-kicker",
-          ".contact-title",
-          ".contact-lead",
-          ".contact-meta-item",
-          ".contact-card",
-          ".contact-form-wrap",
-          ".contact-footer",
-        ],
-        { autoAlpha: 0, y: 24 },
-      );
+      /* 1 — Page-load curtain wipe */
+      gsap.set(curtainRef.current, { scaleY: 1, transformOrigin: "top center" });
+      gsap.to(curtainRef.current, {
+        scaleY: 0,
+        duration: 1.1,
+        ease: "expo.inOut",
+        delay: 0.1,
+      });
 
-      const title = rootRef.current?.querySelector(".contact-title");
-      if (title) {
-        split = new SplitType(title as HTMLElement, { types: "words,chars" });
-        if (split.words) {
-          gsap.set(split.words, { overflow: "visible" });
-        }
-        gsap.set(split.chars, {
-          yPercent: 110,
-          opacity: 0,
-          display: "inline-block",
-          willChange: "transform,opacity",
+      /* 2 — Hero heading: typewriter-style char reveal from clip */
+      const headingEl = rootRef.current?.querySelector(".ct-hero-title") as HTMLElement | null;
+      if (headingEl) {
+        const split = new SplitType(headingEl, { types: "chars,words" });
+        splits.push(split);
+        gsap.set(split.chars, { yPercent: 115, opacity: 0 });
+        gsap.to(split.chars, {
+          yPercent: 0, opacity: 1,
+          duration: 1,
+          stagger: 0.025,
+          ease: "expo.out",
+          delay: 0.9,
+          clearProps: "transform,opacity",
         });
       }
 
-      const introTl = gsap.timeline({ defaults: { ease: "expo.out" }, delay: 0.08 });
-
-      introTl
-        .to(".contact-kicker", { autoAlpha: 1, y: 0, duration: 0.55 }, 0)
-        .to(
-          split?.chars ?? ".contact-title",
-          split?.chars
-            ? {
-                yPercent: 0,
-                opacity: 1,
-                duration: 0.95,
-                stagger: 0.012,
-                ease: "power4.out",
-              }
-            : { autoAlpha: 1, y: 0, duration: 0.85 },
-          0.05,
-        )
-        .to(".contact-lead", { autoAlpha: 1, y: 0, duration: 0.7 }, 0.3)
-        .to(
-          ".contact-meta-item",
-          { autoAlpha: 1, y: 0, duration: 0.6, stagger: 0.08 },
-          0.42,
-        );
-
-      gsap.to(".contact-card", {
-        autoAlpha: 1,
-        y: 0,
-        duration: 0.75,
-        stagger: 0.1,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: ".contact-cards-wrap",
-          scroller,
-          start: "top 84%",
-          once: true,
-        },
-      });
-
-      gsap.to(".contact-form-wrap", {
-        autoAlpha: 1,
-        y: 0,
-        duration: 0.8,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: ".contact-form-wrap",
-          scroller,
-          start: "top 86%",
-          once: true,
-        },
-      });
-
+      /* 3 — Kicker + sub paragraph */
       gsap.fromTo(
-        ".contact-form-field",
-        { opacity: 0, y: 18 },
-        {
-          opacity: 1,
-          y: 0,
-          duration: 0.55,
-          stagger: 0.06,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: ".contact-form-wrap",
-            scroller,
-            start: "top 82%",
-            once: true,
-          },
-        },
+        ".ct-fade",
+        { opacity: 0, y: 26 },
+        { opacity: 1, y: 0, duration: 1, stagger: 0.12, ease: "power3.out", delay: 1.1, clearProps: "transform,opacity" }
       );
 
-      gsap.to(".contact-footer", {
-        autoAlpha: 1,
-        y: 0,
-        duration: 0.7,
-        ease: "power2.out",
-        scrollTrigger: {
-          trigger: ".contact-footer",
-          scroller,
-          start: "top 92%",
-          once: true,
-        },
+      /* 4 — Meta pills slide in */
+      gsap.fromTo(
+        ".ct-pill",
+        { opacity: 0, scale: 0.82, y: 10 },
+        { opacity: 1, scale: 1, y: 0, duration: 0.7, stagger: 0.1, ease: "back.out(1.8)", delay: 1.3, clearProps: "all" }
+      );
+
+      /* 5 — Form rows reveal on scroll */
+      gsap.fromTo(
+        ".ct-line",
+        { opacity: 0, y: 40 },
+        {
+          opacity: 1, y: 0, duration: 0.9, stagger: 0.1, ease: "power3.out", clearProps: "transform,opacity",
+          scrollTrigger: { trigger: formRef.current, scroller, start: "top 85%", once: true },
+        }
+      );
+
+      /* 6 — submit row */
+      gsap.fromTo(
+        ".ct-submit-row",
+        { opacity: 0, y: 30 },
+        {
+          opacity: 1, y: 0, duration: 1, ease: "power3.out", clearProps: "transform,opacity",
+          scrollTrigger: { trigger: ".ct-submit-row", scroller, start: "top 95%", once: true },
+        }
+      );
+
+      /* 7 — Ambient orb parallax */
+      gsap.to(".ct-orb-1", {
+        y: -80, ease: "none",
+        scrollTrigger: { trigger: rootRef.current, scroller, start: "top top", end: "bottom top", scrub: 1.6 },
       });
+      gsap.to(".ct-orb-2", {
+        y: 60, ease: "none",
+        scrollTrigger: { trigger: rootRef.current, scroller, start: "top top", end: "bottom top", scrub: 2 },
+      });
+
     }, rootRef);
 
     scheduleScrollTriggerRefresh();
-
-    return () => {
-      if (split) split.revert();
-      ctx.revert();
-    };
+    return () => { splits.forEach(s => s.revert()); ctx.revert(); };
   }, []);
 
+  /* ── Form submit ── */
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-
-    const fd = new FormData(e.currentTarget);
-    const name = String(fd.get("name") ?? "").trim();
-    const email = String(fd.get("email") ?? "").trim();
+    const fd      = new FormData(e.currentTarget);
+    const name    = String(fd.get("name")    ?? "").trim();
+    const email   = String(fd.get("email")   ?? "").trim();
     const company = String(fd.get("company") ?? "").trim();
-    const type = String(fd.get("type") ?? "").trim();
+    const type    = String(fd.get("type")    ?? "").trim();
     const message = String(fd.get("message") ?? "").trim();
 
-    if (!name || !email || !message) {
-      setSubmitState("error");
-      setFeedback("Please complete all required fields.");
-      return;
-    }
+    if (!name || !email || !message) { setSubmitState("error"); setFeedback("Please complete all required fields."); return; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setSubmitState("error"); setFeedback("Please enter a valid email address."); return; }
 
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailPattern.test(email)) {
-      setSubmitState("error");
-      setFeedback("Please enter a valid email address.");
-      return;
-    }
-
-    setSubmitState("loading");
-    setFeedback("");
-
+    setSubmitState("loading"); setFeedback("");
     window.setTimeout(() => {
-      const body = [
-        `Name: ${name}`,
-        `Email: ${email}`,
-        company ? `Company: ${company}` : "",
-        type ? `Project type: ${type}` : "",
-        "",
-        message,
-      ]
-        .filter(Boolean)
-        .join("\n");
-
-      const subject = encodeURIComponent(`Project inquiry from ${name}`);
-      const mailto = `mailto:hello@wincore.media?subject=${subject}&body=${encodeURIComponent(body)}`;
-
+      const body    = [`Name: ${name}`, `Email: ${email}`, company ? `Company: ${company}` : "", type ? `Project type: ${type}` : "", "", message].filter(Boolean).join("\n");
+      const mailto  = `mailto:hello@wincore.media?subject=${encodeURIComponent(`Project inquiry from ${name}`)}&body=${encodeURIComponent(body)}`;
       setSubmitState("sent");
       setFeedback("Opening your email app now. If it does not open, send directly to hello@wincore.media.");
-
-      gsap.fromTo(
-        ".contact-status-icon",
-        { scale: 0.45, opacity: 0 },
-        { scale: 1, opacity: 1, duration: 0.55, ease: "back.out(1.6)" },
-      );
-
-      if (formRef.current) {
-        formRef.current.reset();
-      }
-
+      formRef.current?.reset();
       window.location.href = mailto;
     }, 420);
   }
 
   return (
-    <section
-      ref={rootRef}
-      className="relative overflow-hidden bg-background pb-24 pt-12 md:pb-32 md:pt-16"
-      aria-label="Contact"
-    >
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-24 left-1/2 h-[360px] w-[min(95vw,980px)] -translate-x-1/2 bg-[radial-gradient(ellipse_at_top,rgba(0,136,204,0.18),transparent_62%)]" />
-        <div className="absolute -left-28 top-1/3 h-64 w-64 rounded-full bg-secondary/[0.10] blur-[110px]" />
-        <div className="absolute -right-24 bottom-10 h-56 w-56 rounded-full bg-accent/[0.12] blur-[95px]" />
+    <section ref={rootRef} className="relative overflow-hidden bg-background min-h-screen" aria-label="Contact">
+
+      {/* Page-load curtain */}
+      <div ref={curtainRef} className="fixed inset-0 z-[200] bg-accent origin-top pointer-events-none" />
+
+      {/* Ambient background orbs */}
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+        <div className="ct-orb-1 absolute -top-40 -right-40 h-[700px] w-[700px] rounded-full bg-accent/[0.04] blur-[130px]" />
+        <div className="ct-orb-2 absolute -bottom-20 -left-40 h-[600px] w-[600px] rounded-full bg-secondary/[0.03] blur-[130px]" />
+        {/* Fine dot grid — very subtle */}
         <div
-          className="absolute inset-0 opacity-[0.1]"
+          className="absolute inset-0 opacity-[0.035]"
           style={{
-            backgroundImage:
-              "linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px)",
-            backgroundSize: "58px 58px",
-            maskImage: "radial-gradient(ellipse 80% 65% at 50% 18%, black 24%, transparent 72%)",
+            backgroundImage: "radial-gradient(circle, rgba(0,0,0,0.7) 1px, transparent 1px)",
+            backgroundSize: "40px 40px",
           }}
         />
       </div>
 
       <div className="_container relative z-10">
-        <header className="mb-14 overflow-visible md:mb-16">
-          <p className="contact-kicker mb-5 opacity-0 text-[10px] font-black uppercase tracking-[0.52em] text-accent">
-            Contact
-          </p>
 
-          <div className="grid grid-cols-1 gap-7 lg:grid-cols-12 lg:items-end lg:gap-10">
-            <div className="overflow-visible lg:col-span-8">
-              <h1 className="contact-title min-h-[2.15em] overflow-visible py-2 opacity-0 font-heading text-[14vw] font-black uppercase leading-[0.96] tracking-[-0.02em] text-foreground sm:text-[11vw] md:text-[8.4vw] lg:text-[6.2vw]">
-                <span className="block">Tell us what</span>
-                <span className="mt-2 block text-secondary/90 italic">you&apos;re building</span>
-              </h1>
+        {/* ── HERO HEADER ─────────────────────────────── */}
+        <header className="pt-36 md:pt-48 pb-24 md:pb-32">
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-12">
+
+            {/* Left: mega headline */}
+            <div className="flex-1">
+              <span className="ct-fade block text-[10px] font-black uppercase tracking-[0.5em] text-accent mb-8">
+                Start a project
+              </span>
+              {/* Clip container prevents descenders clipping during anim */}
+              <div className="overflow-hidden pb-2">
+                <h1
+                  className="ct-hero-title font-heading text-[13vw] md:text-[9vw] lg:text-[8vw] font-black leading-[0.88] tracking-[-0.02em] text-foreground uppercase"
+                  style={{ perspective: "900px" }}
+                >
+                  Let&apos;s build<br />
+                  <span className="italic text-black/20 font-normal lowercase tracking-tighter">something</span>
+                  <br />remarkable.
+                </h1>
+              </div>
             </div>
 
-            <div className="lg:col-span-4">
-              <p className="contact-lead opacity-0 text-sm leading-relaxed text-foreground/60 md:text-base">
-                New brand, campaign, site, or WebGL build. Share your goals and we will reply within
-                two business days.
+            {/* Right: meta pills + descriptor */}
+            <div className="flex flex-col gap-8 md:max-w-[340px] md:pb-2">
+              <p className="ct-fade text-base md:text-lg font-light leading-relaxed text-black/50">
+                New brand, campaign, or digital platform — share your vision and we&apos;ll respond within two business days.
               </p>
 
-              <div className="mt-6 grid grid-cols-1 gap-4">
-                <div
-                  className="contact-meta-item contact-fx-box isolate overflow-visible opacity-0"
-                  style={{ ["--card-grad" as string]: "linear-gradient(315deg, rgba(0,136,204,0.92), rgba(0,208,255,0.8))" }}
-                >
-                  <span className="contact-fx-glow" aria-hidden />
-                  <div className="contact-fx-content p-5">
-                    <p className="text-[9px] font-black uppercase leading-[1.45] tracking-[0.3em] text-white/75">Response</p>
-                    <p className="mt-1 text-sm font-semibold text-white">Within two business days</p>
-                  </div>
+              <div className="flex flex-wrap gap-3">
+                <div className="ct-pill inline-flex items-center gap-2.5 rounded-full border border-black/[0.08] bg-white px-4 py-2.5 text-xs font-semibold shadow-sm">
+                  <Mail size={12} className="text-accent" />
+                  hello@wincore.media
                 </div>
-                <div
-                  className="contact-meta-item contact-fx-box isolate overflow-visible opacity-0"
-                  style={{ ["--card-grad" as string]: "linear-gradient(315deg, rgba(35,35,35,0.86), rgba(90,90,90,0.72))" }}
-                >
-                  <span className="contact-fx-glow" aria-hidden />
-                  <div className="contact-fx-content p-5">
-                    <p className="text-[9px] font-black uppercase leading-[1.45] tracking-[0.3em] text-white/75">Focus</p>
-                    <p className="mt-1 text-sm font-semibold text-white">Branding, Web, Motion, WebGL</p>
-                  </div>
+                <div className="ct-pill inline-flex items-center gap-2.5 rounded-full border border-black/[0.08] bg-white px-4 py-2.5 text-xs font-semibold shadow-sm">
+                  <MapPin size={12} className="text-accent" />
+                  Colombo, Sri Lanka
+                </div>
+                <div className="ct-pill inline-flex items-center gap-2.5 rounded-full border border-black/[0.08] bg-white px-4 py-2.5 text-xs font-semibold shadow-sm tabular-nums" suppressHydrationWarning>
+                  <Clock size={12} className="text-accent" />
+                  {colomboTime || "—:—:—"} LK
                 </div>
               </div>
             </div>
           </div>
         </header>
 
-        <div className="grid grid-cols-1 gap-7 lg:grid-cols-12 lg:gap-10">
-          <aside className="contact-cards-wrap flex flex-col gap-4 lg:col-span-4">
-            <a
-              href="mailto:hello@wincore.media"
-              className="contact-card contact-fx-box group isolate overflow-visible opacity-0"
-              style={{ ["--card-grad" as string]: "linear-gradient(315deg, rgba(255,188,0,0.95), rgba(255,0,88,0.85))" }}
-            >
-              <span className="contact-fx-glow" aria-hidden />
-              <div className="contact-fx-content p-7">
-                <div className="mb-5 flex items-center justify-between">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 text-white">
-                    <Mail size={18} />
-                  </span>
-                  <ArrowUpRight className="h-4 w-4 text-white/80 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                </div>
-                <p className="text-[9px] font-black uppercase leading-[1.45] tracking-[0.35em] text-white/75">Email</p>
-                <p className="mt-1 text-base font-semibold text-white">hello@wincore.media</p>
-              </div>
-            </a>
+        {/* ── FULL-WIDTH FORM ──────────────────────────── */}
+        <form ref={formRef} onSubmit={handleSubmit} className="border-t border-black/[0.07] pb-24 md:pb-40">
 
-            <div
-              className="contact-card contact-fx-box isolate overflow-visible opacity-0"
-              style={{ ["--card-grad" as string]: "linear-gradient(315deg, rgba(3,169,244,0.9), rgba(255,0,88,0.82))" }}
-            >
-              <span className="contact-fx-glow" aria-hidden />
-              <div className="contact-fx-content p-7">
-                <div className="mb-5 flex items-center justify-between">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 text-white">
-                    <MapPin size={18} />
+          {/* Row 1 — Name */}
+          <label className="ct-line group flex flex-col md:flex-row md:items-center gap-4 md:gap-12 border-b border-black/[0.07] py-8 md:py-12 transition-colors duration-500 focus-within:border-accent/40">
+            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-black/25 group-focus-within:text-accent transition-colors duration-500 md:w-[220px] shrink-0">
+              01 / Name
+            </span>
+            <input
+              name="name" type="text" placeholder="Your full name *" required disabled={submitState === "loading"}
+              className="flex-1 bg-transparent text-2xl md:text-4xl font-light text-foreground placeholder:text-black/15 outline-none disabled:opacity-50 caret-accent"
+            />
+          </label>
+
+          {/* Row 2 — Email */}
+          <label className="ct-line group flex flex-col md:flex-row md:items-center gap-4 md:gap-12 border-b border-black/[0.07] py-8 md:py-12 transition-colors duration-500 focus-within:border-accent/40">
+            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-black/25 group-focus-within:text-accent transition-colors duration-500 md:w-[220px] shrink-0">
+              02 / Email
+            </span>
+            <input
+              name="email" type="email" placeholder="your@email.com *" required disabled={submitState === "loading"}
+              className="flex-1 bg-transparent text-2xl md:text-4xl font-light text-foreground placeholder:text-black/15 outline-none disabled:opacity-50 caret-accent"
+            />
+          </label>
+
+          {/* Row 3 — Company */}
+          <label className="ct-line group flex flex-col md:flex-row md:items-center gap-4 md:gap-12 border-b border-black/[0.07] py-8 md:py-12 transition-colors duration-500 focus-within:border-accent/40">
+            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-black/25 group-focus-within:text-accent transition-colors duration-500 md:w-[220px] shrink-0">
+              03 / Company
+            </span>
+            <input
+              name="company" type="text" placeholder="Company / Brand (optional)" disabled={submitState === "loading"}
+              className="flex-1 bg-transparent text-2xl md:text-4xl font-light text-foreground placeholder:text-black/15 outline-none disabled:opacity-50 caret-accent"
+            />
+          </label>
+
+          {/* Row 4 — Project Type */}
+          <div className="ct-line group flex flex-col md:flex-row md:items-center gap-4 md:gap-12 border-b border-black/[0.07] py-8 md:py-12 transition-colors duration-500 focus-within:border-accent/40">
+            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-black/25 group-focus-within:text-accent transition-colors duration-500 md:w-[220px] shrink-0">
+              04 / Project Type
+            </span>
+            <div className="flex flex-wrap gap-3">
+              {["Branding", "Website", "Motion", "WebGL", "Marketing", "Other"].map((tag) => (
+                <label key={tag} className="group/chip cursor-pointer">
+                  <input type="radio" name="type" value={tag} className="sr-only" disabled={submitState === "loading"} />
+                  <span className="inline-flex items-center rounded-full border border-black/[0.10] px-5 py-2 text-sm font-semibold text-black/50 transition-all duration-300 group/chip:hover:border-accent group/chip:hover:text-accent has-[:checked]:border-accent has-[:checked]:bg-accent has-[:checked]:text-white">
+                    {tag}
                   </span>
-                  <Sparkles className="h-4 w-4 text-white/80" />
-                </div>
-                <p className="text-[9px] font-black uppercase leading-[1.45] tracking-[0.35em] text-white/75">Studio</p>
-                <p className="mt-1 text-sm leading-relaxed text-white">
-                  Colombo, Sri Lanka, collaborating with teams globally.
-                </p>
-              </div>
+                </label>
+              ))}
             </div>
-
-            <div
-              className="contact-card contact-fx-box isolate overflow-visible opacity-0"
-              style={{ ["--card-grad" as string]: "linear-gradient(315deg, rgba(77,255,3,0.85), rgba(0,208,255,0.88))" }}
-            >
-              <span className="contact-fx-glow" aria-hidden />
-              <div className="contact-fx-content p-7">
-                <div className="mb-5 flex items-center justify-between">
-                  <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white/20 text-white">
-                    <Clock3 size={18} />
-                  </span>
-                  <span className="text-[10px] font-black uppercase leading-[1.35] tracking-[0.25em] text-white/75">Live</span>
-                </div>
-                <p className="text-[9px] font-black uppercase leading-[1.45] tracking-[0.35em] text-white/75">Local time</p>
-                <p suppressHydrationWarning className="mt-1 font-mono text-xl font-semibold tabular-nums text-white">
-                  {colomboTime || "00:00:00"}
-                </p>
-                <p className="mt-1 text-[11px] text-white/80">Asia/Colombo (GMT+5:30)</p>
-              </div>
-            </div>
-          </aside>
-
-          <div className="contact-form-wrap relative z-20 opacity-0 lg:col-span-8">
-            <form
-              ref={formRef}
-              onSubmit={handleSubmit}
-              className="contact-fx-form relative isolate overflow-visible rounded-[2rem] bg-white/10 px-8 py-9 backdrop-blur-xl md:px-11 md:py-11"
-            >
-              <div className="pointer-events-none absolute inset-0 rounded-[2rem] bg-[linear-gradient(135deg,rgba(255,255,255,0.16),rgba(255,255,255,0.04))]" />
-
-              <div className="relative z-10 mb-8 flex flex-col gap-2 pb-6 md:flex-row md:items-end md:justify-between">
-                <h2 className="text-xl font-black uppercase tracking-tight text-white md:text-2xl">
-                  Project details
-                </h2>
-                <p className="text-[10px] font-black uppercase leading-[1.35] tracking-[0.32em] text-white/75">
-                  Tell us enough to scope quickly
-                </p>
-              </div>
-
-              <div className="relative z-10 grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-6">
-                <label className="contact-form-field contact-input-card flex flex-col gap-2.5">
-                  <span className="text-[10px] font-black uppercase leading-[1.35] tracking-[0.25em] text-white/75">Name *</span>
-                  <input
-                    name="name"
-                    type="text"
-                    required
-                    disabled={submitState === "loading"}
-                    autoComplete="name"
-                    placeholder="Your name"
-                    className="rounded-2xl bg-white/85 px-4 py-3.5 text-sm font-medium text-foreground outline-none transition-all focus:ring-2 focus:ring-white/35 disabled:cursor-not-allowed disabled:opacity-65"
-                  />
-                </label>
-
-                <label className="contact-form-field contact-input-card flex flex-col gap-2.5">
-                  <span className="text-[10px] font-black uppercase leading-[1.35] tracking-[0.25em] text-white/75">Work email *</span>
-                  <input
-                    name="email"
-                    type="email"
-                    required
-                    disabled={submitState === "loading"}
-                    autoComplete="email"
-                    placeholder="you@company.com"
-                    className="rounded-2xl bg-white/85 px-4 py-3.5 text-sm font-medium text-foreground outline-none transition-all focus:ring-2 focus:ring-white/35 disabled:cursor-not-allowed disabled:opacity-65"
-                  />
-                </label>
-
-                <label className="contact-form-field contact-input-card flex flex-col gap-2.5 md:col-span-2">
-                  <span className="text-[10px] font-black uppercase leading-[1.35] tracking-[0.25em] text-white/75">Company / brand</span>
-                  <input
-                    name="company"
-                    type="text"
-                    autoComplete="organization"
-                    disabled={submitState === "loading"}
-                    placeholder="Optional"
-                    className="rounded-2xl bg-white/85 px-4 py-3.5 text-sm font-medium text-foreground outline-none transition-all focus:ring-2 focus:ring-white/35 disabled:cursor-not-allowed disabled:opacity-65"
-                  />
-                </label>
-
-                <label className="contact-form-field contact-input-card flex flex-col gap-2.5 md:col-span-2">
-                  <span className="text-[10px] font-black uppercase leading-[1.35] tracking-[0.25em] text-white/75">Project type</span>
-                  <select
-                    name="type"
-                    defaultValue=""
-                    disabled={submitState === "loading"}
-                    className="cursor-pointer rounded-2xl bg-white/85 px-4 py-3.5 text-sm font-medium text-foreground outline-none transition-all focus:ring-2 focus:ring-white/35 disabled:cursor-not-allowed disabled:opacity-65"
-                  >
-                    <option value="" disabled>
-                      Select an option
-                    </option>
-                    <option value="Branding & identity">Branding & identity</option>
-                    <option value="Website / product">Website / product</option>
-                    <option value="Motion / video">Motion / video</option>
-                    <option value="WebGL / immersive">WebGL / immersive</option>
-                    <option value="Performance marketing">Performance marketing</option>
-                    <option value="Other">Other</option>
-                  </select>
-                </label>
-
-                <label className="contact-form-field contact-input-card flex flex-col gap-2.5 md:col-span-2">
-                  <span className="text-[10px] font-black uppercase leading-[1.35] tracking-[0.25em] text-white/75">Message *</span>
-                  <textarea
-                    name="message"
-                    required
-                    rows={6}
-                    disabled={submitState === "loading"}
-                    placeholder="Goals, timeline, budget range, and links to references..."
-                    className="resize-y rounded-2xl bg-white/85 px-4 py-3.5 text-sm font-medium leading-relaxed text-foreground outline-none transition-all focus:ring-2 focus:ring-white/35 disabled:cursor-not-allowed disabled:opacity-65"
-                  />
-                </label>
-              </div>
-
-              {submitState === "error" && feedback && (
-                <div className="mt-5 flex items-start gap-2.5 rounded-2xl bg-red-500/20 px-4 py-3">
-                  <AlertCircle className="h-5 w-5 shrink-0 text-red-500" />
-                  <p className="text-sm text-white">{feedback}</p>
-                </div>
-              )}
-
-              {submitState === "sent" && feedback && (
-                <div className="mt-5 flex items-start gap-2.5 rounded-2xl bg-white/20 px-4 py-3">
-                  <CheckCircle2 className="contact-status-icon h-5 w-5 shrink-0 text-white" />
-                  <p className="text-sm text-white">{feedback}</p>
-                </div>
-              )}
-
-              <div className="mt-7 flex flex-col gap-4 pt-5 sm:flex-row sm:items-center sm:justify-between">
-                <p className="text-[11px] leading-relaxed text-white/80">
-                  Prefer a call? Mention that in your note and we will line it up.
-                </p>
-
-                <button
-                  type="submit"
-                  disabled={submitState === "loading"}
-                  className="inline-flex items-center justify-center gap-2.5 rounded-full bg-white px-8 py-3.5 text-[10px] font-black uppercase leading-[1.2] tracking-[0.32em] text-black transition-all duration-300 hover:bg-white/90 hover:shadow-[0_12px_28px_rgba(255,255,255,0.2)] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-70"
-                >
-                  {submitState === "loading" ? (
-                    <>
-                      <span className="inline-flex gap-1">
-                        <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white" style={{ animationDelay: "0ms" }} />
-                        <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white" style={{ animationDelay: "120ms" }} />
-                        <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-white" style={{ animationDelay: "240ms" }} />
-                      </span>
-                      Sending
-                    </>
-                  ) : (
-                    <>
-                      Send Inquiry
-                      <ArrowUpRight size={15} strokeWidth={2.5} />
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
           </div>
-        </div>
 
-        <nav
-          className="contact-footer mt-16 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 pt-9 opacity-0 md:justify-between"
-          aria-label="Footer"
-        >
-          <div className="flex flex-wrap justify-center gap-x-8 gap-y-2 md:justify-start">
+          {/* Row 5 — Message */}
+          <label className="ct-line group flex flex-col md:flex-row md:items-start gap-4 md:gap-12 border-b border-black/[0.07] py-8 md:py-12 transition-colors duration-500 focus-within:border-accent/40">
+            <span className="text-[10px] font-black uppercase tracking-[0.5em] text-black/25 group-focus-within:text-accent transition-colors duration-500 md:w-[220px] shrink-0 md:pt-3">
+              05 / Message
+            </span>
+            <textarea
+              name="message" rows={4} placeholder="Goals, timeline, budget, references... *" required disabled={submitState === "loading"}
+              className="flex-1 bg-transparent text-xl md:text-2xl font-light text-foreground placeholder:text-black/15 outline-none resize-none disabled:opacity-50 leading-relaxed caret-accent"
+            />
+          </label>
+
+          {/* Feedback alerts */}
+          {submitState === "error" && feedback && (
+            <div className="mt-8 flex items-start gap-4 rounded-2xl border border-red-200 bg-red-50 px-6 py-5">
+              <div className="mt-0.5 h-2 w-2 rounded-full bg-red-500 shrink-0" />
+              <p className="text-sm font-medium text-red-800 leading-relaxed">{feedback}</p>
+            </div>
+          )}
+          {submitState === "sent" && feedback && (
+            <div className="mt-8 flex items-start gap-4 rounded-2xl border border-emerald-200 bg-emerald-50 px-6 py-5">
+              <div className="mt-0.5 h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
+              <p className="text-sm font-medium text-emerald-800 leading-relaxed">{feedback}</p>
+            </div>
+          )}
+
+          {/* Submit row */}
+          <div className="ct-submit-row mt-16 md:mt-24 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-8">
+            <div className="flex flex-col gap-1">
+              <a href="mailto:hello@wincore.media" className="text-sm font-semibold text-black/40 hover:text-accent transition-colors">
+                hello@wincore.media
+              </a>
+              <p className="text-xs text-black/30 font-medium">Prefer email? Drop us a direct line.</p>
+            </div>
+
+            <button
+              type="submit"
+              disabled={submitState === "loading"}
+              className="group relative inline-flex items-center gap-5 overflow-hidden rounded-full bg-foreground py-5 pl-10 pr-6 text-white transition-all duration-700 hover:bg-accent disabled:opacity-50"
+            >
+              {/* Animated background fill on hover */}
+              <div className="absolute inset-0 -translate-x-full bg-accent transition-transform duration-700 ease-[cubic-bezier(0.25,1,0.5,1)] group-hover:translate-x-0 rounded-full" />
+
+              <span className="relative text-[11px] font-black uppercase tracking-[0.35em]">
+                {submitState === "loading" ? (
+                  <span className="flex items-center gap-2">
+                    <span className="h-1.5 w-1.5 rounded-full bg-white animate-bounce" style={{ animationDelay: "0ms" }} />
+                    <span className="h-1.5 w-1.5 rounded-full bg-white animate-bounce" style={{ animationDelay: "120ms" }} />
+                    <span className="h-1.5 w-1.5 rounded-full bg-white animate-bounce" style={{ animationDelay: "240ms" }} />
+                    Sending
+                  </span>
+                ) : "Send Inquiry"}
+              </span>
+
+              {submitState !== "loading" && (
+                <span className="relative flex h-12 w-12 items-center justify-center rounded-full bg-white/10 transition-transform duration-700 group-hover:rotate-45">
+                  <ArrowUpRight size={20} />
+                </span>
+              )}
+            </button>
+          </div>
+        </form>
+
+        {/* ── FOOTER NAV ───────────────────────────────── */}
+        <nav className="flex flex-col md:flex-row items-center justify-between gap-8 border-t border-black/[0.07] py-12">
+          <div className="flex flex-wrap justify-center gap-8 md:justify-start">
             {NAV_LINKS.map(([href, label]) => (
-              <Link
-                key={href}
-                href={href}
-                className="text-[9px] font-black uppercase tracking-[0.34em] text-foreground/45 transition-colors hover:text-accent"
-              >
+              <Link key={href} href={href} className="text-[10px] font-black uppercase tracking-[0.4em] text-black/30 hover:text-foreground transition-colors duration-300">
                 {label}
               </Link>
             ))}
           </div>
-
-          <p className="text-[9px] font-black uppercase tracking-[0.3em] text-foreground/35">
+          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-black/30">
             © {new Date().getFullYear()} Wincore Media
           </p>
         </nav>
+
       </div>
     </section>
   );

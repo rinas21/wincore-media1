@@ -5,8 +5,56 @@ import gsap from "gsap";
 import { registerGsapPlugins, getScroller, prefersReducedMotion } from "@/lib/motion";
 
 const brands = [
-  "Nova Bank", "Nexus AI", "Island Pulse", "Vortex Tech", "Midas Luxury", 
-  "Aura Digital", "Zenith Media", "Orbit Systems", "Prime Assets", "Eclipse Global"
+  {
+    name: "Nova Bank",
+    image:
+      "https://images.unsplash.com/photo-1550565118-3a14e8d0386f?auto=format&fit=crop&q=80&w=1200",
+  },
+  {
+    name: "Nexus AI",
+    image:
+      "https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=1200",
+  },
+  {
+    name: "Island Pulse",
+    image:
+      "https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?auto=format&fit=crop&q=80&w=1200",
+  },
+  {
+    name: "Vortex Tech",
+    image:
+      "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=1200",
+  },
+  {
+    name: "Midas Luxury",
+    image:
+      "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?auto=format&fit=crop&q=80&w=1200",
+  },
+  {
+    name: "Aura Digital",
+    image:
+      "https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&q=80&w=1200",
+  },
+  {
+    name: "Zenith Media",
+    image:
+      "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=1200",
+  },
+  {
+    name: "Orbit Systems",
+    image:
+      "https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&q=80&w=1200",
+  },
+  {
+    name: "Prime Assets",
+    image:
+      "https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&q=80&w=1200",
+  },
+  {
+    name: "Eclipse Global",
+    image:
+      "https://images.unsplash.com/photo-1526379095098-d400fd0bf935?auto=format&fit=crop&q=80&w=1200",
+  },
 ];
 
 export default function BrandWall() {
@@ -16,68 +64,31 @@ export default function BrandWall() {
     registerGsapPlugins();
     const scroller = getScroller();
     const reduced = prefersReducedMotion();
-    if (reduced) return;
 
     const ctx = gsap.context(() => {
-      const items = gsap.utils.toArray<HTMLElement>(".brand-item");
-
-      // Initial 3D scatter
-      items.forEach((item, i) => {
-          gsap.set(item, {
-            z: (i % 3) * -90,
-            y: (i % 2 === 0 ? 18 : -18),
-            rotateX: (i % 2 === 0 ? 8 : -8),
-              opacity: 0,
-          });
-      });
-
-      gsap.fromTo(items, 
-        { 
-          opacity: 0, 
+      const items = gsap.utils.toArray<HTMLElement>(".brand-reveal-item");
+      gsap.fromTo(
+        items,
+        {
+          y: reduced ? 0 : 36,
+          opacity: reduced ? 1 : 0,
+          scale: reduced ? 1 : 0.96,
         },
         {
+          y: 0,
           opacity: 1,
-          duration: 1.6,
-          stagger: 0.08,
-          ease: "expo.out",
+          scale: 1,
+          duration: reduced ? 0 : 0.8,
+          stagger: reduced ? 0 : 0.06,
+          ease: "power4.out",
           scrollTrigger: {
             trigger: sectionRef.current,
             scroller,
-            start: "top 75%",
-            once: true
-          }
-        }
+            start: "top 84%",
+            once: true,
+          },
+        },
       );
-
-      // 3D Orbit Flight on scroll
-      gsap.to(items, {
-        y: (i) => (i % 2 === 0 ? -36 : 36),
-        z: (i) => (i % 3 === 0 ? 120 : -120),
-        rotateX: (i) => (i % 2 === 0 ? 12 : -12),
-        rotateY: (i) => (i % 5 === 0 ? 14 : -14),
-        ease: "none",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          scroller,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: 1.5,
-        }
-      });
-
-      // Background pulse intensity increases on scroll
-      gsap.to(".brand-glow", {
-        opacity: 0.15,
-        scale: 1.8,
-        ease: "none",
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          scroller,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: true,
-        }
-      });
     }, sectionRef);
 
     return () => ctx.revert();
@@ -86,7 +97,7 @@ export default function BrandWall() {
   return (
     <section 
       ref={sectionRef}
-      className="relative py-12 md:py-16 bg-background overflow-hidden"
+      className="relative bg-background overflow-hidden pt-12 pb-24 md:pt-16 md:pb-36"
     >
       <div className="_container relative z-10">
         <div className="mb-16 md:mb-24 text-center max-w-4xl mx-auto">
@@ -97,27 +108,31 @@ export default function BrandWall() {
           </h2>
         </div>
 
-        <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-4 px-4 perspective-[2000px] transform-style-3d md:gap-x-10 md:gap-y-6">
+        <ul className="brand-codepen-grid">
           {brands.map((brand, i) => (
-            <div 
-              key={i}
-              className="brand-item group relative flex h-24 w-44 items-center justify-center rounded-[2rem] bg-gradient-to-br from-white to-black/[0.02] shadow-md shadow-black/10 transition-all duration-700 hover:bg-white hover:shadow-lg hover:shadow-black/15 will-change-transform md:h-36 md:w-56"
-            >
-              <div className="brand-shine absolute inset-0 bg-gradient-to-tr from-accent/10 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity rounded-[2rem]" />
-              <div className="absolute inset-0 rounded-[2rem] bg-[radial-gradient(circle_at_center,rgba(0,0,0,0.03),transparent_70%)] opacity-0 group-hover:opacity-100 transition-opacity" />
-              
-              <span className="relative z-10 px-3 text-center text-[11px] font-black uppercase leading-[1.3] tracking-[0.14em] text-black/60 transition-all duration-700 group-hover:scale-105 group-hover:text-foreground md:text-[15px]">
-                {brand}
-              </span>
-              
-              <div className="absolute top-4 right-4 h-1 w-1 rounded-full bg-accent/20 group-hover:scale-150 transition-transform" />
-            </div>
+            <li key={i} className="brand-reveal-item brand-card-li">
+              <div className="brand-card-details">
+                <div
+                  className="brand-card-bg"
+                  style={{ backgroundImage: `url(${brand.image})` }}
+                  aria-hidden="true"
+                />
+                <div
+                  className="brand-card-cut"
+                  style={{ backgroundImage: `url(${brand.image})` }}
+                  aria-hidden="true"
+                />
+                <p aria-hidden="true">{brand.name}</p>
+                <p aria-hidden="true">{brand.name}</p>
+                <h3>{brand.name}</h3>
+              </div>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
 
-      <div className="brand-glow absolute top-1/2 left-1/4 h-[40vw] w-[40vw] rounded-full bg-accent/5 blur-[160px] pointer-events-none opacity-30" />
-      <div className="brand-glow absolute bottom-1/4 right-1/4 h-[30vw] w-[30vw] rounded-full bg-secondary/5 blur-[140px] pointer-events-none opacity-20" />
+      <div className="absolute top-1/2 left-1/4 h-[40vw] w-[40vw] rounded-full bg-accent/5 blur-[160px] pointer-events-none opacity-20" />
+      <div className="absolute bottom-1/4 right-1/4 h-[30vw] w-[30vw] rounded-full bg-secondary/5 blur-[140px] pointer-events-none opacity-15" />
     </section>
   );
 }

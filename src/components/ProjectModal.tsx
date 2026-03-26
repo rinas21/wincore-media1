@@ -152,7 +152,7 @@ export default function ProjectModal({
       <div className="modal-bg absolute inset-0 bg-black/50 backdrop-blur-md" onMouseDown={onClose} />
 
       <div
-        className="modal-content relative z-[1] my-auto flex w-full max-w-[min(100%,1280px)] flex-col overflow-hidden rounded-[1.35rem] border border-black/10 bg-background shadow-[0_48px_120px_rgba(0,0,0,0.14)] sm:rounded-2xl lg:my-6 lg:max-h-[min(94dvh,960px)] lg:flex-row lg:rounded-[2rem]"
+        className="modal-content relative z-[1] my-auto flex w-full max-w-[min(100%,1280px)] flex-col overflow-hidden rounded-[1.35rem] border border-black/10 bg-background shadow-[0_48px_120px_rgba(0,0,0,0.14)] sm:rounded-2xl lg:my-6 lg:max-h-[94dvh] lg:flex-row lg:rounded-[2rem]"
       >
         <button
           type="button"
@@ -188,8 +188,8 @@ export default function ProjectModal({
         </div>
 
         {/* Copy + meta — scrolls independently on short viewports */}
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-y-auto">
-          <div className="flex flex-1 flex-col gap-10 px-10 pb-16 pt-[5.5rem] sm:gap-11 sm:px-14 sm:pb-20 sm:pt-[5.5rem] lg:gap-12 lg:px-24 lg:pb-24 lg:pt-24">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+          <div className="flex min-h-0 flex-1 flex-col gap-10 overflow-y-auto px-10 pb-10 pt-[5.5rem] sm:px-14 sm:pb-14 sm:pt-[5.5rem] lg:gap-12 lg:px-24 lg:pb-16 lg:pt-24">
             <header className="stagger-item space-y-4">
               <p className="text-[12.5px] font-black uppercase tracking-[0.32em] text-accent">
                 Case study · {project.category}
@@ -227,13 +227,13 @@ export default function ProjectModal({
               ].map(({ icon: Icon, label, value }) => (
                 <div
                   key={label}
-                  className="meta-item group/meta relative overflow-hidden rounded-3xl border border-black/[0.06] bg-gradient-to-br from-white via-white/80 to-black/[0.02] p-7 transition-all duration-500 hover:border-accent/30 hover:shadow-[0_24px_48px_rgba(0,0,0,0.04)] sm:p-9"
+                  className="meta-item group/meta relative overflow-hidden rounded-3xl border border-black/[0.06] bg-gradient-to-br from-white via-white/80 to-black/[0.02] p-6 transition-all duration-500 hover:border-accent/30 hover:shadow-[0_24px_48px_rgba(0,0,0,0.04)] sm:p-7"
                 >
                   {/* Subtle Accent Glow */}
                   <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-accent/5 blur-2xl transition-opacity group-hover/meta:opacity-100" />
                   
-                  <div className="relative z-10">
-                    <div className="mb-6 flex items-center gap-4">
+                  <div className="project-meta-content relative z-10">
+                    <div className="mb-4 flex items-center gap-3">
                       <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/5 text-accent transition-colors group-hover/meta:bg-accent group-hover/meta:text-white">
                         <Icon size={18} />
                       </div>
@@ -242,7 +242,7 @@ export default function ProjectModal({
                       </span>
                     </div>
                     
-                    <p className="text-[1.1rem] font-bold leading-tight tracking-tight text-foreground/90 sm:text-xl">
+                    <p className="break-words text-[1.02rem] font-bold leading-tight tracking-tight text-foreground/90 sm:text-[1.1rem]">
                       {value}
                     </p>
                   </div>
@@ -251,7 +251,7 @@ export default function ProjectModal({
             </div>
           </div>
 
-          <div className="stagger-item mt-auto flex flex-col gap-5 border-t border-black/8 bg-background/95 px-10 pb-16 pt-10 sm:flex-row sm:gap-6 sm:px-14 sm:pb-20 sm:pt-12 lg:px-24 lg:pb-16 lg:pt-14">
+          <div className="stagger-item shrink-0 flex flex-col gap-5 border-t border-black/8 bg-background/95 px-10 pb-10 pt-8 sm:flex-row sm:gap-6 sm:px-14 sm:pb-12 sm:pt-10 lg:px-24 lg:pb-12 lg:pt-12">
             <Link
               href="/contact"
               className="group relative inline-flex flex-[1.4] items-center justify-center gap-3 rounded-2xl bg-accent px-8 py-5 text-[12.5px] font-black uppercase tracking-[0.32em] text-white transition-all hover:scale-[1.01] hover:shadow-[0_12px_36px_rgba(0,191,255,0.18)] active:scale-[0.99] sm:py-6"

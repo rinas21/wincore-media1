@@ -67,205 +67,134 @@ const PROJECTS: Project[] = [
 
 export default function WorkCarousel() {
   const sectionRef = useRef<HTMLElement>(null);
-  const pinRef = useRef<HTMLDivElement>(null);
-  const trackRef = useRef<HTMLDivElement>(null);
-  const progressRef = useRef<HTMLDivElement>(null);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
-  const [useHorizontal, setUseHorizontal] = useState(false);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-
-    const reduceMq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const coarseMq = window.matchMedia("(pointer: coarse)");
-
-    const updateMode = () => {
-      const shouldHorizontal = !reduceMq.matches && !coarseMq.matches && window.innerWidth >= 1024;
-      setUseHorizontal(shouldHorizontal);
-    };
-
-    updateMode();
-    window.addEventListener("resize", updateMode);
-    return () => {
-      window.removeEventListener("resize", updateMode);
-    };
-  }, []);
 
   useEffect(() => {
     registerGsapPlugins();
     const scroller = getScroller();
     const reduced = prefersReducedMotion();
-
-    const track = trackRef.current;
-    const pin = pinRef.current;
     const section = sectionRef.current;
-    if (!track || !pin || !section) return;
-
-    const scrollDistance = () => Math.max(0, track.scrollWidth - window.innerWidth);
-    const cleanupTilt: Array<() => void> = [];
+    if (!section) return;
 
     const ctx = gsap.context(() => {
-      if (useHorizontal && !reduced) {
-        gsap.to(track, {
-          x: () => -scrollDistance(),
-          ease: "none",
-          scrollTrigger: {
-            trigger: pin,
-            scroller,
-            start: "top top",
-            end: () => "+=" + String(scrollDistance()),
-            pin: true,
-            scrub: 1, // 1:1 feel
-            anticipatePin: 1.2,
-            invalidateOnRefresh: true,
-            onUpdate(self) {
-              if (progressRef.current) {
-                progressRef.current.style.transform = `scaleX(${self.progress})`;
-              }
-              
-              // Depth Scaling Effect
-              const cards = gsap.utils.toArray<HTMLElement>(".wc-tilt");
-              const center = window.innerWidth / 2;
-              
-              cards.forEach((card) => {
-                const rect = card.getBoundingClientRect();
-                const cardCenter = rect.left + rect.width / 2;
-                const distanceFromCenter = Math.abs(center - cardCenter);
-                const maxDistance = window.innerWidth;
-                
-                const normalizedDistance = Math.min(distanceFromCenter / maxDistance, 1);
-                const scale = 1 - normalizedDistance * 0.12;
-                const opacity = 1; // Always show full opacity per user request
-
-                gsap.set(card, {
-                  scale,
-                  opacity,
-                  transformPerspective: 1200,
-                  rotateY: (cardCenter - center) * 0.02,
-                  translateZ: 0,
-                  backfaceVisibility: "hidden",
-                });
-              });
+      const cards = gsap.utils.toArray<HTMLElement>(".wc-reveal-item");
+      cards.forEach((card, i) => {
+        gsap.fromTo(
+          card,
+          { y: reduced ? 0 : 64, opacity: reduced ? 1 : 0, scale: reduced ? 1 : 0.96 },
+          {
+            y: 0,
+            opacity: 1,
+            scale: 1,
+            duration: reduced ? 0 : 0.9,
+            delay: i * 0.04,
+            ease: "power4.out",
+            scrollTrigger: {
+              trigger: card,
+              scroller,
+              start: "top 86%",
+              once: true,
             },
           },
-        });
-      } else {
-        gsap.set(track, { x: 0, clearProps: "transform" });
-      }
+        );
 
-      const cards = gsap.utils.toArray<HTMLElement>(".wc-tilt");
-      cards.forEach((card) => {
-        const media = card.querySelector(".wc-media") as HTMLElement | null;
-        const shine = card.querySelector(".wc-shine") as HTMLElement | null;
-        if (!media) return;
+        if (!reduced) {
+          gsap.to(card, {
+            yPercent: -2,
+            ease: "none",
+            scrollTrigger: {
+              trigger: card,
+              scroller,
+              start: "top bottom",
+              end: "bottom top",
+              scrub: 0.8,
+            },
+          });
+        }
+      });
 
-        gsap.set(card, { transformPerspective: 1000 });
-        const toRX = gsap.quickTo(card, "rotationX", { duration: 0.5, ease: "power3.out" });
-        const toRY = gsap.quickTo(card, "rotationY", { duration: 0.5, ease: "power3.out" });
-
-        const onMove = (e: PointerEvent) => {
-          if (reduced) return;
-          const r = card.getBoundingClientRect();
-          const px = (e.clientX - r.left) / Math.max(r.width, 1);
-          const py = (e.clientY - r.top) / Math.max(r.height, 1);
-          toRX((py - 0.5) * -4);
-          toRY((px - 0.5) * 5);
-          if (shine) {
-            shine.style.opacity = "1";
-            shine.style.background = `radial-gradient(400px circle at ${px * 100}% ${py * 100}%, rgba(0,191,255,0.15), transparent 60%)`;
-          }
-        };
-
-        const onLeave = () => {
-          toRX(0);
-          toRY(0);
-          if (shine) shine.style.opacity = "0";
-        };
-
-        card.addEventListener("pointermove", onMove);
-        card.addEventListener("pointerleave", onLeave);
-        cleanupTilt.push(() => {
-          card.removeEventListener("pointermove", onMove);
-          card.removeEventListener("pointerleave", onLeave);
-        });
+      const media = gsap.utils.toArray<HTMLElement>(".wc-media");
+      media.forEach((el) => {
+        if (reduced) return;
+        gsap.fromTo(
+          el,
+          { scale: 1.08 },
+          {
+            scale: 1,
+            ease: "none",
+            scrollTrigger: {
+              trigger: el,
+              scroller,
+              start: "top 92%",
+              end: "bottom 20%",
+              scrub: 0.8,
+            },
+          },
+        );
       });
     }, section);
 
     return () => {
-      cleanupTilt.forEach((fn) => fn());
       ctx.revert();
     };
-  }, [useHorizontal]);
+  }, []);
 
   return (
     <section
       id="works"
       ref={sectionRef}
-      className="relative bg-background overflow-hidden"
+      className="relative overflow-hidden bg-background py-20 md:py-28"
       aria-label="Featured works"
     >
-      <div className="pointer-events-none absolute left-[-6vw] top-[32%] select-none text-[min(36vw,380px)] font-black uppercase italic leading-none text-black/[0.02]">
-        Archive
-      </div>
-
-      <div className="wc-heading-block _container relative z-10 py-24 md:py-32">
-        <div className="flex flex-col gap-10 md:flex-row md:items-end md:justify-between">
+      <div className="_container relative z-10">
+        <div className="mb-14 flex flex-col gap-6 md:mb-20 md:flex-row md:items-end md:justify-between">
           <div className="max-w-2xl">
-            <span className="mb-6 inline-block text-[10px] font-black uppercase leading-[1.35] tracking-[0.42em] text-accent">Selected Archives</span>
-            <h2 className="font-heading text-4xl md:text-5xl lg:text-7xl font-black uppercase leading-[1.02] tracking-tighter text-foreground">
+            <span className="mb-5 inline-block text-[10px] font-black uppercase leading-[1.35] tracking-[0.42em] text-accent">
+              Selected Archives
+            </span>
+            <h2 className="font-heading text-4xl font-black uppercase leading-[1.02] tracking-tighter text-foreground md:text-5xl lg:text-7xl">
               Works that <br />
               <span className="text-black/30 italic">rewrite the rules</span>
             </h2>
           </div>
-          <div className="flex items-center gap-4">
-             <div className={`h-px w-32 bg-gradient-to-r from-accent/50 to-transparent ${useHorizontal ? "opacity-100" : "opacity-0"}`} />
-             <span className="text-[10px] font-black uppercase leading-[1.35] tracking-[0.24em] text-black/35">
-               {useHorizontal ? "Scroll Side" : "Scroll Down"}
-             </span>
-          </div>
+          <p className="max-w-md text-sm font-light leading-relaxed text-black/45 md:text-base md:text-right">
+            Scroll down to move through projects. Each card pops in, then hands focus to the next.
+          </p>
         </div>
-      </div>
 
-      <div
-        ref={pinRef}
-        className={`relative z-[1] w-full ${useHorizontal ? "h-[85vh] overflow-hidden" : "h-auto overflow-visible"}`}
-      >
-        <div ref={trackRef} className={useHorizontal ? "flex h-full w-max will-change-transform" : "grid grid-cols-1 gap-12 px-5 pb-24 sm:px-6 md:px-8"}>
+        <div className="grid grid-cols-1 gap-8 md:gap-10">
           {PROJECTS.map((project, i) => (
-            <div
-              key={project.id}
-              className={useHorizontal
-                ? "box-border flex h-full w-[100vw] flex-shrink-0 items-center justify-center px-5 sm:px-8 md:px-16 lg:px-24"
-                : "relative w-full aspect-video"}
-            >
+            <div key={project.id} className="wc-reveal-item">
               <button
                 type="button"
                 onClick={() => setSelectedProject(project)}
-                className="wc-tilt group relative h-[70vh] w-full max-w-7xl overflow-hidden rounded-[3rem] border border-black/[0.08] bg-white text-left shadow-[0_45px_100px_rgba(0,0,0,0.08)] transition-all duration-500 hover:border-accent/30"
+                className="wc-card wc-refer-card group relative block w-full text-left"
               >
-                <Image
-                  src={project.image}
-                  alt={project.title}
-                  fill
-                  className="object-cover transition-transform duration-1000 group-hover:scale-[1.03] saturate-[1.05]"
-                  sizes="(max-width: 1024px) 100vw, 1400px"
-                  quality={100}
-                  priority={i === 0}
-                  loading={i === 0 ? undefined : "lazy"}
-                />
-                <div className="wc-shine pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-500" />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-transparent opacity-60 pointer-events-none" />
-                
-                <div className="absolute bottom-12 left-10 right-10 z-10 sm:bottom-16 sm:left-14 sm:right-14 md:bottom-20 md:left-16 md:right-16 lg:bottom-24 lg:left-24 lg:right-24">
-                  <span className="mb-6 block text-[11px] font-black uppercase leading-[1.35] tracking-[0.45em] text-accent">
-                    {project.category}
-                  </span>
-                  <h3 className="text-3xl md:text-6xl font-black uppercase leading-[0.96] tracking-tighter text-white transition-transform group-hover:translate-x-2 drop-shadow-lg">
-                    {project.title}
-                  </h3>
-                  <div className="mt-8 flex items-center gap-3">
-                    <span className="h-px w-12 bg-white/40" />
-                    <p className="text-[12px] font-black uppercase leading-[1.35] tracking-[0.34em] text-white/75 transition-colors group-hover:text-accent">View Project</p>
+                <div className="wc-refer-inner relative aspect-[16/9] w-full overflow-hidden rounded-[2rem] border border-black/[0.08] bg-white shadow-[0_24px_64px_rgba(0,0,0,0.08)] transition-colors group-hover:border-accent/40">
+                  <div className="wc-media wc-refer-media absolute inset-0">
+                    <Image
+                      src={project.image}
+                      alt={project.title}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 1024px) 100vw, 1240px"
+                      quality={95}
+                      priority={i === 0}
+                      loading={i === 0 ? undefined : "lazy"}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+                  </div>
+
+                  <div className="absolute bottom-0 left-0 right-0 z-10 p-6 md:p-8 lg:p-10">
+                    <span className="mb-3 block text-[10px] font-black uppercase leading-[1.35] tracking-[0.4em] text-accent/95">
+                      {project.category}
+                    </span>
+                    <h3 className="wc-refer-title text-2xl font-black uppercase leading-[0.95] tracking-tight text-white md:text-4xl">
+                      {project.title}
+                    </h3>
+                    <p className="mt-4 text-[11px] font-black uppercase leading-[1.35] tracking-[0.28em] text-white/75">
+                      Open Project
+                    </p>
                   </div>
                 </div>
               </button>

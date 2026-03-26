@@ -51,17 +51,6 @@ export default function PageMotion({ children }: PageMotionProps) {
 
       if (sections.length === 0) return;
 
-      // ── Hidden state ──────────────────────────────────────────────────────
-      // clip-path starts fully closed (bottom edge to top), y is pushed down,
-      // autoAlpha:0 guarantees visibility:hidden (no paint) + opacity:0.
-      const hiddenState = {
-        autoAlpha: 0,
-        y: 16,
-      };
-
-      // Apply hidden state immediately so elements are invisible on first paint.
-      gsap.set(sections, hiddenState);
-
       if (reduced) {
         // Skip animation for users who prefer reduced motion.
         gsap.set(sections, {
@@ -87,6 +76,7 @@ export default function PageMotion({ children }: PageMotionProps) {
             duration: 1.1,
             delay: index === 0 ? 0.12 : 0,
             ease: "expo.out",
+            immediateRender: false,
             clearProps: "transform",
             scrollTrigger: {
               trigger: section,

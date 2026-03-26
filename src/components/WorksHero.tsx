@@ -4,21 +4,14 @@ import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SplitType from "split-type";
-import dynamic from "next/dynamic";
 import {
   registerGsapPlugins,
-  getScroller,
   prefersReducedMotion,
 } from "@/lib/motion";
 import { useLenis } from "@/context/LenisContext";
 import { usePreloaderDone } from "@/context/PreloaderContext";
 
 gsap.registerPlugin(ScrollTrigger);
-
-const WorksScene = dynamic(() => import("@/components/WorksScene"), {
-  ssr: false,
-  loading: () => null,
-});
 
 export default function WorksHero() {
   const rootRef = useRef<HTMLElement>(null);
@@ -33,68 +26,37 @@ export default function WorksHero() {
     const reduced = prefersReducedMotion();
     if (reduced) return;
 
-    const scroller = getScroller();
     let split: SplitType | undefined;
 
     const ctx = gsap.context(() => {
       const h1 = titleRef.current?.querySelector("h1");
       if (h1) {
         split = new SplitType(h1, { types: "chars,lines" });
-        gsap.set(split.chars, {
-          opacity: 0,
-          scale: 0.85,
-          y: 40,
-        });
-
-        const revealTl = gsap.timeline({ delay: 0.5 });
-
-        revealTl
-          .to(split.chars, {
+        gsap.fromTo(
+          split.chars,
+          { opacity: reduced ? 1 : 0, y: reduced ? 0 : 36 },
+          {
             opacity: 1,
-            scale: 1,
             y: 0,
-            duration: 1.8,
-            stagger: 0.02,
-            ease: "expo.out",
-          })
-          .from(
-            ".scene-wrap",
-            {
-              opacity: 0,
-              scale: 1.2,
-              duration: 3,
-              ease: "power2.out",
-            },
-            "-=1.8",
-          );
-
-        const root = rootRef.current;
-        if (root) {
-          gsap.set(root, { scale: 1, opacity: 1 });
-          gsap.to(root, {
-            scale: 0.94,
-            opacity: 0.72,
-            ease: "none",
-            scrollTrigger: {
-              trigger: root,
-              scroller,
-              start: "top top",
-              end: "bottom top",
-              scrub: 1.2,
-            },
-          });
-        }
+            duration: reduced ? 0 : 1.15,
+            stagger: reduced ? 0 : 0.018,
+            ease: "power4.out",
+          },
+        );
       }
 
-      gsap.set(".hero-sub", { y: 40, opacity: 0 });
-      gsap.from(".hero-sub", {
-        y: 40,
-        opacity: 0,
-        duration: 1.5,
-        ease: "power4.out",
-        stagger: 0.15,
-        delay: 1.2,
-      });
+      gsap.fromTo(
+        ".hero-sub",
+        { y: reduced ? 0 : 30, opacity: reduced ? 1 : 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: reduced ? 0 : 0.95,
+          ease: "power4.out",
+          stagger: reduced ? 0 : 0.12,
+          delay: reduced ? 0 : 0.35,
+        },
+      );
     }, rootRef);
 
     return () => {
@@ -108,11 +70,7 @@ export default function WorksHero() {
       ref={rootRef}
       className="relative min-h-[90vh] flex flex-col items-center justify-center overflow-hidden bg-background px-5 pt-40 pb-16 sm:px-6 md:px-10 md:pt-48 md:pb-20 lg:px-12"
     >
-      <div className="scene-wrap absolute inset-0 opacity-10 mix-blend-multiply pointer-events-none">
-        <WorksScene />
-      </div>
-
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,rgba(255,255,255,0.8)_80%)] z-1" />
+      <div className="absolute inset-0 z-[1] bg-[radial-gradient(circle_at_center,rgba(0,136,204,0.06)_0%,rgba(255,255,255,0.9)_72%)]" />
       
       <div className="relative z-10 w-full max-w-[1240px] text-center">
         <div ref={titleRef} className="flex flex-col items-center">
@@ -123,7 +81,7 @@ export default function WorksHero() {
           
           <h1 className="font-heading text-[16vw] sm:text-[14vw] md:text-[10vw] lg:text-[9vw] font-black uppercase leading-[0.96] tracking-tighter text-foreground">
             World-class <br />
-            <span className="text-black/15 italic font-light tracking-[-0.08em] hover:text-black transition-colors duration-1000 cursor-default">creativity</span>
+            <span className="text-black/20 italic font-light tracking-[-0.08em]">creativity</span>
           </h1>
           
           <p className="hero-sub mx-auto mt-16 max-w-3xl text-lg font-light leading-relaxed text-black/50 md:text-xl md:leading-relaxed">

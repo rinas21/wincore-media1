@@ -253,14 +253,14 @@ function ServiceModal({
     <div
       ref={overlayRef}
       onClick={onBackdrop}
-      className="fixed inset-0 z-[999] flex items-end justify-center bg-black/50 backdrop-blur-sm sm:items-center sm:p-6"
+      className="fixed inset-0 z-[999] flex items-end justify-center bg-black/50 p-3 backdrop-blur-sm sm:items-center sm:p-6"
       role="dialog"
       aria-modal="true"
       aria-label={`${service.title} — service details`}
     >
       <div
         ref={panelRef}
-        className="relative w-full max-w-2xl max-h-[92dvh] overflow-y-auto rounded-t-[2rem] bg-background shadow-[0_32px_80px_rgba(0,0,0,0.18)] sm:rounded-[2rem] scrollbar-hide"
+        className="service-modal-panel relative mb-1 w-full max-w-2xl max-h-[calc(100dvh-1rem)] overflow-y-auto rounded-t-[2rem] bg-background shadow-[0_32px_80px_rgba(0,0,0,0.18)] sm:mb-0 sm:max-h-[92dvh] sm:rounded-[2rem] scrollbar-hide"
       >
         {/* ── Hero image ── */}
         <div className="relative h-56 w-full overflow-hidden rounded-t-[2rem] sm:h-72">
@@ -296,7 +296,7 @@ function ServiceModal({
         </div>
 
         {/* ── Body ── */}
-        <div className="px-7 py-9 sm:px-10 sm:py-10">
+        <div className="service-modal-body px-6 py-8 sm:px-10 sm:py-10">
 
           {/* What we do */}
           <p className="smodal-stagger mb-8 text-[15px] font-light leading-[1.8] text-black/50">
@@ -352,7 +352,7 @@ function ServiceModal({
           </div>
 
           {/* CTA row */}
-          <div className="smodal-stagger mt-9 flex flex-col-reverse items-stretch gap-3 border-t border-black/[0.06] pt-7 sm:flex-row sm:items-center sm:justify-between">
+          <div className="service-modal-footer smodal-stagger mt-9 flex flex-col-reverse items-stretch gap-3 border-t border-black/[0.06] pt-7 sm:flex-row sm:items-center sm:justify-between">
             <button
               onClick={handleClose}
               className="text-[10px] font-black uppercase tracking-[0.4em] text-black/30 transition-colors hover:text-black/55"
@@ -483,7 +483,7 @@ export default function ServiceCards() {
         <div className="_container relative z-10">
 
           {/* ── Header ── */}
-          <div className="mb-24 flex flex-col gap-10 md:mb-32 md:flex-row md:items-end md:justify-between">
+          <div className="mb-20 flex flex-col gap-8 md:mb-28 md:flex-row md:items-end md:justify-between md:gap-12">
             <div>
               {/* kicker — matches site standard exactly */}
               <p className="sc-kicker mb-8 text-[11px] font-black uppercase leading-[1.4] tracking-[0.5em] text-accent">
@@ -510,6 +510,15 @@ export default function ServiceCards() {
                 <div
                   key={s.title}
                   className="sc-row group relative cursor-pointer overflow-hidden"
+                  onClick={() => openModal(s)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" || e.key === " ") {
+                      e.preventDefault();
+                      openModal(s);
+                    }
+                  }}
                   onMouseEnter={() => setHoveredIndex(i)}
                   onMouseLeave={() => setHoveredIndex(null)}
                 >
@@ -536,7 +545,7 @@ export default function ServiceCards() {
 
                   {/* row content */}
                   <div
-                    className="relative z-10 flex items-center justify-between gap-6 py-11 transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] md:py-14"
+                    className="relative z-10 flex items-center justify-between gap-6 px-1 py-10 transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] sm:px-2 md:px-3 md:py-12"
                     style={{
                       paddingLeft: isHovered ? "calc(40% + 2.5rem)" : "0rem",
                     }}
@@ -559,15 +568,17 @@ export default function ServiceCards() {
 
                       {/* Explore button — pill style, consistent with site CTA language */}
                       <button
-                        onClick={() => openModal(s)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openModal(s);
+                        }}
                         aria-label={`Explore ${s.title}`}
                         className="flex items-center gap-2 rounded-full border border-black/10 bg-background px-5 py-2.5 text-[10px] font-black uppercase tracking-[0.38em] text-foreground/50 shadow-sm transition-all duration-300 hover:border-accent/30 hover:bg-accent hover:text-white hover:shadow-md hover:shadow-accent/20"
                         style={{
-                          opacity: isHovered ? 1 : 0,
-                          transform: isHovered ? "translateY(0)" : "translateY(8px)",
+                          opacity: 1,
+                          transform: "translateY(0)",
                           transition:
-                            "opacity 0.3s ease, transform 0.3s ease, background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s",
-                          pointerEvents: isHovered ? "auto" : "none",
+                            "background-color 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s",
                         }}
                       >
                         {s.link ? s.linkLabel ?? "Open Platform" : "Explore"}

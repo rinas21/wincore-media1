@@ -14,36 +14,32 @@ import {
 
 const stats = [
   {
-    value: 12,
+    value: 200,
     suffix: "+",
-    label: "Awards Won",
-    desc: "Local and international creative excellence recognised across categories.",
-    accent: "from-accent/[0.08] to-transparent",
-    image: "https://images.unsplash.com/photo-1549417229-aa67d3263c09?auto=format&fit=crop&q=80&w=800",
+    label: "Campaigns Delivered",
+    desc: "Full-funnel campaigns across every vertical — built to perform and scale.",
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=1400",
   },
   {
     value: 95,
     suffix: "%",
     label: "Client Retention",
-    desc: "Clients stay because results compound and trust is earned, not assumed.",
-    accent: "from-secondary/[0.07] to-transparent",
-    image: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=800",
-  },
-  {
-    value: 200,
-    suffix: "+",
-    label: "Campaigns Delivered",
-    desc: "Full-funnel campaigns across every vertical — built to perform.",
-    accent: "from-white/[0.05] to-transparent",
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=800",
+    desc: "Clients stay because trust is earned, not assumed.",
+    image: "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&q=80&w=1400",
   },
   {
     value: 10,
     suffix: "y",
     label: "Years in the Game",
-    desc: "A decade of digital authority, craft, and measurable outcomes.",
-    accent: "from-accent/[0.05] to-secondary/[0.03]",
-    image: "https://images.unsplash.com/photo-1549417229-aa67d3263c09?auto=format&fit=crop&q=80&w=800",
+    desc: "A decade of digital authority and measurable outcomes.",
+    image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=1400",
+  },
+  {
+    value: 12,
+    suffix: "+",
+    label: "Awards Won",
+    desc: "Local and international creative excellence recognised globally.",
+    image: "https://images.unsplash.com/photo-1549417229-aa67d3263c09?auto=format&fit=crop&q=80&w=1400",
   },
 ];
 
@@ -57,20 +53,20 @@ export default function AwardsStats() {
     const splits: SplitType[] = [];
 
     const ctx = gsap.context(() => {
-      // ── Heading char reveal ──
+      // Heading Entry animations
       const headingEl = sectionRef.current?.querySelector(".aw-heading") as HTMLElement | null;
       if (headingEl) {
-        const split = new SplitType(headingEl, { types: "chars" });
+        const split = new SplitType(headingEl, { types: "chars,words" });
         splits.push(split);
         if (split.chars) {
           gsap.fromTo(
             split.chars,
-            { yPercent: reduced ? 0 : 110, opacity: reduced ? 1 : 0 },
+            { yPercent: reduced ? 0 : 100, opacity: reduced ? 1 : 0 },
             {
               yPercent: 0,
               opacity: 1,
-              duration: reduced ? 0 : 1,
-              stagger: 0.018,
+              duration: reduced ? 0 : 1.2,
+              stagger: 0.02,
               ease: "expo.out",
               clearProps: "transform,opacity",
               scrollTrigger: { trigger: headingEl, scroller, start: "top 85%", once: true },
@@ -80,77 +76,83 @@ export default function AwardsStats() {
       }
 
       gsap.fromTo(
-        ".aw-kicker",
-        { y: reduced ? 0 : 20, opacity: reduced ? 1 : 0 },
+        ".aw-fade-up",
+        { y: reduced ? 0 : 30, opacity: reduced ? 1 : 0 },
         {
-          y: 0, opacity: 1, duration: reduced ? 0 : 0.8, ease: "expo.out", clearProps: "transform,opacity",
-          scrollTrigger: { trigger: ".aw-kicker", scroller, start: "top 90%", once: true },
-        }
-      );
-      gsap.fromTo(
-        ".aw-body",
-        { y: reduced ? 0 : 22, opacity: reduced ? 1 : 0 },
-        {
-          y: 0, opacity: 1, duration: reduced ? 0 : 1, ease: "expo.out", clearProps: "transform,opacity",
-          scrollTrigger: { trigger: ".aw-body", scroller, start: "top 90%", once: true },
+          y: 0, opacity: 1, duration: reduced ? 0 : 1, ease: "expo.out", stagger: 0.1, clearProps: "transform,opacity",
+          scrollTrigger: { trigger: ".aw-header-container", scroller, start: "top 85%", once: true },
         }
       );
 
-      // ── Count-up — triggered when each sticky card reaches view ──
-      const cards = gsap.utils.toArray<HTMLElement>(".aw-card");
-      cards.forEach((card, i) => {
-        const numEl = card.querySelector<HTMLElement>(".aw-num");
-        if (!numEl) return;
-        const target = stats[i].value;
+      // Desktop Image Accordion Hover Logic
+      const panels = gsap.utils.toArray<HTMLElement>(".aw-panel");
+      if (panels.length && !reduced) {
+        panels.forEach((panel, i) => {
+          gsap.fromTo(
+            panel,
+            { opacity: 0, scale: 0.95 },
+            {
+              opacity: 1, scale: 1, duration: 1.2, stagger: 0.1, ease: "power3.out", clearProps: "transform,opacity",
+              scrollTrigger: { trigger: ".aw-accordion-container", scroller, start: "top 80%", once: true }
+            }
+          );
+
+          panel.addEventListener("mouseenter", () => {
+             panels.forEach(p => {
+               p.style.flex = "1";
+               gsap.to(p.querySelector(".aw-panel-expanded"), { opacity: 0, duration: 0.4, ease: "power2.out" });
+               gsap.to(p.querySelector(".aw-panel-collapsed"), { opacity: 1, duration: 0.4, ease: "power2.out", delay: 0.1 });
+             });
+             
+             panel.style.flex = "7";
+             gsap.to(panel.querySelector(".aw-panel-expanded"), { opacity: 1, duration: 0.6, ease: "power2.out", delay: 0.3 });
+             gsap.to(panel.querySelector(".aw-panel-collapsed"), { opacity: 0, duration: 0.2, ease: "power2.out" });
+          });
+        });
+      }
+
+      // Mobile Image Accordion Interaction Array
+      const mobilePanels = gsap.utils.toArray<HTMLElement>(".aw-mobile-panel");
+      if (mobilePanels.length && !reduced) {
+        gsap.fromTo(
+          mobilePanels,
+          { y: 30, opacity: 0 },
+          { y: 0, opacity: 1, duration: 1, stagger: 0.1, ease: "power3.out", scrollTrigger: { trigger: ".aw-accordion-mobile", scroller, start: "top 85%", once: true } }
+        );
+
+        mobilePanels.forEach((panel) => {
+          panel.addEventListener("click", () => {
+             mobilePanels.forEach(p => {
+               p.style.height = "90px";
+               gsap.to(p.querySelector(".aw-mobile-expanded"), { opacity: 0, duration: 0.3 });
+               gsap.to(p.querySelector(".aw-mobile-collapsed"), { opacity: 1, duration: 0.4, delay: 0.1 });
+             });
+             
+             panel.style.height = "400px";
+             gsap.to(panel.querySelector(".aw-mobile-expanded"), { opacity: 1, duration: 0.5, delay: 0.2 });
+             gsap.to(panel.querySelector(".aw-mobile-collapsed"), { opacity: 0, duration: 0.2 });
+          });
+        });
+      }
+
+      // Number Count Ups
+      const nums = gsap.utils.toArray<HTMLElement>(".aw-num");
+      nums.forEach((numEl) => {
+        const targetStr = numEl.getAttribute("data-target");
+        if (!targetStr) return;
+        
         const proxy = { val: 0 };
         gsap.to(proxy, {
-          val: target,
-          duration: reduced ? 0 : 1.8,
-          ease: "power2.out",
-          scrollTrigger: {
-            trigger: card,
-            scroller,
-            start: "top 65%",
-            once: true,
-          },
+          val: parseFloat(targetStr),
+          duration: reduced ? 0 : 2.5,
+          ease: "expo.out",
+          scrollTrigger: { trigger: numEl.closest("section"), scroller, start: "top 85%", once: true },
           onUpdate() {
             numEl.textContent = Math.round(proxy.val).toString();
           },
         });
-
-        // ── 3D Kinetic Warp Entrance ──
-        const isEven = i % 2 === 0;
-        
-        gsap.fromTo(
-          card,
-          {
-            opacity: 0,
-            x: isEven ? -140 : 140,
-            y: 30,
-            skewY: isEven ? -6 : 6,
-            rotateY: isEven ? 20 : -20,
-            scale: 0.9,
-            transformPerspective: 1800,
-          },
-          {
-            opacity: 1,
-            x: 0,
-            y: 0,
-            skewY: 0,
-            rotateY: 0,
-            scale: 1,
-            duration: 1.45,
-            ease: "expo.out",
-            clearProps: "all",
-            scrollTrigger: {
-              trigger: card,
-              scroller,
-              start: "top 92%",
-              toggleActions: "play none none reverse",
-            },
-          }
-        );
       });
+
     }, sectionRef);
 
     scheduleScrollTriggerRefresh();
@@ -162,127 +164,121 @@ export default function AwardsStats() {
   }, []);
 
   return (
-    <section
-      ref={sectionRef}
-      className="relative overflow-visible border-t border-black/5 bg-background pb-20 pt-20 md:pb-28 md:pt-28"
-      aria-label="Awards and stats"
-    >
-      {/* Ambient glows */}
-      <div className="pointer-events-none absolute left-[-20vw] top-1/4 h-[40vw] w-[40vw] rounded-full bg-secondary/5 blur-[100px]" />
-      <div className="pointer-events-none absolute right-[-10vw] top-1/2 h-[30vw] w-[30vw] rounded-full bg-accent/5 blur-[80px]" />
-
-      <div className="_container relative z-10">
-        {/* ── Header ── */}
-        <div className="mb-24 flex flex-col items-start justify-between gap-12 md:flex-row md:items-end px-4 md:px-0">
-          <div>
-            <span className="aw-kicker mb-8 block text-[10px] font-black uppercase tracking-[0.6em] text-secondary italic">
+    <section ref={sectionRef} className="relative overflow-visible bg-background py-24 md:py-32" aria-label="Our Impact">
+      <div className="_container relative z-10 font-sans">
+        
+        {/* Header Section */}
+        <div className="aw-header-container mb-20 lg:mb-28 flex flex-col lg:flex-row items-start lg:items-end justify-between gap-12 px-4 md:px-0">
+          <div className="max-w-3xl">
+            <span className="aw-fade-up mb-8 block text-xs font-bold uppercase tracking-[0.2em] text-accent">
               Track Record
             </span>
-            <h2
-              className="aw-heading pb-1 text-[12vw] font-black uppercase leading-[0.9] tracking-tighter md:text-[7vw]"
-              style={{ perspective: "800px" }}
-            >
+            <h2 className="aw-heading text-[3.5rem] font-medium leading-[0.95] tracking-tight md:text-[6.5rem] lg:text-[8rem]">
               Outcomes<br />
-              <span className="text-black/[0.08] italic">that lead</span>
+              <span className="text-black/30 italic font-light">that lead.</span>
             </h2>
           </div>
-          <p className="aw-body max-w-[36ch] text-lg font-light leading-relaxed text-black/40 md:text-2xl">
+          <p className="aw-fade-up max-w-[28ch] text-lg font-light leading-relaxed text-black/60 md:text-xl md:pb-6">
             Awards are a signal. Outcomes are the standard. We build systems that perform and visuals that move.
           </p>
         </div>
 
-        {/* ── 3D Kinetic Warp Gallery ── */}
-        <div className="flex flex-col gap-24 md:gap-32 lg:gap-40">
-          {stats.map((stat, i) => (
-            <div
-              key={i}
-              className="aw-card-wrapper perspective-[2000px]"
-            >
-              <div
-                className="aw-card group relative min-h-[340px] md:min-h-[460px] overflow-hidden rounded-[3rem] border border-black/[0.06] bg-gradient-to-br from-white via-white/80 to-black/[0.01] px-12 py-14 shadow-[0_45px_100px_rgba(0,0,0,0.04),inset_0_1px_0_rgba(255,255,255,0.8)] backdrop-blur-2xl transition-all duration-700 hover:border-accent/30 hover:shadow-[0_60px_120px_rgba(0,191,255,0.06)] will-change-transform md:px-16 md:py-16 lg:px-24 lg:py-24 transform-gpu"
-              >
-                {/* Dynamic Shine Trail */}
-                <div className="absolute inset-0 z-0 bg-gradient-to-tr from-accent/[0.03] via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
-                
-                {/* Background Image Context - increased visibility and removed muddy blend */}
-                <div className="absolute inset-0 z-0 opacity-[0.25] transition-all duration-[1.5s] group-hover:opacity-[0.45] group-hover:scale-105">
-                  <Image
-                    src={stat.image}
-                    alt=""
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 1400px"
-                    priority={i < 2}
-                  />
+        {/* Desktop Interactive Accordion Gallery */}
+        <div className="aw-accordion-container hidden lg:flex w-full h-[650px] xl:h-[750px] gap-4 mb-20 px-4 md:px-0">
+           {stats.map((stat, i) => (
+             <div 
+               key={i} 
+               className={`aw-panel relative h-full rounded-[2.5rem] overflow-hidden cursor-pointer bg-black/5 group`}
+               style={{ 
+                 transition: "flex 0.8s cubic-bezier(0.25, 1, 0.5, 1)", 
+                 flex: i === 0 ? "7" : "1" 
+               }}
+             >
+                {/* Immersive Image Background */}
+                <div className="absolute inset-0 z-0 overflow-hidden">
+                  <Image src={stat.image} alt={stat.label} fill className="object-cover transition-transform duration-[6s] ease-out scale-100 group-hover:scale-110" priority={i === 0} sizes="(max-width: 1400px) 100vw, 1400px" />
+                  <div className="absolute inset-0 bg-black/40 transition-opacity duration-700 bg-gradient-to-t from-black/80 via-black/30 to-black/10" />
                 </div>
 
-                {/* Glass Glint Overlay */}
-                <div className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(circle_at_20%_0%,rgba(255,255,255,0.5),transparent_40%)]" />
-
-                <div className="relative z-10 flex h-full flex-col justify-between">
-                  {/* Indicator Header */}
-                  <div className="mb-14 flex items-center justify-between">
-                    <div className="flex items-center gap-6">
-                      <span className="text-[11px] font-black uppercase tracking-[0.6em] text-black/15">
-                        {String(i + 1).padStart(2, "0")} <span className="text-black/5 mx-2">/</span> {stats.length}
-                      </span>
-                      <div className="h-[2px] w-12 bg-accent/20" />
-                      <span className="text-[11px] font-black uppercase tracking-[0.55em] text-accent/80">
-                        {stat.label}
-                      </span>
-                    </div>
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full border border-black/5 bg-black/[0.01] text-black/40 group-hover:border-accent/40 group-hover:bg-accent/10 group-hover:text-accent transition-all duration-700 hover:rotate-45">
-                      <ArrowUpRight size={18} />
-                    </div>
-                  </div>
-
-                  <div className={`grid grid-cols-1 md:grid-cols-12 gap-10 md:gap-16 items-center ${i % 2 !== 0 ? 'md:flex-row-reverse' : ''}`}>
-                    {/* Big Projection Number with Vision Stroke */}
-                    <div className={`md:col-span-6 flex items-baseline relative ${i % 2 !== 0 ? 'md:justify-end' : ''}`}>
-                      <div className="absolute -left-12 -top-12 text-[14rem] font-black text-transparent [-webkit-text-stroke:1px_rgba(0,0,0,0.08)] select-none leading-none md:text-[18rem]">
-                        {stat.value}
-                      </div>
-                      <div className="flex items-baseline relative z-10 transition-transform duration-700 group-hover:scale-105 will-change-transform">
-                        <span className="aw-num text-[7rem] md:text-[10rem] lg:text-[12rem] font-black leading-none tracking-tighter text-foreground" data-target={stat.value}>
-                          0
-                        </span>
-                        <span className="mb-[0.2em] ml-2 text-[3.5rem] md:text-[5.5rem] font-black text-accent leading-none">
-                          {stat.suffix}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Context & Description */}
-                    <div className={`md:col-span-6 flex flex-col gap-10 ${i % 2 !== 0 ? 'md:items-start' : 'md:items-end'}`}>
-                      <p className={`max-w-[34ch] text-lg font-light leading-relaxed text-black/50 md:text-xl md:leading-[1.7] ${i % 2 !== 0 ? 'md:text-left' : 'md:text-right'}`}>
-                        {stat.desc}
-                      </p>
-                      <div className="group/line relative h-1 w-32 bg-black/[0.04] overflow-hidden md:w-56">
-                        <div className="absolute inset-x-0 bottom-0 h-full bg-accent -translate-x-full transition-transform duration-1000 group-hover:translate-x-0" />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Geometric Detail */}
-                  <div className="absolute top-20 left-10 h-32 w-px bg-gradient-to-b from-accent/20 to-transparent" />
-                  <div className="absolute bottom-10 right-10 flex gap-1">
-                    {[1, 2, 3].map(dot => (
-                      <div key={dot} className="h-1 w-1 rounded-full bg-black/10 transition-colors group-hover:bg-accent/40" />
-                    ))}
-                  </div>
+                {/* Collapsed State (Rotated Content) */}
+                <div 
+                  className="aw-panel-collapsed absolute inset-0 z-10 flex items-center justify-center pointer-events-none"
+                  style={{ opacity: i === 0 ? 0 : 1 }}
+                >
+                   <div className="flex items-center gap-12 rotate-[-90deg] whitespace-nowrap">
+                     <span className="text-white/60 font-bold tracking-[0.2em]">0{i+1}</span>
+                     <span className="text-white text-2xl xl:text-3xl font-medium tracking-wide">{stat.label}</span>
+                   </div>
                 </div>
-              </div>
-            </div>
-          ))}
+
+                {/* Expanded State (Full Detail) */}
+                <div 
+                  className="aw-panel-expanded absolute inset-0 z-20 flex flex-col justify-between p-12 pointer-events-none"
+                  style={{ opacity: i === 0 ? 1 : 0 }}
+                >
+                   <div className="flex justify-between items-center w-full">
+                      <span className="text-white font-bold tracking-[0.2em] bg-white/10 px-6 py-2 rounded-full backdrop-blur-md">0{i+1} / 04</span>
+                      <div className="h-16 w-16 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/20 transition-transform duration-700 group-hover:rotate-45">
+                        <ArrowUpRight size={24} />
+                      </div>
+                   </div>
+                   <div className="flex flex-col">
+                      <div className="flex items-baseline mb-4">
+                         <span className="aw-num text-white text-[8rem] xl:text-[10rem] font-bold leading-none tracking-tighter" data-target={stat.value}>0</span>
+                         <span className="text-accent text-[5rem] xl:text-[6rem] font-bold leading-[0.8] ml-2">{stat.suffix}</span>
+                      </div>
+                      <h3 className="text-white text-4xl xl:text-5xl font-medium mb-6 tracking-tight">{stat.label}</h3>
+                      <p className="text-white/80 max-w-[42ch] text-lg font-light leading-relaxed">{stat.desc}</p>
+                   </div>
+                </div>
+             </div>
+           ))}
         </div>
 
-        {/* Bottom indicator */}
-        <div className="mt-16 mb-8 flex flex-col items-center gap-6">
-          <div className="h-16 w-px bg-gradient-to-b from-black/20 to-transparent" />
-          <p className="text-[9px] font-black uppercase tracking-[0.6em] text-black/15 animate-pulse">
-            Scroll to stack results
-          </p>
+        {/* Mobile Accordion Interaction */}
+        <div className="aw-accordion-mobile lg:hidden flex flex-col w-full px-4 md:px-0 gap-3 mb-10">
+           {stats.map((stat, i) => (
+             <div 
+               key={i} 
+               className={`aw-mobile-panel relative w-full rounded-[2rem] overflow-hidden cursor-pointer bg-black`}
+               style={{ 
+                 transition: "height 0.8s cubic-bezier(0.25, 1, 0.5, 1)", 
+                 height: i === 0 ? "460px" : "90px" 
+               }}
+             >
+                <div className="absolute inset-0 z-0">
+                  <Image src={stat.image} alt={stat.label} fill className="object-cover" />
+                  <div className="absolute inset-0 bg-black/40 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
+                </div>
+
+                {/* Mobile Collapsed State */}
+                <div 
+                  className="aw-mobile-collapsed absolute inset-0 z-10 flex items-center px-8 pointer-events-none"
+                  style={{ opacity: i === 0 ? 0 : 1 }}
+                >
+                   <span className="text-white/60 font-bold tracking-[0.2em] w-12 text-sm">0{i+1}</span>
+                   <span className="text-white text-xl font-medium tracking-wide">{stat.label}</span>
+                </div>
+
+                {/* Mobile Expanded State */}
+                <div 
+                  className="aw-mobile-expanded absolute inset-0 z-20 flex flex-col justify-between p-8 pointer-events-none"
+                  style={{ opacity: i === 0 ? 1 : 0 }}
+                >
+                   <span className="text-white w-fit font-bold tracking-[0.2em] text-xs bg-white/10 px-4 py-2 rounded-full backdrop-blur-md">0{i+1} / 04</span>
+                   <div className="flex flex-col">
+                      <div className="flex items-baseline mb-4 mt-auto">
+                         <span className="aw-num text-white text-[5.5rem] font-bold leading-none tracking-tighter" data-target={stat.value}>0</span>
+                         <span className="text-accent text-[3rem] font-bold leading-none ml-2">{stat.suffix}</span>
+                      </div>
+                      <h3 className="text-white text-2xl md:text-3xl font-medium mb-3">{stat.label}</h3>
+                      <p className="text-white/80 text-sm md:text-base font-light leading-relaxed">{stat.desc}</p>
+                   </div>
+                </div>
+             </div>
+           ))}
         </div>
+
       </div>
     </section>
   );
