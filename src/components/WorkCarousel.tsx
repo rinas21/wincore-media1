@@ -9,6 +9,7 @@ import {
   getScroller,
   prefersReducedMotion,
 } from "@/lib/motion";
+import { ArrowUpRight } from "lucide-react";
 
 const PROJECTS: Project[] = [
   {
@@ -17,7 +18,7 @@ const PROJECTS: Project[] = [
     category: "Vibrant UI / 3D",
     image: "/works/vibrant_webgl.png",
     tags: ["WebGL", "3D UI", "Performance"],
-    description: "A neon-fused, high-performance interface for a decentralized tech network. Immersive visuals and colorful data-flow.",
+    description: "A neon-fused, high-performance interface for a decentralized tech network.",
     stack: "React, Three.js, GSAP",
     duration: "10 Weeks",
     role: "Lead Agency",
@@ -30,7 +31,7 @@ const PROJECTS: Project[] = [
     category: "Branding / Web Product",
     image: "/works/vibrant_fintech.png",
     tags: ["Fintech", "Glassmorphism", "Branding"],
-    description: "Reimagining modern finance with an emerald-gold aesthetic. High saturation, premium glass surfaces, and sophisticated data visualisations.",
+    description: "Reimagining modern finance with an emerald-gold aesthetic.",
     stack: "Next.js, D3.js, GSAP",
     duration: "8 Weeks",
     role: "Core Studio",
@@ -43,7 +44,7 @@ const PROJECTS: Project[] = [
     category: "Product / Motion",
     image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=1200",
     tags: ["AI", "Creative", "Motion"],
-    description: "Vibrant magenta and violet gradients powering the next generation of creative AI platforms. A study in color and flow.",
+    description: "Vibrant magenta and violet gradients powering next-gen AI platforms.",
     stack: "React, Framer, AI",
     duration: "12 Weeks",
     role: "Creative Partner",
@@ -56,7 +57,7 @@ const PROJECTS: Project[] = [
     category: "Video / Experience",
     image: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=1200",
     tags: ["Video", "Cinematic", "Tropics"],
-    description: "Hyper-colored cinematic tours for luxury island retreats. Rich tropical palettes and vibrant motion choreography.",
+    description: "Hyper-colored cinematic tours for luxury island retreats.",
     stack: "After Effects, DaVinci",
     duration: "6 Weeks",
     role: "Production",
@@ -69,7 +70,7 @@ const PROJECTS: Project[] = [
     category: "App / Motion",
     image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=1200",
     tags: ["Mobile", "Prototyping", "UI/UX"],
-    description: "A dark-mode first UI for premium electric mobility. Fluid micro-interactions and high-contrast typography.",
+    description: "A dark-mode first UI for premium electric mobility.",
     stack: "React Native, Reanimated",
     duration: "14 Weeks",
     role: "UX & Dev Partner",
@@ -82,7 +83,7 @@ const PROJECTS: Project[] = [
     category: "Web / Editorial",
     image: "https://images.unsplash.com/photo-1600607686527-6fb886090705?auto=format&fit=crop&q=80&w=1200",
     tags: ["Minimal", "Layout", "Typography"],
-    description: "A brutalist yet pristine editorial platform showcasing avant-garde architectural designs.",
+    description: "A brutalist yet pristine editorial platform for avant-garde designs.",
     stack: "Next.js, Sanity, GSAP",
     duration: "8 Weeks",
     role: "Full Service",
@@ -95,7 +96,7 @@ const PROJECTS: Project[] = [
     category: "3D / Brand",
     image: "https://images.unsplash.com/photo-1614729939124-032f0b56c9ce?auto=format&fit=crop&q=80&w=1200",
     tags: ["Brand", "3D", "Identity"],
-    description: "Brand identity and immersive 3D landing page for a deep-tech research firm. Metallic materials and dynamic lighting.",
+    description: "Brand identity and immersive 3D landing page for deep-tech firm.",
     stack: "Spline, React",
     duration: "6 Weeks",
     role: "Visual Lead",
@@ -108,7 +109,7 @@ const PROJECTS: Project[] = [
     category: "Commerce / UX",
     image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&q=80&w=1200",
     tags: ["Shopify", "Headless", "UX"],
-    description: "A blazingly fast headless commerce storefront for a high-end streetwear label. Infinite scrolling and 3D product previews.",
+    description: "Blazingly fast headless commerce for high-end streetwear.",
     stack: "Hydrogen, Tailwind",
     duration: "12 Weeks",
     role: "Tech Partner",
@@ -129,137 +130,141 @@ export default function WorkCarousel() {
     if (!section) return;
 
     const ctx = gsap.context(() => {
-      const cards = gsap.utils.toArray<HTMLElement>(".wc-reveal-item");
+      const cards = gsap.utils.toArray<HTMLElement>(".wc-card-wrapper");
+      
       cards.forEach((card, i) => {
-        gsap.fromTo(
-          card,
-          { y: reduced ? 0 : 64, opacity: reduced ? 1 : 0, scale: reduced ? 1 : 0.96 },
-          {
-            y: 0,
-            opacity: 1,
-            scale: 1,
-            duration: reduced ? 0 : 0.9,
-            delay: i * 0.04,
-            ease: "power4.out",
-            scrollTrigger: {
-              trigger: card,
-              scroller,
-              start: "top 86%",
-              once: true,
-            },
-          },
+        if (reduced) return;
+
+        // Perspective Entrance
+        gsap.fromTo(card, 
+          { y: 150, opacity: 0, rotateX: 10, scale: 0.95 },
+          { 
+            y: 0, opacity: 1, rotateX: 0, scale: 1, 
+            duration: 1.5, ease: "expo.out",
+            scrollTrigger: { trigger: card, scroller, start: "top 95%", once: true }
+          }
         );
 
-        if (!reduced) {
-          gsap.to(card, {
-            yPercent: -2,
-            ease: "none",
-            scrollTrigger: {
-              trigger: card,
-              scroller,
-              start: "top bottom",
-              end: "bottom top",
-              scrub: 0.8,
-            },
+        // Hover Parallax Tilt
+        const inner = card.querySelector(".wc-inner");
+        card.addEventListener("mousemove", (e) => {
+          const { left, top, width, height } = card.getBoundingClientRect();
+          const x = (e.clientX - left) / width - 0.5;
+          const y = (e.clientY - top) / height - 0.5;
+          gsap.to(inner, { 
+            rotateY: x * 15, rotateX: -y * 15, 
+            x: x * 20, y: y * 20, 
+            duration: 0.6, ease: "power2.out" 
           });
+        });
+
+        card.addEventListener("mouseleave", () => {
+          gsap.to(inner, { rotateY: 0, rotateX: 0, x: 0, y: 0, duration: 1, ease: "elastic.out(1, 0.3)" });
+        });
+      });
+
+      // Horizontal Text Scrub
+      gsap.to(".wc-scrub", {
+        xPercent: -30,
+        ease: "none",
+        scrollTrigger: {
+          trigger: section,
+          scroller,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1,
         }
       });
 
-      const media = gsap.utils.toArray<HTMLElement>(".wc-media");
-      media.forEach((el) => {
-        if (reduced) return;
-        gsap.fromTo(
-          el,
-          { scale: 1.08 },
-          {
-            scale: 1,
-            ease: "none",
-            scrollTrigger: {
-              trigger: el,
-              scroller,
-              start: "top 92%",
-              end: "bottom 20%",
-              scrub: 0.8,
-            },
-          },
-        );
-      });
     }, section);
 
-    return () => {
-      ctx.revert();
-    };
+    return () => ctx.revert();
   }, []);
 
   return (
-    <section
-      id="works"
-      ref={sectionRef}
-      className="relative overflow-hidden bg-background py-20 md:py-28"
-      aria-label="Featured works"
-    >
-      <div className="_container relative z-10">
-        <div className="mb-14 flex flex-col gap-6 md:mb-20 md:flex-row md:items-end md:justify-between">
-          <div className="max-w-2xl">
-            <span className="mb-5 inline-block text-[10px] font-black uppercase leading-[1.35] tracking-[0.42em] text-accent">
-              Selected Archives
-            </span>
-            <h2 className="font-heading text-4xl font-black uppercase leading-[1.02] tracking-tighter text-foreground md:text-5xl lg:text-7xl">
-              Works that <br />
-              <span className="text-black/30 italic">rewrite the rules</span>
-            </h2>
+    <section ref={sectionRef} className="relative bg-white py-32 md:py-48 overflow-visible">
+      
+      <div className="max-w-[1600px] mx-auto px-6 sm:px-12 lg:px-24">
+        
+        {/* HEADER AREA */}
+        <div className="mb-32 flex flex-col items-start gap-12">
+          <div className="space-y-4">
+             <div className="flex items-center gap-4">
+               <div className="w-10 h-[1px] bg-accent" />
+               <span className="text-[10px] font-black uppercase tracking-[0.5em] text-accent">Selected Archives</span>
+             </div>
+             <h2 className="text-[12vw] md:text-[8rem] lg:text-[10rem] font-black leading-[0.8] tracking-[-0.07em] uppercase">
+                Works <br />
+                <span className="text-black/5 italic font-serif lowercase font-light">that rewrite.</span>
+             </h2>
           </div>
-          <p className="max-w-md text-sm font-light leading-relaxed text-black/45 md:text-base md:text-right">
-            Scroll down to move through projects. Each card pops in, then hands focus to the next.
+          <p className="max-w-md text-xl font-light leading-relaxed text-black/40">
+             Scroll down to navigate through our primary orbit. Focus shifts as you dwell on the architecture of each system.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-x-16 md:gap-y-32">
-          {PROJECTS.map((project, i) => (
-            <div key={project.id} className={`wc-reveal-item ${i % 2 !== 0 ? 'md:mt-32' : ''}`}>
-              <button
-                type="button"
-                onClick={() => setSelectedProject(project)}
-                className="wc-card wc-refer-card group relative block w-full text-left outline-none"
-              >
-                <div className="wc-refer-inner relative aspect-[4/5] md:aspect-[3/4] lg:aspect-[4/5] w-full overflow-hidden rounded-[2rem] bg-black/5 shadow-[0_24px_64px_rgba(0,0,0,0.04)] transition-all duration-700 group-hover:shadow-[0_40px_80px_rgba(0,191,255,0.15)] group-hover:-translate-y-2">
-                  <div className="wc-media wc-refer-media absolute inset-0 transition-transform duration-1000 group-hover:scale-110">
-                    <Image
-                      src={project.image}
-                      alt={project.title}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 1024px) 100vw, 1240px"
-                      quality={95}
-                      priority={i === 0}
-                      loading={i === 0 ? undefined : "lazy"}
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
-                  </div>
-
-                  <div className="absolute inset-x-0 bottom-0 z-10 p-8 md:p-10 translate-y-4 group-hover:translate-y-0 transition-transform duration-500">
-                    <div className="bg-black/20 backdrop-blur-md rounded-2xl p-6 border border-white/20 shadow-2xl">
-                      <span className="mb-2 block text-[9px] font-black uppercase leading-[1.35] tracking-[0.4em] text-accent">
-                        {project.category}
-                      </span>
-                      <h3 className="wc-refer-title text-2xl font-black uppercase leading-[0.95] tracking-tight text-white md:text-3xl">
-                        {project.title}
-                      </h3>
-                      <div className="mt-5 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity duration-500 delay-100">
-                        <p className="text-[10px] font-black uppercase leading-[1.35] tracking-[0.2em] text-white">
-                          View Case Study
-                        </p>
-                        <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center text-white">
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                        </div>
-                      </div>
+        {/* ULTRA-MODERN ARCHITECTURAL GRID */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-y-32 md:gap-y-64 items-center">
+          {PROJECTS.map((p, i) => {
+             const isEven = i % 2 === 0;
+             return (
+               <div 
+                 key={p.id} 
+                 className={`wc-card-wrapper col-span-1 md:col-span-10 ${isEven ? 'md:col-start-1 text-left' : 'md:col-start-3 text-right'} perspective-[2000px]`}
+               >
+                 <button 
+                   onClick={() => setSelectedProject(p)}
+                   className="wc-inner relative group w-full outline-none transform-gpu"
+                 >
+                    {/* Background Indexing */}
+                    <div className={`absolute -top-12 ${isEven ? 'left-0' : 'right-0'} text-[18vw] font-black italic text-black/[0.03] leading-none pointer-events-none transition-all duration-1000 group-hover:text-black/[0.06] group-hover:translate-y-[-10px]`}>
+                       0{p.id}
                     </div>
-                  </div>
-                </div>
-              </button>
-            </div>
-          ))}
+
+                    <div className={`flex flex-col ${isEven ? 'md:flex-row' : 'md:flex-row-reverse'} items-end gap-12 lg:gap-24`}>
+                       
+                       {/* IMAGE MONOLITH */}
+                       <div className="relative w-full md:w-[60%] aspect-[16/10] overflow-hidden rounded-[2.5rem] bg-black/5 shadow-[0_60px_100px_rgba(0,0,0,0.08)] transform-gpu transition-all duration-1000 group-hover:shadow-[0_80px_120px_rgba(0,136,204,0.15)] group-hover:scale-[1.02]">
+                          <Image 
+                            src={p.image} 
+                            alt={p.title} 
+                            fill 
+                            className="object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110" 
+                            sizes="(max-width: 1400px) 100vw, 800px" 
+                          />
+                          {/* Inner Shine Overlay */}
+                          <div className="absolute inset-0 bg-gradient-to-tr from-black/40 via-transparent to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+                       </div>
+
+                       {/* CONTENT BLOCK */}
+                       <div className={`w-full md:w-[40%] pb-8 ${isEven ? 'text-left' : 'text-right'} space-y-6`}>
+                          <div className={`flex items-center gap-3 ${isEven ? 'justify-start' : 'justify-end'}`}>
+                             <div className="w-6 h-[1px] bg-accent/30" />
+                             <span className="text-[9px] font-black uppercase tracking-[0.4em] text-accent">{p.category}</span>
+                          </div>
+                          <h3 className="text-4xl lg:text-7xl font-black uppercase tracking-[-0.03em] leading-none group-hover:text-accent transition-colors duration-700">
+                             {p.title}
+                          </h3>
+                          <div className={`flex items-center gap-6 pt-4 ${isEven ? 'justify-start' : 'justify-end'}`}>
+                             <span className="text-[10px] font-black text-black/20 group-hover:text-black transition-colors">EST. PROJECT {p.duration}</span>
+                             <div className="w-12 h-12 rounded-full border border-black/10 flex items-center justify-center group-hover:bg-black group-hover:text-white transition-all duration-700">
+                                <ArrowUpRight size={20} className="group-hover:rotate-45 transition-transform duration-700" />
+                             </div>
+                          </div>
+                       </div>
+                    </div>
+                 </button>
+               </div>
+             );
+          })}
         </div>
+      </div>
+
+      {/* BACKGROUND FLOATING TEXT */}
+      <div className="absolute top-1/2 left-0 w-full pointer-events-none opacity-[0.02] overflow-hidden">
+         <div className="wc-scrub text-[25vw] font-black uppercase whitespace-nowrap leading-none tracking-[-0.05em]">
+            Digital Authority &middot; Selective Engineering &middot; Immersive Systems &middot;
+         </div>
       </div>
 
       <ProjectModal project={selectedProject} isOpen={!!selectedProject} onClose={() => setSelectedProject(null)} />

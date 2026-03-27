@@ -1,341 +1,257 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
-import ScrollTrigger from "gsap/ScrollTrigger";
-import SplitType from "split-type";
-import { ArrowUpRight, Mail, MapPin, Clock } from "lucide-react";
-import { registerGsapPlugins, prefersReducedMotion } from "@/lib/motion";
+import { ArrowUpRight, Send, Sparkles } from "lucide-react";
+import { registerGsapPlugins, scheduleScrollTriggerRefresh } from "@/lib/motion";
 
 type SubmitState = "idle" | "loading" | "sent" | "error";
 
 const SERVICES = [
-  "Branding & Identity",
-  "Website Design & Build",
-  "Motion & Video",
-  "Performance Marketing",
-  "WebGL & Immersive",
-  "Strategy & Consulting",
-  "Other",
+  "Design & Branding",
+  "Digital Products",
+  "Creative Development",
+  "AI Architecture",
+  "Content & Strategy",
 ];
-
-function useColomboTime() {
-  const [time, setTime] = useState("");
-  useEffect(() => {
-    const fmt = () =>
-      new Intl.DateTimeFormat("en-US", {
-        hour: "2-digit", minute: "2-digit", second: "2-digit",
-        hour12: false, timeZone: "Asia/Colombo",
-      }).format(new Date());
-    window.setTimeout(() => setTime(fmt()), 0);
-    const id = window.setInterval(() => setTime(fmt()), 1000);
-    return () => window.clearInterval(id);
-  }, []);
-  return time;
-}
 
 export default function ContactPageContent() {
   const rootRef = useRef<HTMLElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
-  const colomboTime = useColomboTime();
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [submitState, setSubmitState] = useState<SubmitState>("idle");
   const [feedback, setFeedback] = useState("");
 
   function toggleService(svc: string) {
-    setSelectedServices((prev) =>
-      prev.includes(svc) ? prev.filter((s) => s !== svc) : [...prev, svc]
+    setSelectedServices(prev =>
+      prev.includes(svc) ? prev.filter(s => s !== svc) : [...prev, svc]
     );
   }
 
   useEffect(() => {
     registerGsapPlugins();
-    const reduced = prefersReducedMotion();
-    const splits: SplitType[] = [];
-
     const ctx = gsap.context(() => {
-      if (reduced) return;
-
-      // Hero
-      const titleEl = rootRef.current?.querySelector(".ct-hero-title");
-      if (titleEl) {
-        const split = new SplitType(titleEl as HTMLElement, { types: "lines,words" });
-        splits.push(split);
-        gsap.fromTo(split.words, 
-          { y: 50, opacity: 0 },
-          { y: 0, opacity: 1, duration: 1.2, stagger: 0.04, ease: "expo.out", delay: 0.1 }
-        );
-      }
-
-      gsap.fromTo(".ct-fade-up",
-        { opacity: 0, y: 30 },
-        { opacity: 1, y: 0, duration: 1, stagger: 0.1, ease: "power3.out", delay: 0.4 }
+      // 01: Line drawing effect
+      gsap.fromTo(".ct-line", 
+        { scaleX: 0, opacity: 0 }, 
+        { scaleX: 1, opacity: 1, duration: 1.8, ease: "expo.out", delay: 0.2 }
       );
 
-      // Info Blocks
-      gsap.fromTo(".ct-info-block",
-        { opacity: 0, x: -20 },
+      // 02: Cinematic text reveals
+      gsap.fromTo(".ct-reveal",
+        { y: 60, opacity: 0 },
+        { y: 0, opacity: 1, duration: 1.5, stagger: 0.1, ease: "power4.out", delay: 0.4 }
+      );
+
+      // 03: Field sequential reveal
+      gsap.fromTo(".ct-field",
+        { y: 30, opacity: 0 },
         { 
-          opacity: 1, x: 0, duration: 0.8, stagger: 0.1, ease: "power3.out",
-          scrollTrigger: { trigger: ".ct-info-grid", start: "top 80%", once: true }
+          y: 0, opacity: 1, duration: 1, stagger: 0.1, ease: "expo.out",
+          scrollTrigger: { trigger: ".ct-field-wrap", start: "top 90%" }
         }
       );
-
-      // Form 
-      gsap.fromTo(".ct-form-row",
-        { opacity: 0, y: 20 },
-        {
-          opacity: 1, y: 0, duration: 0.8, stagger: 0.06, ease: "power3.out",
-          scrollTrigger: { trigger: formRef.current, start: "top 80%", once: true }
-        }
-      );
-
     }, rootRef);
-    
-    return () => { splits.forEach((s) => s.revert()); ctx.revert(); };
+
+    scheduleScrollTriggerRefresh();
+    return () => ctx.revert();
   }, []);
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
-    const name    = String(fd.get("name")    ?? "").trim();
-    const email   = String(fd.get("email")   ?? "").trim();
-    const company = String(fd.get("company") ?? "").trim();
-    const website = String(fd.get("website") ?? "").trim();
+    const name = String(fd.get("name") ?? "").trim();
+    const email = String(fd.get("email") ?? "").trim();
     const message = String(fd.get("message") ?? "").trim();
 
     if (!name || !email || !message) {
-      setSubmitState("error"); setFeedback("Please fill in all required fields."); return;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      setSubmitState("error"); setFeedback("Please enter a valid email address."); return;
+      setSubmitState("error");
+      setFeedback("Identification required.");
+      return;
     }
 
-    setSubmitState("loading"); setFeedback("");
-    window.setTimeout(() => {
+    setSubmitState("loading");
+    setFeedback("Syncing mission parameters...");
+
+    setTimeout(() => {
       const body = [
-        `Name: ${name}`, `Email: ${email}`,
-        company ? `Company: ${company}` : "",
-        website ? `Website: ${website}` : "",
-        selectedServices.length ? `Services: ${selectedServices.join(", ")}` : "",
-        "", message,
-      ].filter(Boolean).join("\n");
-
-      window.location.href = `mailto:hello@wincore.media?subject=${encodeURIComponent(`Project inquiry — ${name}`)}&body=${encodeURIComponent(body)}`;
+        `Name: ${name}`,
+        `Email: ${email}`,
+        `Interest: ${selectedServices.join(", ") || "General Inquiry"}`,
+        `Message:`,
+        message,
+      ].join("\n");
+      window.location.href = `mailto:hello@wincore.media?subject=Inquiry: ${name}&body=${encodeURIComponent(body)}`;
       setSubmitState("sent");
-      setFeedback("Launching your email client. If nothing opens, write to hello@wincore.media.");
+      setFeedback("Transmission successful.");
       formRef.current?.reset();
       setSelectedServices([]);
-    }, 450);
+    }, 1200);
   }
 
   return (
-    <section ref={rootRef} className="bg-background min-h-[100svh] text-foreground relative overflow-hidden flex flex-col justify-between">
-      {/* Background Ambience */}
-      <div className="absolute top-[-10%] right-[-10%] w-[800px] h-[800px] bg-accent/[0.04] blur-[140px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-[-10%] left-[-10%] w-[600px] h-[600px] bg-secondary/[0.03] blur-[120px] rounded-full pointer-events-none" />
+    <section ref={rootRef} className="bg-white text-black min-h-screen relative">
+      
+      {/* ── ARCHITECTURAL GUTTER (LEFT) ──────────────── */}
+      {/* Using a fluid left-margin strategy: 10% viewport width for massive breathing room */}
+      <div className="w-full pl-[5vw] sm:pl-[8vw] lg:pl-[12vw] pr-6 sm:pr-12 md:pr-24 lg:pr-32 py-32 md:py-48 overflow-visible">
+        
+        {/* TOP LINE ACCENT */}
+        <div className="w-32 h-[1px] bg-accent mb-12 ct-line origin-left" />
 
-      <div>
-        {/* HERO SECTION */}
-        <div className="pt-40 pb-16 md:pt-56 md:pb-24 px-6 md:px-12 lg:px-24 max-w-[1400px] mx-auto relative z-10 w-full">
-          <p className="ct-fade-up text-[11px] font-black uppercase tracking-[0.45em] text-accent mb-6 md:mb-10">
-            Contact Wincore
-          </p>
-          <h1 className="ct-hero-title font-heading text-[12vw] md:text-[8vw] lg:text-[7.5rem] font-black uppercase leading-[0.85] tracking-tighter mb-10 md:mb-16">
-            Start the <br />
-            <span className="text-black/20 italic font-light tracking-tight">conversation.</span>
+        {/* ── HEADER ────────────────────────────────────── */}
+        <div className="mb-32 md:mb-40 ct-reveal">
+          <p className="text-[10px] font-black uppercase tracking-[0.6em] text-accent mb-6">Uplink Initiation</p>
+          <h1 className="text-[clamp(3.5rem,12vw,10rem)] font-bold tracking-[-0.07em] leading-[0.8] uppercase">
+            Start <br />
+            <span className="text-black/5 italic font-serif lowercase font-light">Further.</span>
           </h1>
-          
-          <div className="ct-fade-up flex flex-col md:flex-row justify-between items-start md:items-end gap-10 border-b border-black/10 pb-16">
-            <p className="text-lg md:text-2xl font-light text-black/50 max-w-xl leading-relaxed">
-              Whether building a premium brand, an immersive WebGL site, or executing a global campaign, everything starts with a simple hello.
-            </p>
-            <a
-              href="https://cal.com/wincore"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group inline-flex items-center justify-center gap-4 bg-black text-white px-8 py-5 md:px-10 md:py-6 rounded-full shadow-[0_12px_24px_rgba(0,0,0,0.15)] hover:shadow-[0_20px_40px_rgba(0,191,255,0.2)] transition-all duration-300 w-full md:w-auto shrink-0"
-            >
-              <span className="text-[11px] font-black uppercase tracking-[0.2em] whitespace-nowrap">Book a discovery call</span>
-              <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-accent transition-colors duration-300 transform group-hover:scale-110">
-                <ArrowUpRight size={16} />
-              </div>
-            </a>
-          </div>
         </div>
 
-        {/* TWO COL LAYOUT: CONTACT INFO + FORM */}
-        <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-24 pb-32 md:pb-48 grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24 relative z-10">
+        {/* ── MAIN GRID ─────────────────────────────────── */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-24 lg:gap-40 items-start">
           
-          {/* INFO COLUMN */}
-          <div className="ct-info-grid lg:col-span-4 flex flex-col gap-10 md:gap-14 pt-2">
-            <div className="ct-info-block flex gap-5 group">
-              <div className="shrink-0 w-12 h-12 rounded-full border border-black/10 flex items-center justify-center bg-black/[0.02] group-hover:border-accent group-hover:bg-accent/5 transition-all duration-300">
-                <Mail className="text-black/40 group-hover:text-accent transition-colors duration-300" size={20} />
+          {/* INFO COLUMN (4/12) */}
+          <div className="lg:col-span-4 space-y-24 ct-reveal">
+            <div>
+              <p className="text-[9px] font-black uppercase tracking-[0.4em] text-black/20 mb-8 underline underline-offset-[12px] decoration-accent/20">Operational Node</p>
+              <a href="mailto:hello@wincore.media" className="text-3xl md:text-5xl font-black tracking-tight hover:text-accent transition-all duration-700 block leading-none">
+                hello@<br />wincore.media
+              </a>
+            </div>
+
+            <div className="grid grid-cols-2 gap-8 pt-12 border-t border-black/5">
+              <div>
+                <p className="text-[9px] font-black uppercase tracking-[0.4em] text-black/15 mb-4 font-serif">Presence</p>
+                <p className="text-lg font-black tracking-tighter uppercase">Colombo, LK</p>
+                <p className="text-[10px] text-black/30 mt-2 font-bold italic tracking-widest lowercase">Global Remote Node</p>
               </div>
               <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/40 mb-2">Direct email</p>
-                <a href="mailto:hello@wincore.media" className="text-xl md:text-2xl font-bold tracking-tight text-foreground hover:text-accent transition-colors block break-words">
-                  hello@wincore.media
+                <p className="text-[9px] font-black uppercase tracking-[0.4em] text-black/15 mb-4 font-serif">Strategy</p>
+                <a href="https://cal.com/wincore" target="_blank" className="flex items-center gap-2 text-lg font-black hover:text-accent transition-colors group">
+                  Book Call
+                  <ArrowUpRight size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform text-accent" />
                 </a>
-                <p className="text-sm font-light text-black/50 mt-2">Always available. Replies within 24 hours.</p>
               </div>
             </div>
 
-            <div className="ct-info-block flex gap-5 group">
-              <div className="shrink-0 w-12 h-12 rounded-full border border-black/10 flex items-center justify-center bg-black/[0.02] group-hover:border-accent group-hover:bg-accent/5 transition-all duration-300">
-                <MapPin className="text-black/40 group-hover:text-accent transition-colors duration-300" size={20} />
-              </div>
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/40 mb-2">Headquarters</p>
-                <p className="text-xl md:text-2xl font-bold tracking-tight text-foreground">
-                  Colombo, LK
-                </p>
-                <p className="text-sm font-light text-black/50 mt-2">Remote-first, operating globally.</p>
-              </div>
-            </div>
-
-            <div className="ct-info-block flex gap-5 group">
-              <div className="shrink-0 w-12 h-12 rounded-full border border-black/10 flex items-center justify-center bg-black/[0.02] group-hover:border-accent group-hover:bg-accent/5 transition-all duration-300">
-                <Clock className="text-black/40 group-hover:text-accent transition-colors duration-300" size={20} />
-              </div>
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/40 mb-2">Local Time</p>
-                <p className="text-xl md:text-2xl font-bold tracking-tight text-foreground tabular-nums">
-                  {colomboTime || "—:—:—"}
-                </p>
-                <p className="text-sm font-light text-black/50 mt-2">GMT +5:30</p>
+            <div className="pt-12 opacity-10">
+              <p className="text-[9px] font-black uppercase tracking-[0.4em] mb-4">Trajectory</p>
+              <div className="flex flex-col gap-2">
+                 {['Fortune 500', 'Innovators', 'Boutique Builders'].map(t => (
+                   <span key={t} className="text-xl font-black uppercase tracking-tighter">{t}</span>
+                 ))}
               </div>
             </div>
           </div>
 
-          {/* FORM COLUMN */}
-          <div className="lg:col-span-8 bg-black/[0.015] border border-black/5 shadow-[0_4px_24px_rgba(0,0,0,0.02)] rounded-[2rem] p-8 md:p-12 lg:p-16">
-            <form ref={formRef} onSubmit={handleSubmit} noValidate className="flex flex-col gap-12 md:gap-14">
+          {/* FORM COLUMN (8/12) */}
+          <div className="lg:col-span-8 w-full">
+            <form ref={formRef} onSubmit={onSubmit} className="space-y-24">
               
-              <div className="ct-form-row">
-                <p className="text-[10px] font-black uppercase tracking-[0.3em] text-black/40 mb-6">
-                  What do you need help with?
-                </p>
-                <div className="flex flex-wrap gap-3 md:gap-4">
-                  {SERVICES.map((svc) => {
+              {/* SERVICE SELECTION */}
+              <div className="space-y-12 ct-reveal">
+                <div className="flex items-center gap-4">
+                  <Sparkles size={16} className="text-accent" />
+                  <p className="text-[10px] font-black uppercase tracking-[0.5em] text-accent">Spectrum of Action *</p>
+                </div>
+                <div className="flex flex-wrap gap-4 md:gap-8">
+                  {SERVICES.map(svc => {
                     const active = selectedServices.includes(svc);
                     return (
                       <button
                         key={svc}
                         type="button"
                         onClick={() => toggleService(svc)}
-                        className={`px-5 py-3 md:px-6 md:py-3.5 rounded-full text-xs md:text-sm font-medium transition-all duration-300 border ${
-                          active
-                            ? "bg-black border-black text-white shadow-[0_12px_24px_rgba(0,0,0,0.15)] transform -translate-y-1"
-                            : "bg-white border-black/10 text-black/60 hover:border-black/30 hover:text-black hover:bg-black/5"
+                        className={`text-2xl md:text-5xl font-black tracking-tighter transition-all duration-700 text-left relative group ${
+                          active ? "text-black scale-[1.03]" : "text-black/5 hover:text-black/10"
                         }`}
                       >
-                        {svc}
+                        <span className="relative z-10">{svc}</span>
+                        {active && (
+                          <div className="absolute -bottom-2 left-0 w-full h-[3px] bg-accent ct-line origin-left" />
+                        )}
                       </button>
                     );
                   })}
                 </div>
               </div>
 
-              <div className="ct-form-row grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12 pt-6">
-                <div className="relative group">
-                  <input
-                    id="name" name="name" type="text"
-                    required disabled={submitState === "loading"}
-                    className="w-full bg-transparent border-b border-black/15 pb-4 pt-4 text-lg md:text-xl font-medium text-foreground outline-none focus:border-accent transition-colors peer"
-                    placeholder=" "
-                  />
-                  <label htmlFor="name" className="absolute left-0 top-4 text-black/40 text-lg transition-all duration-300 peer-focus:-top-4 peer-focus:text-[10px] peer-focus:font-black peer-focus:uppercase peer-focus:tracking-[0.2em] peer-focus:text-accent peer-not-placeholder-shown:-top-4 peer-not-placeholder-shown:text-[10px] peer-not-placeholder-shown:font-black peer-not-placeholder-shown:uppercase peer-not-placeholder-shown:tracking-[0.2em] peer-not-placeholder-shown:text-black/60 cursor-text">
-                    Your Name *
-                  </label>
-                </div>
-
-                <div className="relative group">
-                  <input
-                    id="email" name="email" type="email"
-                    required disabled={submitState === "loading"}
-                    className="w-full bg-transparent border-b border-black/15 pb-4 pt-4 text-lg md:text-xl font-medium text-foreground outline-none focus:border-accent transition-colors peer"
-                    placeholder=" "
-                  />
-                  <label htmlFor="email" className="absolute left-0 top-4 text-black/40 text-lg transition-all duration-300 peer-focus:-top-4 peer-focus:text-[10px] peer-focus:font-black peer-focus:uppercase peer-focus:tracking-[0.2em] peer-focus:text-accent peer-not-placeholder-shown:-top-4 peer-not-placeholder-shown:text-[10px] peer-not-placeholder-shown:font-black peer-not-placeholder-shown:uppercase peer-not-placeholder-shown:tracking-[0.2em] peer-not-placeholder-shown:text-black/60 cursor-text">
-                    Email Address *
-                  </label>
-                </div>
-
-                <div className="relative group">
-                  <input
-                    id="company" name="company" type="text"
-                    disabled={submitState === "loading"}
-                    className="w-full bg-transparent border-b border-black/15 pb-4 pt-4 text-lg md:text-xl font-medium text-foreground outline-none focus:border-accent transition-colors peer"
-                    placeholder=" "
-                  />
-                  <label htmlFor="company" className="absolute left-0 top-4 text-black/40 text-lg transition-all duration-300 peer-focus:-top-4 peer-focus:text-[10px] peer-focus:font-black peer-focus:uppercase peer-focus:tracking-[0.2em] peer-focus:text-accent peer-not-placeholder-shown:-top-4 peer-not-placeholder-shown:text-[10px] peer-not-placeholder-shown:font-black peer-not-placeholder-shown:uppercase peer-not-placeholder-shown:tracking-[0.2em] peer-not-placeholder-shown:text-black/60 cursor-text">
-                    Company (Optional)
-                  </label>
-                </div>
-
-                <div className="relative group">
-                  <input
-                    id="website" name="website" type="url"
-                    disabled={submitState === "loading"}
-                    className="w-full bg-transparent border-b border-black/15 pb-4 pt-4 text-lg md:text-xl font-medium text-foreground outline-none focus:border-accent transition-colors peer"
-                    placeholder=" "
-                  />
-                  <label htmlFor="website" className="absolute left-0 top-4 text-black/40 text-lg transition-all duration-300 peer-focus:-top-4 peer-focus:text-[10px] peer-focus:font-black peer-focus:uppercase peer-focus:tracking-[0.2em] peer-focus:text-accent peer-not-placeholder-shown:-top-4 peer-not-placeholder-shown:text-[10px] peer-not-placeholder-shown:font-black peer-not-placeholder-shown:uppercase peer-not-placeholder-shown:tracking-[0.2em] peer-not-placeholder-shown:text-black/60 cursor-text">
-                    Website URL (Optional)
-                  </label>
-                </div>
-              </div>
-
-              <div className="ct-form-row relative group pt-6">
-                <textarea
-                  id="message" name="message" rows={4}
-                  required disabled={submitState === "loading"}
-                  className="w-full bg-transparent border-b border-black/15 pb-4 pt-4 text-lg md:text-xl font-medium text-foreground outline-none focus:border-accent transition-colors peer resize-none"
-                  placeholder=" "
-                />
-                <label htmlFor="message" className="absolute left-0 top-4 text-black/40 text-lg transition-all duration-300 peer-focus:-top-4 peer-focus:text-[10px] peer-focus:font-black peer-focus:uppercase peer-focus:tracking-[0.2em] peer-focus:text-accent peer-not-placeholder-shown:-top-4 peer-not-placeholder-shown:text-[10px] peer-not-placeholder-shown:font-black peer-not-placeholder-shown:uppercase peer-not-placeholder-shown:tracking-[0.2em] peer-not-placeholder-shown:text-black/60 cursor-text">
-                  Your Message *
-                </label>
-              </div>
-
-              {submitState === "error" && feedback && (
-                <div className="ct-form-row px-5 py-4 bg-red-50 border border-red-100 rounded-xl flex gap-3 items-center">
-                  <div className="h-2 w-2 rounded-full bg-red-500 shrink-0" />
-                  <p className="text-sm font-medium text-red-600">{feedback}</p>
-                </div>
-              )}
-              {submitState === "sent" && feedback && (
-                <div className="ct-form-row px-5 py-4 bg-emerald-50 border border-emerald-100 rounded-xl flex gap-3 items-center">
-                  <div className="h-2 w-2 rounded-full bg-emerald-500 shrink-0" />
-                  <p className="text-sm font-medium text-emerald-600">{feedback}</p>
-                </div>
-              )}
-
-              <div className="ct-form-row pt-6 flex flex-col md:flex-row items-center justify-between gap-8 md:gap-6 mt-4 border-t border-black/5">
-                <p className="text-xs font-light text-black/40 text-center md:text-left mx-auto md:mx-0 order-2 md:order-1">
-                  Any files to attach? <br className="hidden md:block" /> Email us directly at <a href="mailto:hello@wincore.media" className="font-semibold text-black hover:text-accent transition-colors">hello@wincore.media</a>
-                </p>
+              {/* INPUT FIELDS */}
+              <div className="ct-field-wrap space-y-20 pt-16 border-t border-black/5">
                 
-                <button
-                  type="submit"
-                  disabled={submitState === "loading"}
-                  className="group relative flex items-center justify-center gap-3 overflow-hidden rounded-xl bg-accent px-10 py-5 w-full md:w-auto transition-all duration-300 hover:shadow-[0_15px_30px_rgba(0,191,255,0.25)] min-w-[200px] order-1 md:order-2"
-                >
-                  <span className="relative z-10 text-[11px] font-black uppercase tracking-[0.2em] text-white">
-                    {submitState === "loading" ? "Processing..." : "Submit Enquiry"}
-                  </span>
-                  <div className="absolute inset-0 bg-black translate-y-[100%] transition-transform duration-500 group-hover:translate-y-0" />
-                </button>
+                <div className="ct-field relative group">
+                  <input 
+                    name="name" type="text" required placeholder=" "
+                    className="w-full bg-transparent py-6 text-3xl md:text-5xl font-black tracking-tight outline-none focus:text-accent transition-colors peer border-b border-black/10 focus:border-accent"
+                  />
+                  <label className="absolute left-0 top-6 text-black/10 text-3xl md:text-5xl font-black tracking-tight transition-all duration-500 pointer-events-none peer-focus:-translate-y-12 peer-focus:text-[10px] peer-focus:tracking-[0.5em] peer-focus:text-accent peer-not-placeholder-shown:-translate-y-12 peer-not-placeholder-shown:text-[10px] peer-not-placeholder-shown:tracking-[0.5em]">
+                    Identity Name *
+                  </label>
+                </div>
+
+                <div className="ct-field relative group">
+                  <input 
+                    name="email" type="email" required placeholder=" "
+                    className="w-full bg-transparent py-6 text-3xl md:text-5xl font-black tracking-tight outline-none focus:text-accent transition-colors peer border-b border-black/10 focus:border-accent"
+                  />
+                  <label className="absolute left-0 top-6 text-black/10 text-3xl md:text-5xl font-black tracking-tight transition-all duration-500 pointer-events-none peer-focus:-translate-y-12 peer-focus:text-[10px] peer-focus:tracking-[0.5em] peer-focus:text-accent peer-not-placeholder-shown:-translate-y-12 peer-not-placeholder-shown:text-[10px] peer-not-placeholder-shown:tracking-[0.5em]">
+                    Digital Uplink *
+                  </label>
+                </div>
+
+                <div className="ct-field relative group pt-4">
+                  <textarea 
+                    name="message" required rows={4} placeholder=" "
+                    className="w-full bg-transparent py-6 text-3xl md:text-5xl font-black tracking-tight outline-none focus:text-accent transition-colors peer resize-none border-b border-black/10 focus:border-accent"
+                  />
+                  <label className="absolute left-0 top-6 text-black/10 text-3xl md:text-5xl font-black tracking-tight transition-all duration-500 pointer-events-none peer-focus:-translate-y-16 peer-focus:text-[10px] peer-focus:tracking-[0.5em] peer-focus:text-accent peer-not-placeholder-shown:-translate-y-16 peer-not-placeholder-shown:text-[10px] peer-not-placeholder-shown:tracking-[0.5em]">
+                    Vision Mission Overview *
+                  </label>
+                </div>
               </div>
 
+              {/* ACTION FOOTER */}
+              <div className="pt-24 flex flex-col md:flex-row items-start md:items-center justify-between gap-16 border-t border-black/10">
+                 <div className="flex flex-col gap-1 opacity-20 hover:opacity-100 transition-opacity">
+                    <p className="text-[10px] font-black uppercase tracking-[0.5em] text-accent">Wincore Studio</p>
+                    <p className="text-[10px] font-bold italic lowercase">selective partnerships &middot; world wide</p>
+                 </div>
+
+                 {/* No-Crop Button Wrapper */}
+                 <div className="w-full sm:w-auto overflow-visible">
+                    <button
+                      type="submit"
+                      disabled={submitState === "loading"}
+                      className="group relative h-28 w-full sm:min-w-[400px] rounded-[1rem] bg-black text-white px-12 overflow-hidden shadow-2xl transition-all duration-700 active:scale-95 disabled:opacity-50"
+                    >
+                      <div className="absolute inset-0 bg-accent translate-y-full transition-transform duration-700 ease-expo group-hover:translate-y-0" />
+                      <div className="relative z-10 flex items-center justify-between gap-12">
+                        {submitState === "loading" ? (
+                          <div className="h-6 w-6 border-2 border-white/20 border-t-white rounded-full animate-spin mx-auto" />
+                        ) : (
+                           <>
+                            <div className="text-left">
+                               <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40 mb-1">Authorization</p>
+                               <span className="text-[14px] font-black uppercase tracking-[0.4em]">Establish Link</span>
+                            </div>
+                            <Send size={24} className="transition-all duration-700 group-hover:translate-x-4 group-hover:-translate-y-4 text-accent" />
+                           </>
+                        )}
+                      </div>
+                    </button>
+                 </div>
+              </div>
+
+              {feedback && (
+                <div className="text-[10px] font-black uppercase tracking-[0.5em] text-accent animate-pulse pt-8 text-left">
+                   &raquo; {feedback}
+                </div>
+              )}
             </form>
           </div>
         </div>
       </div>
-
     </section>
   );
 }

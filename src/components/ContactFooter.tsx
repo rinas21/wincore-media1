@@ -158,7 +158,7 @@ export default function ContactFooter() {
         {/* ── Massive Brand Centerpiece ── */}
         <div className="cf-reveal mb-20 md:mb-32">
           <Link href="/" className="group cf-main-logo flex flex-col items-start transition-transform hover:scale-[1.01]">
-            <span className="text-7xl font-[1000] tracking-[-0.05em] text-foreground md:text-[11rem] lg:text-[13rem] leading-[0.8]">WINCOR</span>
+            <span className="text-7xl font-[1000] tracking-[-0.05em] text-foreground md:text-[11rem] lg:text-[13rem] leading-[0.8]">WINCORE</span>
             <div className="flex items-center gap-4 mt-4">
               <div className="h-px w-24 bg-accent/40" />
               <span className="text-xs font-black uppercase tracking-[0.6em] text-accent group-hover:tracking-[0.8em] transition-all duration-700">

@@ -13,7 +13,7 @@ export default function PageMain({ children, className, variant = "inner" }: Pag
     <main
       className={cn(
         "bg-background text-foreground min-h-screen",
-        variant === "inner" && "pt-28 md:pt-32",
+        variant === "inner" && "is-inner-page",
         className,
       )}
     >

@@ -98,15 +98,15 @@ export default function AwardsStats() {
           );
 
           panel.addEventListener("mouseenter", () => {
-             panels.forEach(p => {
-               p.style.flex = "1";
-               gsap.to(p.querySelector(".aw-panel-expanded"), { opacity: 0, duration: 0.4, ease: "power2.out" });
-               gsap.to(p.querySelector(".aw-panel-collapsed"), { opacity: 1, duration: 0.4, ease: "power2.out", delay: 0.1 });
-             });
-             
-             panel.style.flex = "7";
-             gsap.to(panel.querySelector(".aw-panel-expanded"), { opacity: 1, duration: 0.6, ease: "power2.out", delay: 0.3 });
-             gsap.to(panel.querySelector(".aw-panel-collapsed"), { opacity: 0, duration: 0.2, ease: "power2.out" });
+            panels.forEach(p => {
+              p.style.flex = "1";
+              gsap.to(p.querySelector(".aw-panel-expanded"), { opacity: 0, duration: 0.4, ease: "power2.out" });
+              gsap.to(p.querySelector(".aw-panel-collapsed"), { opacity: 1, duration: 0.4, ease: "power2.out", delay: 0.1 });
+            });
+
+            panel.style.flex = "7";
+            gsap.to(panel.querySelector(".aw-panel-expanded"), { opacity: 1, duration: 0.6, ease: "power2.out", delay: 0.3 });
+            gsap.to(panel.querySelector(".aw-panel-collapsed"), { opacity: 0, duration: 0.2, ease: "power2.out" });
           });
         });
       }
@@ -122,15 +122,15 @@ export default function AwardsStats() {
 
         mobilePanels.forEach((panel) => {
           panel.addEventListener("click", () => {
-             mobilePanels.forEach(p => {
-               p.style.height = "90px";
-               gsap.to(p.querySelector(".aw-mobile-expanded"), { opacity: 0, duration: 0.3 });
-               gsap.to(p.querySelector(".aw-mobile-collapsed"), { opacity: 1, duration: 0.4, delay: 0.1 });
-             });
-             
-             panel.style.height = "400px";
-             gsap.to(panel.querySelector(".aw-mobile-expanded"), { opacity: 1, duration: 0.5, delay: 0.2 });
-             gsap.to(panel.querySelector(".aw-mobile-collapsed"), { opacity: 0, duration: 0.2 });
+            mobilePanels.forEach(p => {
+              p.style.height = "90px";
+              gsap.to(p.querySelector(".aw-mobile-expanded"), { opacity: 0, duration: 0.3 });
+              gsap.to(p.querySelector(".aw-mobile-collapsed"), { opacity: 1, duration: 0.4, delay: 0.1 });
+            });
+
+            panel.style.height = "400px";
+            gsap.to(panel.querySelector(".aw-mobile-expanded"), { opacity: 1, duration: 0.5, delay: 0.2 });
+            gsap.to(panel.querySelector(".aw-mobile-collapsed"), { opacity: 0, duration: 0.2 });
           });
         });
       }
@@ -140,7 +140,7 @@ export default function AwardsStats() {
       nums.forEach((numEl) => {
         const targetStr = numEl.getAttribute("data-target");
         if (!targetStr) return;
-        
+
         const proxy = { val: 0 };
         gsap.to(proxy, {
           val: parseFloat(targetStr),
@@ -166,7 +166,7 @@ export default function AwardsStats() {
   return (
     <section ref={sectionRef} className="relative overflow-visible bg-background py-24 md:py-32" aria-label="Our Impact">
       <div className="_container relative z-10 font-sans">
-        
+
         {/* Header Section */}
         <div className="aw-header-container mb-20 lg:mb-28 flex flex-col lg:flex-row items-start lg:items-end justify-between gap-12 px-4 md:px-0">
           <div className="max-w-3xl">
@@ -185,98 +185,98 @@ export default function AwardsStats() {
 
         {/* Desktop Interactive Accordion Gallery */}
         <div className="aw-accordion-container hidden lg:flex w-full h-[650px] xl:h-[750px] gap-4 mb-20 px-4 md:px-0">
-           {stats.map((stat, i) => (
-             <div 
-               key={i} 
-               className={`aw-panel relative h-full rounded-[2.5rem] overflow-hidden cursor-pointer bg-black/5 group`}
-               style={{ 
-                 transition: "flex 0.8s cubic-bezier(0.25, 1, 0.5, 1)", 
-                 flex: i === 0 ? "7" : "1" 
-               }}
-             >
-                {/* Immersive Image Background */}
-                <div className="absolute inset-0 z-0 overflow-hidden">
-                  <Image src={stat.image} alt={stat.label} fill className="object-cover transition-transform duration-[6s] ease-out scale-100 group-hover:scale-110" priority={i === 0} sizes="(max-width: 1400px) 100vw, 1400px" />
-                  <div className="absolute inset-0 bg-black/40 transition-opacity duration-700 bg-gradient-to-t from-black/80 via-black/30 to-black/10" />
-                </div>
+          {stats.map((stat, i) => (
+            <div
+              key={i}
+              className={`aw-panel relative h-full rounded-[2.5rem] overflow-hidden cursor-pointer bg-black/5 group`}
+              style={{
+                transition: "flex 0.8s cubic-bezier(0.25, 1, 0.5, 1)",
+                flex: i === 0 ? "7" : "1"
+              }}
+            >
+              {/* Immersive Image Background */}
+              <div className="absolute inset-0 z-0 overflow-hidden">
+                <Image src={stat.image} alt={stat.label} fill className="object-cover transition-transform duration-[6s] ease-out scale-100 group-hover:scale-110" priority={i === 0} sizes="(max-width: 1400px) 100vw, 1400px" />
+                <div className="absolute inset-0 bg-black/40 transition-opacity duration-700 bg-gradient-to-t from-black/80 via-black/30 to-black/10" />
+              </div>
 
-                {/* Collapsed State (Rotated Content) */}
-                <div 
-                  className="aw-panel-collapsed absolute inset-0 z-10 flex items-center justify-center pointer-events-none"
-                  style={{ opacity: i === 0 ? 0 : 1 }}
-                >
-                   <div className="flex items-center gap-12 rotate-[-90deg] whitespace-nowrap">
-                     <span className="text-white/60 font-bold tracking-[0.2em]">0{i+1}</span>
-                     <span className="text-white text-2xl xl:text-3xl font-medium tracking-wide">{stat.label}</span>
-                   </div>
+              {/* Collapsed State (Rotated Content) */}
+              <div
+                className="aw-panel-collapsed absolute inset-0 z-10 flex items-center justify-center pointer-events-none"
+                style={{ opacity: i === 0 ? 0 : 1 }}
+              >
+                <div className="flex items-center gap-12 rotate-[-90deg] whitespace-nowrap">
+                  <span className="text-white/60 font-bold tracking-[0.2em]">0{i + 1}</span>
+                  <span className="text-white text-2xl xl:text-3xl font-medium tracking-wide">{stat.label}</span>
                 </div>
+              </div>
 
-                {/* Expanded State (Full Detail) */}
-                <div 
-                  className="aw-panel-expanded absolute inset-0 z-20 flex flex-col justify-between p-12 pointer-events-none"
-                  style={{ opacity: i === 0 ? 1 : 0 }}
-                >
-                   <div className="flex justify-between items-center w-full">
-                      <span className="text-white font-bold tracking-[0.2em] bg-white/10 px-6 py-2 rounded-full backdrop-blur-md">0{i+1} / 04</span>
-                      <div className="h-16 w-16 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/20 transition-transform duration-700 group-hover:rotate-45">
-                        <ArrowUpRight size={24} />
-                      </div>
-                   </div>
-                   <div className="flex flex-col">
-                      <div className="flex items-baseline mb-4">
-                         <span className="aw-num text-white text-[8rem] xl:text-[10rem] font-bold leading-none tracking-tighter" data-target={stat.value}>0</span>
-                         <span className="text-accent text-[5rem] xl:text-[6rem] font-bold leading-[0.8] ml-2">{stat.suffix}</span>
-                      </div>
-                      <h3 className="text-white text-4xl xl:text-5xl font-medium mb-6 tracking-tight">{stat.label}</h3>
-                      <p className="text-white/80 max-w-[42ch] text-lg font-light leading-relaxed">{stat.desc}</p>
-                   </div>
+              {/* Expanded State (Full Detail) */}
+              <div
+                className="aw-panel-expanded absolute inset-0 z-20 flex flex-col justify-between p-12 pointer-events-none"
+                style={{ opacity: i === 0 ? 1 : 0 }}
+              >
+                <div className="flex justify-between items-center w-full">
+                  <span className="text-white font-bold tracking-[0.2em] bg-white/10 px-6 py-2 rounded-full backdrop-blur-md">0{i + 1} / 04</span>
+                  <div className="h-16 w-16 rounded-full bg-white/10 backdrop-blur-md flex items-center justify-center text-white border border-white/20 transition-transform duration-700 group-hover:rotate-45">
+                    <ArrowUpRight size={24} />
+                  </div>
                 </div>
-             </div>
-           ))}
+                <div className="flex flex-col">
+                  <div className="flex items-baseline mb-4">
+                    <span className="aw-num text-white text-[8rem] xl:text-[10rem] font-bold leading-none tracking-tighter" data-target={stat.value}>0</span>
+                    <span className="text-accent text-[5rem] xl:text-[6rem] font-bold leading-[0.8] ml-2">{stat.suffix}</span>
+                  </div>
+                  <h3 className="text-white text-4xl xl:text-5xl font-medium mb-6 tracking-tight">{stat.label}</h3>
+                  <p className="text-white/80 max-w-[42ch] text-lg font-light leading-relaxed">{stat.desc}</p>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
 
         {/* Mobile Accordion Interaction */}
         <div className="aw-accordion-mobile lg:hidden flex flex-col w-full px-4 md:px-0 gap-3 mb-10">
-           {stats.map((stat, i) => (
-             <div 
-               key={i} 
-               className={`aw-mobile-panel relative w-full rounded-[2rem] overflow-hidden cursor-pointer bg-black`}
-               style={{ 
-                 transition: "height 0.8s cubic-bezier(0.25, 1, 0.5, 1)", 
-                 height: i === 0 ? "460px" : "90px" 
-               }}
-             >
-                <div className="absolute inset-0 z-0">
-                  <Image src={stat.image} alt={stat.label} fill className="object-cover" />
-                  <div className="absolute inset-0 bg-black/40 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
-                </div>
+          {stats.map((stat, i) => (
+            <div
+              key={i}
+              className={`aw-mobile-panel relative w-full rounded-[2rem] overflow-hidden cursor-pointer bg-black`}
+              style={{
+                transition: "height 0.8s cubic-bezier(0.25, 1, 0.5, 1)",
+                height: i === 0 ? "460px" : "90px"
+              }}
+            >
+              <div className="absolute inset-0 z-0">
+                <Image src={stat.image} alt={stat.label} fill className="object-cover" />
+                <div className="absolute inset-0 bg-black/40 bg-gradient-to-t from-black/80 via-black/40 to-black/20" />
+              </div>
 
-                {/* Mobile Collapsed State */}
-                <div 
-                  className="aw-mobile-collapsed absolute inset-0 z-10 flex items-center px-8 pointer-events-none"
-                  style={{ opacity: i === 0 ? 0 : 1 }}
-                >
-                   <span className="text-white/60 font-bold tracking-[0.2em] w-12 text-sm">0{i+1}</span>
-                   <span className="text-white text-xl font-medium tracking-wide">{stat.label}</span>
-                </div>
+              {/* Mobile Collapsed State */}
+              <div
+                className="aw-mobile-collapsed absolute inset-0 z-10 flex items-center px-8 pointer-events-none"
+                style={{ opacity: i === 0 ? 0 : 1 }}
+              >
+                <span className="text-white/60 font-bold tracking-[0.2em] w-12 text-sm">0{i + 1}</span>
+                <span className="text-white text-xl font-medium tracking-wide">{stat.label}</span>
+              </div>
 
-                {/* Mobile Expanded State */}
-                <div 
-                  className="aw-mobile-expanded absolute inset-0 z-20 flex flex-col justify-between p-8 pointer-events-none"
-                  style={{ opacity: i === 0 ? 1 : 0 }}
-                >
-                   <span className="text-white w-fit font-bold tracking-[0.2em] text-xs bg-white/10 px-4 py-2 rounded-full backdrop-blur-md">0{i+1} / 04</span>
-                   <div className="flex flex-col">
-                      <div className="flex items-baseline mb-4 mt-auto">
-                         <span className="aw-num text-white text-[5.5rem] font-bold leading-none tracking-tighter" data-target={stat.value}>0</span>
-                         <span className="text-accent text-[3rem] font-bold leading-none ml-2">{stat.suffix}</span>
-                      </div>
-                      <h3 className="text-white text-2xl md:text-3xl font-medium mb-3">{stat.label}</h3>
-                      <p className="text-white/80 text-sm md:text-base font-light leading-relaxed">{stat.desc}</p>
-                   </div>
+              {/* Mobile Expanded State */}
+              <div
+                className="aw-mobile-expanded absolute inset-0 z-20 flex flex-col justify-between p-8 pointer-events-none"
+                style={{ opacity: i === 0 ? 1 : 0 }}
+              >
+                <span className="text-white w-fit font-bold tracking-[0.2em] text-xs bg-white/10 px-4 py-2 rounded-full backdrop-blur-md">0{i + 1} / 04</span>
+                <div className="flex flex-col">
+                  <div className="flex items-baseline mb-4 mt-auto">
+                    <span className="aw-num text-white text-[5.5rem] font-bold leading-none tracking-tighter" data-target={stat.value}>0</span>
+                    <span className="text-accent text-[3rem] font-bold leading-none ml-2">{stat.suffix}</span>
+                  </div>
+                  <h3 className="text-white text-2xl md:text-3xl font-medium mb-3">{stat.label}</h3>
+                  <p className="text-white/80 text-sm md:text-base font-light leading-relaxed">{stat.desc}</p>
                 </div>
-             </div>
-           ))}
+              </div>
+            </div>
+          ))}
         </div>
 
       </div>

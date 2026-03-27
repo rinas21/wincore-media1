@@ -65,7 +65,7 @@ export default function Header() {
       >
         <Link href="/" className="group flex items-center gap-1.5 md:gap-2.5 transition-transform hover:scale-[1.02]" onClick={() => setIsMenuOpen(false)}>
           <span className="text-xl md:text-2xl lg:text-3xl font-extrabold tracking-tight text-foreground">
-            WINCOR
+            WINCORE
           </span>
           <span className="flex h-4 items-center rounded bg-black/5 px-1.5 text-[8px] font-bold uppercase tracking-[0.1em] text-black/60 md:h-5 md:px-2 md:text-[10px]">
             Agency

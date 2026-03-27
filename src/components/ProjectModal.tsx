@@ -3,7 +3,7 @@
 import { useEffect, useRef, useLayoutEffect } from "react";
 import gsap from "gsap";
 import Image from "next/image";
-import { X, ArrowRight, ExternalLink, Calendar, Code2, Rocket, Briefcase } from "lucide-react";
+import { X, ArrowRight, ExternalLink, Sparkles } from "lucide-react";
 import Link from "next/link";
 
 export type Project = {
@@ -20,13 +20,6 @@ export type Project = {
   link: string;
 };
 
-function descriptionParagraphs(text: string) {
-  return text
-    .split(/\n+/)
-    .map((s) => s.trim())
-    .filter(Boolean);
-}
-
 export default function ProjectModal({
   project,
   isOpen,
@@ -42,236 +35,141 @@ export default function ProjectModal({
     if (!isOpen) return;
 
     const ctx = gsap.context(() => {
-      gsap.set(".modal-bg", { opacity: 0 });
-      gsap.set(".modal-content", { y: 40, opacity: 0, scale: 0.98 });
-      gsap.set(".stagger-item", { y: 24, opacity: 0 });
-      gsap.set(".image-reveal", { scale: 1.02, opacity: 0 });
-      gsap.set(".meta-item", { y: 16, opacity: 0 });
-      gsap.set(".close-btn", { scale: 0, opacity: 0 });
+      gsap.set(".pm-overlay", { opacity: 0 });
+      gsap.set(".pm-card", { y: 40, opacity: 0, scale: 0.98 });
+      gsap.set(".pm-stagger", { y: 20, opacity: 0 });
+      gsap.set(".pm-image", { scale: 1.1, opacity: 0 });
 
-      const tl = gsap.timeline({ defaults: { ease: "expo.out" } });
+      const tl = gsap.timeline({ defaults: { ease: "expo.out", duration: 1.2 } });
 
-      tl.to(".modal-bg", {
-        opacity: 1,
-        duration: 0.55,
-      })
-        .to(
-          ".modal-content",
-          {
-            y: 0,
-            opacity: 1,
-            scale: 1,
-            duration: 0.75,
-          },
-          "-=0.35",
-        )
-        .to(
-          ".image-reveal",
-          {
-            scale: 1,
-            opacity: 1,
-            duration: 0.9,
-            ease: "power3.out",
-          },
-          "-=0.55",
-        )
-        .to(
-          ".stagger-item",
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.65,
-            stagger: 0.08,
-          },
-          "-=0.5",
-        )
-        .to(
-          ".meta-item",
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.5,
-            stagger: 0.06,
-          },
-          "-=0.45",
-        )
-        .to(
-          ".close-btn",
-          {
-            scale: 1,
-            opacity: 1,
-            duration: 0.45,
-            ease: "back.out(1.6)",
-          },
-          "-=0.6",
-        );
+      tl.to(".pm-overlay", { opacity: 1, duration: 0.6 })
+        .to(".pm-card", { y: 0, opacity: 1, scale: 1 }, "-=0.4")
+        .to(".pm-image", { scale: 1, opacity: 1 }, "-=0.8")
+        .to(".pm-stagger", { y: 0, opacity: 1, stagger: 0.08 }, "-=1");
     }, modalRef);
 
     return () => ctx.revert();
   }, [isOpen]);
 
   useEffect(() => {
-    const onEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-
-    if (isOpen) {
-      document.body.style.overflow = "hidden";
-      window.addEventListener("keydown", onEsc);
-    } else {
-      document.body.style.overflow = "";
-      window.removeEventListener("keydown", onEsc);
-    }
-
-    return () => {
-      document.body.style.overflow = "";
-      window.removeEventListener("keydown", onEsc);
-    };
-  }, [isOpen, onClose]);
+    if (isOpen) document.body.style.overflow = "hidden";
+    else document.body.style.overflow = "";
+  }, [isOpen]);
 
   if (!project) return null;
-
-  const parsedDescription = descriptionParagraphs(project.description);
-  const bodyCopy =
-    parsedDescription.length > 0
-      ? parsedDescription
-      : [
-          "Strategic storytelling, motion, and interface craft — built for measurable outcomes.",
-        ];
 
   return (
     <div
       ref={modalRef}
-      className={`fixed inset-0 z-[2000] flex items-start justify-center overflow-y-auto overscroll-contain p-4 sm:p-6 md:items-center md:p-10 lg:p-12 transition-all duration-300 ${
-        isOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
+      className={`fixed inset-0 z-[7000] flex items-center justify-center p-4 sm:p-8 lg:p-16 transition-visibility duration-500 ${
+        isOpen ? "visible" : "invisible"
       }`}
-      role="dialog"
-      aria-modal="true"
-      aria-label={`Project: ${project.title}`}
     >
-      <div className="modal-bg absolute inset-0 bg-black/50 backdrop-blur-md" onMouseDown={onClose} />
+      {/* ── MINIMAL OVERLAY ───────────────────────── */}
+      <div className="pm-overlay absolute inset-0 bg-white/60 backdrop-blur-2xl" onClick={onClose} />
 
-      <div
-        className="modal-content relative z-[1] my-auto flex w-full max-w-[min(100%,1280px)] flex-col overflow-hidden rounded-[1.35rem] border border-black/10 bg-background shadow-[0_48px_120px_rgba(0,0,0,0.14)] sm:rounded-2xl lg:my-6 lg:max-h-[94dvh] lg:flex-row lg:rounded-[2rem]"
-      >
+      {/* ── THE SPLIT MONOLITH ────────────────────── */}
+      <div className="pm-card relative w-full max-w-7xl h-full lg:max-h-[850px] bg-white border border-black/5 shadow-[0_100px_200px_rgba(0,0,0,0.08)] flex flex-col lg:flex-row overflow-hidden rounded-[2.5rem]">
+        
+        {/* CLOSE CONTROL */}
         <button
-          type="button"
           onClick={onClose}
-          className="close-btn group absolute right-4 top-4 z-[2010] flex h-12 w-12 items-center justify-center rounded-full border border-black/10 bg-background/95 text-foreground shadow-sm backdrop-blur-sm transition-colors hover:bg-foreground hover:text-background sm:right-6 sm:top-6 lg:right-7 lg:top-7"
-          aria-label="Close project modal"
+          className="absolute top-8 right-8 z-50 group flex items-center justify-center h-12 w-12 rounded-full bg-white shadow-xl hover:bg-black hover:text-white transition-all duration-500 border border-black/5"
         >
-          <X className="h-5 w-5 transition-transform duration-300 group-hover:rotate-90" />
+          <X size={20} className="group-hover:rotate-90 transition-transform duration-500" />
         </button>
 
-        {/* Image — tall enough, contain so nothing is cropped off-frame */}
-        <div className="relative flex w-full shrink-0 flex-col bg-muted lg:w-[47%] lg:min-h-0 lg:min-w-0 lg:border-r lg:border-black/8 lg:self-stretch">
-          <div className="relative aspect-[16/11] w-full sm:aspect-[16/10] lg:aspect-auto lg:h-full lg:min-h-[min(66vh,580px)]">
-            <div className="image-reveal absolute inset-0">
-              <Image
-                src={project.image}
-                alt={project.title}
-                fill
-                className="object-contain object-center p-6 sm:p-8 lg:p-10"
-                sizes="(max-width: 1024px) 100vw, 46vw"
+        {/* LEFT: IMMERSIVE IMAGE (50%) */}
+        <div className="relative w-full lg:w-1/2 h-[45vh] lg:h-auto overflow-hidden bg-black group">
+           <div className="pm-image absolute inset-0">
+              <Image 
+                src={project.image} 
+                alt={project.title} 
+                fill 
+                className="object-cover group-hover:scale-110 transition-transform duration-[5s] ease-out" 
                 priority
               />
-              <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background/90 via-background/20 to-transparent lg:from-background/70" />
-            </div>
-          </div>
-
-          <div className="pointer-events-none absolute bottom-6 left-6 right-6 sm:bottom-8 sm:left-8 stagger-item md:block">
-            <span className="mb-2 block text-[10px] font-black uppercase tracking-[0.35em] text-foreground/50">
-              Visual identity
-            </span>
-            <div className="h-px w-20 bg-accent/50" />
-          </div>
+           </div>
+           {/* Visual Gradients for Depth */}
+           <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/60 to-transparent" />
+           <div className="absolute inset-x-12 bottom-12 space-y-2">
+              <span className="pm-stagger block text-[10px] font-black uppercase tracking-[0.4em] text-accent">Visual Concept</span>
+              <p className="pm-stagger text-[11px] font-black uppercase tracking-[0.25em] text-white/40">v. ARCHIVE 2026</p>
+           </div>
         </div>
 
-        {/* Copy + meta — scrolls independently on short viewports */}
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-          <div className="flex min-h-0 flex-1 flex-col gap-10 overflow-y-auto px-10 pb-10 pt-[5.5rem] sm:px-14 sm:pb-14 sm:pt-[5.5rem] lg:gap-12 lg:px-24 lg:pb-16 lg:pt-24">
-            <header className="stagger-item space-y-4">
-              <p className="text-[12.5px] font-black uppercase tracking-[0.32em] text-accent">
-                Case study · {project.category}
-              </p>
-              <h2 className="break-words text-[1.85rem] font-black uppercase leading-[1.08] tracking-tight text-foreground sm:text-[2.1rem] lg:text-[2.25rem]">
-                {project.title}
-              </h2>
-            </header>
+        {/* RIGHT: STRUCTURED DATA (50%) */}
+        <div className="flex-1 flex flex-col bg-white overflow-hidden">
+           
+           <div className="flex-1 overflow-y-auto p-10 md:p-14 lg:p-20 scrollbar-hide space-y-20">
+              
+              {/* HEADER SECTION */}
+              <div className="pm-stagger space-y-6">
+                 <div className="flex items-center gap-4">
+                    <Sparkles size={16} className="text-accent" />
+                    <p className="text-[10px] font-black uppercase tracking-[0.5em] text-accent">Mission Detail</p>
+                 </div>
+                 <h2 className="text-4xl lg:text-7xl font-black uppercase tracking-[-0.04em] leading-none text-black">
+                   {project.title}
+                 </h2>
+                 <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-black/20">{project.category}</p>
+              </div>
 
-            <div className="stagger-item space-y-4 text-[16px] font-light leading-[1.6] text-foreground/75 sm:text-[17px] lg:leading-[1.65]">
-              {bodyCopy.map((para, i) => (
-                <p key={i} className="max-w-prose">
-                  {para}
-                </p>
-              ))}
-            </div>
-
-            <div className="stagger-item flex flex-wrap gap-2.5 sm:gap-3">
-              {project.tags.map((tag) => (
-                <span
-                  key={tag}
-                  className="inline-flex items-center rounded-full border border-black/10 bg-black/[0.03] px-5 py-3 text-[11.5px] font-bold uppercase tracking-wider text-foreground/85 sm:px-6 sm:py-3"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 md:gap-6">
-              {[
-                { icon: Calendar, label: "Duration", value: project.duration },
-                { icon: Briefcase, label: "Role", value: project.role },
-                { icon: Code2, label: "Stack", value: project.stack },
-                { icon: Rocket, label: "Impact", value: project.impact },
-              ].map(({ icon: Icon, label, value }) => (
-                <div
-                  key={label}
-                  className="meta-item group/meta relative overflow-hidden rounded-3xl border border-black/[0.06] bg-gradient-to-br from-white via-white/80 to-black/[0.02] p-6 transition-all duration-500 hover:border-accent/30 hover:shadow-[0_24px_48px_rgba(0,0,0,0.04)] sm:p-7"
-                >
-                  {/* Subtle Accent Glow */}
-                  <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-accent/5 blur-2xl transition-opacity group-hover/meta:opacity-100" />
-                  
-                  <div className="project-meta-content relative z-10">
-                    <div className="mb-4 flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-accent/5 text-accent transition-colors group-hover/meta:bg-accent group-hover/meta:text-white">
-                        <Icon size={18} />
-                      </div>
-                      <span className="text-[11.5px] font-black uppercase tracking-[0.25em] text-black/30 group-hover/meta:text-accent/80 transition-colors">
-                        {label}
+              {/* MISSION ARCHITECTURE */}
+              <div className="pm-stagger space-y-8">
+                 <div className="w-12 h-[2px] bg-black/10" />
+                 <p className="text-2xl font-light leading-relaxed text-black/70 italic max-w-xl">
+                    {project.description}
+                 </p>
+                 <div className="flex flex-wrap gap-2.5">
+                    {project.tags.map(t => (
+                      <span key={t} className="text-[9px] font-black uppercase tracking-widest bg-black/[0.03] px-5 py-2.5 rounded-full text-black/40">
+                        {t}
                       </span>
-                    </div>
-                    
-                    <p className="break-words text-[1.02rem] font-bold leading-tight tracking-tight text-foreground/90 sm:text-[1.1rem]">
-                      {value}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+                    ))}
+                 </div>
+              </div>
 
-          <div className="stagger-item shrink-0 flex flex-col gap-5 border-t border-black/8 bg-background/95 px-10 pb-10 pt-8 sm:flex-row sm:gap-6 sm:px-14 sm:pb-12 sm:pt-10 lg:px-24 lg:pb-12 lg:pt-12">
-            <Link
-              href="/contact"
-              className="group relative inline-flex flex-[1.4] items-center justify-center gap-3 rounded-2xl bg-accent px-8 py-5 text-[12.5px] font-black uppercase tracking-[0.32em] text-white transition-all hover:scale-[1.01] hover:shadow-[0_12px_36px_rgba(0,191,255,0.18)] active:scale-[0.99] sm:py-6"
-              onClick={onClose}
-            >
-              <span className="relative z-10">Start a project</span>
-              <ArrowRight className="relative z-10 h-5 w-5 transition-transform group-hover:translate-x-1" />
-            </Link>
+              {/* PRECISION STATS GRID (ORGANIZED) */}
+              <div className="pm-stagger grid grid-cols-2 gap-x-12 gap-y-12 pt-12 border-t border-black/5">
+                 {[
+                   { label: "Engineering Stack", val: project.stack },
+                   { label: "Deployment Role", val: project.role },
+                   { label: "Mission Duration", val: project.duration },
+                   { label: "Operational Impact", val: project.impact }
+                 ].map((s, i) => (
+                   <div key={i} className="space-y-3">
+                      <p className="text-[9px] font-black uppercase tracking-[0.4em] text-black/15">{s.label}</p>
+                      <p className="text-base font-bold uppercase tracking-tight text-black">{s.val}</p>
+                   </div>
+                 ))}
+              </div>
+           </div>
 
-            <a
-              href={project.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex flex-1 items-center justify-center gap-3 rounded-2xl border border-black/15 bg-background px-8 py-5 text-[12.5px] font-black uppercase tracking-[0.32em] text-foreground transition-all hover:border-accent/40 hover:bg-black/[0.01] sm:py-6"
-            >
-              Live site
-              <ExternalLink className="h-5 w-5 opacity-70" />
-            </a>
-          </div>
+           {/* ACTION BOTTOM BAR */}
+           <div className="pm-stagger shrink-0 p-10 lg:px-20 lg:pb-16 lg:pt-0 flex flex-col sm:flex-row gap-6">
+              <Link
+                href="/contact"
+                className="group relative flex-[1.4] bg-black text-white h-20 rounded-2xl flex items-center justify-between px-10 overflow-hidden shadow-2xl transition-transform active:scale-95"
+                onClick={onClose}
+              >
+                 <div className="absolute inset-0 bg-accent translate-y-full group-hover:translate-y-0 transition-transform duration-700 ease-expo" />
+                 <span className="relative z-10 text-[11px] font-black uppercase tracking-[0.4em]">Propel Forward</span>
+                 <ArrowRight size={20} className="relative z-10 group-hover:translate-x-3 transition-transform duration-700" />
+              </Link>
+              <a
+                href={project.link}
+                target="_blank"
+                rel="noopener"
+                className="group flex-1 border border-black/10 h-20 rounded-2xl flex items-center justify-center gap-4 hover:border-black transition-all"
+              >
+                 <span className="text-[11px] font-black uppercase tracking-[0.4em]">Live site</span>
+                 <ExternalLink size={16} className="opacity-20 group-hover:opacity-100 transition-opacity" />
+              </a>
+           </div>
+
         </div>
+
       </div>
     </div>
   );

@@ -14,6 +14,16 @@
   --color-secondary: var(--secondary);
 }
 
+.is-inner-page {
+  padding-top: 117px;
+}
+
+@media (min-width: 768px) {
+  .is-inner-page {
+    padding-top: 133px;
+  }
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -76,6 +86,26 @@ section {
 
 .page-motion-item:last-child {
   margin-bottom: 0;
+}
+
+/* Contact page: keep minimum breathing room globally */
+.ct-hero-title,
+.ct-fade-up,
+.ct-info-block,
+.ct-form-panel,
+.ct-form-row {
+  margin: 3px;
+}
+
+.ct-form-panel {
+  overflow: visible;
+}
+
+.ct-form-row input,
+.ct-form-row textarea,
+.ct-form-row select {
+  padding-left: 3px;
+  padding-right: 3px;
 }
 
 /* Services intro spacing controlled globally */
