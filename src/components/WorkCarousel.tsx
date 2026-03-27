@@ -9,112 +9,85 @@ import {
   getScroller,
   prefersReducedMotion,
 } from "@/lib/motion";
-import { ArrowUpRight } from "lucide-react";
 
 const PROJECTS: Project[] = [
   {
     id: 1,
-    title: "Luminex Ecosystem",
-    category: "Vibrant UI / 3D",
+    title: "Onyx Luxury",
+    category: "High-End Commerce",
     image: "/works/vibrant_webgl.png",
-    tags: ["WebGL", "3D UI", "Performance"],
-    description: "A neon-fused, high-performance interface for a decentralized tech network.",
-    stack: "React, Three.js, GSAP",
-    duration: "10 Weeks",
-    role: "Lead Agency",
-    impact: "+240% Speed",
-    link: "https://luminex.tech",
+    tags: ["E-Commerce", "WebGL", "Brand Strategy"],
+    description: "A flagship digital storefront for Onyx, blending 3D product interaction with seamless conversion architecture. Engineered for elite performance and visceral user engagement.",
+    stack: "React, Three.js, Shopify",
+    duration: "12 Weeks",
+    role: "Full-Service Partner",
+    impact: "+40% Conversion",
+    link: "https://onyx-luxury.com",
   },
   {
     id: 2,
-    title: "Aurum FinTech",
-    category: "Branding / Web Product",
+    title: "Cipher Fintech",
+    category: "Financial Systems",
     image: "/works/vibrant_fintech.png",
-    tags: ["Fintech", "Glassmorphism", "Branding"],
-    description: "Reimagining modern finance with an emerald-gold aesthetic.",
-    stack: "Next.js, D3.js, GSAP",
-    duration: "8 Weeks",
-    role: "Core Studio",
-    impact: "99% Uptime",
-    link: "https://aurum.finance",
+    tags: ["Product Design", "Security", "AI Systems"],
+    description: "Reimagining the security of digital assets. Cipher is a high-security, ultra-efficient fintech dashboard built for real-time transaction monitoring and global scales.",
+    stack: "Next.js, D3.js, Rust",
+    duration: "16 Weeks",
+    role: "Product Architecture",
+    impact: "99.9% Efficiency",
+    link: "https://cipher-fin.io",
   },
   {
     id: 3,
-    title: "Nova AI Studio",
-    category: "Product / Motion",
+    title: "Aura Experiences",
+    category: "Immersive Motion",
     image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=1200",
-    tags: ["AI", "Creative", "Motion"],
-    description: "Vibrant magenta and violet gradients powering next-gen AI platforms.",
-    stack: "React, Framer, AI",
-    duration: "12 Weeks",
-    role: "Creative Partner",
-    impact: "1M+ Users",
-    link: "https://nova-ai.io",
+    tags: ["WebGL", "Motion Design", "3D UI"],
+    description: "An evocative, atmospheric experience for a luxury wellness brand. We built a fluid, non-linear navigation system that responds to the user's kinetic energy and focus.",
+    stack: "GSAP, WebGL, React",
+    duration: "8 Weeks",
+    role: "Direction & Motion",
+    impact: "1.2M+ Reach",
+    link: "https://aura-exp.com",
   },
   {
     id: 4,
-    title: "Pulse Tourism",
-    category: "Video / Experience",
-    image: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&q=80&w=1200",
-    tags: ["Video", "Cinematic", "Tropics"],
-    description: "Hyper-colored cinematic tours for luxury island retreats.",
-    stack: "After Effects, DaVinci",
-    duration: "6 Weeks",
-    role: "Production",
-    impact: "+300% Booking",
-    link: "https://pulse.travel",
+    title: "Vanguard App",
+    category: "Native Mobility",
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=1200",
+    tags: ["App Design", "UI/UX", "Prototyping"],
+    description: "Leading the charge in premium electric mobility. Vanguard is more than an app; it is a companion for high-performance navigation and vehicle intelligence.",
+    stack: "React Native, Swift",
+    duration: "14 Weeks",
+    role: "Mobile Strategy",
+    impact: "4.8 App Rating",
+    link: "https://vanguard-drive.ai",
   },
   {
     id: 5,
-    title: "Vanguard Mobility",
-    category: "App / Motion",
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=1200",
-    tags: ["Mobile", "Prototyping", "UI/UX"],
-    description: "A dark-mode first UI for premium electric mobility.",
-    stack: "React Native, Reanimated",
-    duration: "14 Weeks",
-    role: "UX & Dev Partner",
-    impact: "4.9 App Store",
-    link: "https://vanguard.eco",
+    title: "Neon Analytics",
+    category: "AI Data Platform",
+    image: "https://images.unsplash.com/photo-1614729939124-032f0b56c9ce?auto=format&fit=crop&q=80&w=1200",
+    tags: ["AI Integration", "Big Data", "Visual Systems"],
+    description: "A complex data visualization engine that turns massive datasets into actionable intelligence through an intuitive, dark-mode first interface architecture.",
+    stack: "PyTorch, Next.js, D3",
+    duration: "10 Weeks",
+    role: "Engineering Lead",
+    impact: "Seed Funded",
+    link: "https://neon-data.tech",
   },
   {
     id: 6,
-    title: "Aura Architecture",
-    category: "Web / Editorial",
+    title: "Prism Editorial",
+    category: "Brand Expression",
     image: "https://images.unsplash.com/photo-1600607686527-6fb886090705?auto=format&fit=crop&q=80&w=1200",
-    tags: ["Minimal", "Layout", "Typography"],
-    description: "A brutalist yet pristine editorial platform for avant-garde designs.",
-    stack: "Next.js, Sanity, GSAP",
-    duration: "8 Weeks",
-    role: "Full Service",
-    impact: "+150% Engagement",
-    link: "https://aura-arch.com",
-  },
-  {
-    id: 7,
-    title: "Nexus Labs",
-    category: "3D / Brand",
-    image: "https://images.unsplash.com/photo-1614729939124-032f0b56c9ce?auto=format&fit=crop&q=80&w=1200",
-    tags: ["Brand", "3D", "Identity"],
-    description: "Brand identity and immersive 3D landing page for deep-tech firm.",
-    stack: "Spline, React",
+    tags: ["Typography", "Editorial", "Web Design"],
+    description: "A minimal, brutalist editorial platform for avant-garde architectural designs. Focusing on space, light, and the hierarchy of information over decorative clutter.",
+    stack: "Next.js, Sanity.io",
     duration: "6 Weeks",
-    role: "Visual Lead",
-    impact: "Seed Funded",
-    link: "https://nexus-labs.ai",
-  },
-  {
-    id: 8,
-    title: "Chroma E-Commerce",
-    category: "Commerce / UX",
-    image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?auto=format&fit=crop&q=80&w=1200",
-    tags: ["Shopify", "Headless", "UX"],
-    description: "Blazingly fast headless commerce for high-end streetwear.",
-    stack: "Hydrogen, Tailwind",
-    duration: "12 Weeks",
-    role: "Tech Partner",
-    impact: "+35% Conv. Rate",
-    link: "https://chroma.store",
+    role: "Brand & Design",
+    impact: "+200% Sessions",
+    link: "https://prism-arch.com",
   },
 ];
 
@@ -175,7 +148,6 @@ export default function WorkCarousel() {
           scrub: 1,
         }
       });
-
     }, section);
 
     return () => ctx.revert();
@@ -191,15 +163,15 @@ export default function WorkCarousel() {
           <div className="space-y-4">
              <div className="flex items-center gap-4">
                <div className="w-10 h-[1px] bg-accent" />
-               <span className="text-[10px] font-black uppercase tracking-[0.5em] text-accent">Selected Archives</span>
+               <span className="text-[10px] font-black uppercase tracking-[0.5em] text-accent">Wincore Archives</span>
              </div>
              <h2 className="text-[12vw] md:text-[8rem] lg:text-[10rem] font-black leading-[0.8] tracking-[-0.07em] uppercase">
                 Works <br />
-                <span className="text-black/5 italic font-serif lowercase font-light">that rewrite.</span>
+                <span className="text-black/5 italic font-serif lowercase font-light">that lead.</span>
              </h2>
           </div>
           <p className="max-w-md text-xl font-light leading-relaxed text-black/40">
-             Scroll down to navigate through our primary orbit. Focus shifts as you dwell on the architecture of each system.
+             Navigate through our primary digital orbit. Each project represent a milestone in Wincore Media engineering.
           </p>
         </div>
 
@@ -224,16 +196,15 @@ export default function WorkCarousel() {
                     <div className={`flex flex-col ${isEven ? 'md:flex-row' : 'md:flex-row-reverse'} items-end gap-12 lg:gap-24`}>
                        
                        {/* IMAGE MONOLITH */}
-                       <div className="relative w-full md:w-[60%] aspect-[16/10] overflow-hidden rounded-[2.5rem] bg-black/5 shadow-[0_60px_100px_rgba(0,0,0,0.08)] transform-gpu transition-all duration-1000 group-hover:shadow-[0_80px_120px_rgba(0,136,204,0.15)] group-hover:scale-[1.02]">
+                       <div className="relative w-full md:w-[60%] aspect-[16/10] overflow-hidden rounded-[2.5rem] bg-black/5 shadow-[0_60px_100px_rgba(0,0,0,0.08)] transform-gpu transition-all duration-1000">
                           <Image 
                             src={p.image} 
                             alt={p.title} 
                             fill 
-                            className="object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 group-hover:scale-110" 
+                            className="object-cover transition-all duration-1000 group-hover:scale-110" 
                             sizes="(max-width: 1400px) 100vw, 800px" 
                           />
-                          {/* Inner Shine Overlay */}
-                          <div className="absolute inset-0 bg-gradient-to-tr from-black/40 via-transparent to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+                          <div className="absolute inset-0 bg-gradient-to-tr from-black/20 via-transparent to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
                        </div>
 
                        {/* CONTENT BLOCK */}
@@ -246,10 +217,7 @@ export default function WorkCarousel() {
                              {p.title}
                           </h3>
                           <div className={`flex items-center gap-6 pt-4 ${isEven ? 'justify-start' : 'justify-end'}`}>
-                             <span className="text-[10px] font-black text-black/20 group-hover:text-black transition-colors">EST. PROJECT {p.duration}</span>
-                             <div className="w-12 h-12 rounded-full border border-black/10 flex items-center justify-center group-hover:bg-black group-hover:text-white transition-all duration-700">
-                                <ArrowUpRight size={20} className="group-hover:rotate-45 transition-transform duration-700" />
-                             </div>
+                             <span className="text-[10px] font-black text-black/20 group-hover:text-black transition-colors uppercase tracking-[0.2em]">Mission {p.duration}</span>
                           </div>
                        </div>
                     </div>
@@ -260,10 +228,9 @@ export default function WorkCarousel() {
         </div>
       </div>
 
-      {/* BACKGROUND FLOATING TEXT */}
       <div className="absolute top-1/2 left-0 w-full pointer-events-none opacity-[0.02] overflow-hidden">
          <div className="wc-scrub text-[25vw] font-black uppercase whitespace-nowrap leading-none tracking-[-0.05em]">
-            Digital Authority &middot; Selective Engineering &middot; Immersive Systems &middot;
+            Wincore Media &middot; Selective Engineering &middot; Immersive Systems &middot; Digital Command
          </div>
       </div>
 

@@ -197,7 +197,7 @@ export default function AwardsStats() {
               {/* Immersive Image Background */}
               <div className="absolute inset-0 z-0 overflow-hidden">
                 <Image src={stat.image} alt={stat.label} fill className="object-cover transition-transform duration-[6s] ease-out scale-100 group-hover:scale-110" priority={i === 0} sizes="(max-width: 1400px) 100vw, 1400px" />
-                <div className="absolute inset-0 bg-black/40 transition-opacity duration-700 bg-gradient-to-t from-black/80 via-black/30 to-black/10" />
+                <div className="absolute inset-0 bg-black/10 transition-opacity duration-700 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
               </div>
 
               {/* Collapsed State (Rotated Content) */}
