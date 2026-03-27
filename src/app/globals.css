@@ -602,6 +602,10 @@ h1, h2, h3, h4, h5, h6 {
   margin: 3px;
 }
 
+.pm-content-col {
+  margin-left: 3px;
+}
+
 /* Service modal: keep layout stable even if global spacing rules change */
 .service-modal-panel {
   margin-left: auto;

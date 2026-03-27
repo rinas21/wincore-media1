@@ -52,7 +52,7 @@ export default function ContactFooter() {
           duration: reduced ? 0 : 0.8,
           ease: "expo.out",
           clearProps: "transform,opacity",
-          scrollTrigger: { trigger: ".cf-kicker", scroller, start: "top 90%", once: true },
+          scrollTrigger: { trigger: ".cf-kicker", scroller, start: "top 98%", once: true },
         },
       );
 
@@ -68,7 +68,7 @@ export default function ContactFooter() {
             ease: "expo.out",
             delay: i * 0.08,
             clearProps: "transform,opacity",
-            scrollTrigger: { trigger: el, scroller, start: "top 92%", once: true },
+            scrollTrigger: { trigger: el, scroller, start: "top 98%", once: true },
           },
         );
       });
@@ -82,7 +82,7 @@ export default function ContactFooter() {
           duration: reduced ? 0 : 0.9,
           ease: "expo.out",
           clearProps: "transform,opacity",
-          scrollTrigger: { trigger: ".cf-contact-block", scroller, start: "top 88%", once: true },
+          scrollTrigger: { trigger: ".cf-contact-block", scroller, start: "top 98%", once: true },
         },
       );
 
@@ -99,7 +99,7 @@ export default function ContactFooter() {
             ease: "expo.out",
             delay: i * 0.07,
             clearProps: "transform,opacity",
-            scrollTrigger: { trigger: el, scroller, start: "top 90%", once: true },
+            scrollTrigger: { trigger: el, scroller, start: "top 98%", once: true },
           },
         );
       });
@@ -115,7 +115,7 @@ export default function ContactFooter() {
           scrollTrigger: {
             trigger: ".cf-main-logo",
             scroller,
-            start: "top 92%",
+            start: "top 98%",
             once: true,
           },
         },

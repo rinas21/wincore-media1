@@ -80,9 +80,9 @@ export default function PageMotion({ children }: PageMotionProps) {
             clearProps: "transform",
             scrollTrigger: {
               trigger: section,
-              // Use a generous threshold so the first visible section always
-              // fires even when measurements are slightly off after Lenis init.
-              start: index === 0 ? "top 95%" : "top 92%",
+              // Relaxed the start threshold slightly to ensure late-page elements (like footers) 
+              // fire even if they are already visible without much scroll room remaining.
+              start: index === 0 ? "top 98%" : "top 95%",
               end: "top 65%",
               once: true,
               scroller,

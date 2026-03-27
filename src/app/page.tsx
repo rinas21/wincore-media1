@@ -28,7 +28,7 @@ export default function Home() {
         <div className="page-motion-item" data-page-motion>
           <AboutTeaser />
         </div>
-        <div className="page-motion-item" data-page-motion>
+        <div className="page-motion-item relative z-20">
           <ContactFooter />
         </div>
       </PageMotion>

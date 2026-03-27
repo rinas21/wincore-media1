@@ -154,13 +154,13 @@ export default function WorkCarousel() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="relative bg-white py-32 md:py-48 overflow-visible">
+    <section ref={sectionRef} className="relative bg-white py-16 md:py-24 overflow-visible">
       
       <div className="max-w-[1600px] mx-auto px-6 sm:px-12 lg:px-24">
         
         {/* HEADER AREA */}
-        <div className="mb-32 flex flex-col items-start gap-12">
-          <div className="space-y-4">
+        <div className="mb-16 flex flex-col items-start gap-6">
+          <div className="space-y-1">
              <div className="flex items-center gap-4">
                <div className="w-10 h-[1px] bg-accent" />
                <span className="text-[10px] font-black uppercase tracking-[0.5em] text-accent">Wincore Archives</span>
@@ -176,7 +176,7 @@ export default function WorkCarousel() {
         </div>
 
         {/* ULTRA-MODERN ARCHITECTURAL GRID */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-y-32 md:gap-y-64 items-center">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-y-16 md:gap-y-32 items-center">
           {PROJECTS.map((p, i) => {
              const isEven = i % 2 === 0;
              return (
@@ -193,7 +193,7 @@ export default function WorkCarousel() {
                        0{p.id}
                     </div>
 
-                    <div className={`flex flex-col ${isEven ? 'md:flex-row' : 'md:flex-row-reverse'} items-end gap-12 lg:gap-24`}>
+                    <div className={`flex flex-col ${isEven ? 'md:flex-row' : 'md:flex-row-reverse'} items-end gap-6 lg:gap-12`}>
                        
                        {/* IMAGE MONOLITH */}
                        <div className="relative w-full md:w-[60%] aspect-[16/10] overflow-hidden rounded-[2.5rem] bg-black/5 shadow-[0_60px_100px_rgba(0,0,0,0.08)] transform-gpu transition-all duration-1000">
@@ -208,7 +208,7 @@ export default function WorkCarousel() {
                        </div>
 
                        {/* CONTENT BLOCK */}
-                       <div className={`w-full md:w-[40%] pb-8 ${isEven ? 'text-left' : 'text-right'} space-y-6`}>
+                       <div className={`w-full md:w-[40%] pb-4 ${isEven ? 'text-left' : 'text-right'} space-y-2`}>
                           <div className={`flex items-center gap-3 ${isEven ? 'justify-start' : 'justify-end'}`}>
                              <div className="w-6 h-[1px] bg-accent/30" />
                              <span className="text-[9px] font-black uppercase tracking-[0.4em] text-accent">{p.category}</span>

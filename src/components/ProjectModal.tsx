@@ -61,9 +61,8 @@ export default function ProjectModal({
   return (
     <div
       ref={modalRef}
-      className={`fixed inset-0 z-[7000] flex items-center justify-center p-4 sm:p-10 lg:p-20 transition-visibility duration-500 ${
-        isOpen ? "visible" : "invisible"
-      }`}
+      className={`fixed inset-0 z-[7000] flex items-center justify-center p-4 sm:p-10 lg:p-20 transition-visibility duration-500 ${isOpen ? "visible" : "invisible"
+        }`}
     >
       <style jsx global>{`
         @keyframes pm-glitch-1 {
@@ -87,14 +86,16 @@ export default function ProjectModal({
         .pm-glitch-img:nth-child(3) { animation: pm-glitch-2 3s infinite linear; }
         .pm-glitch-img:nth-child(4) { animation: pm-glitch-3 3s infinite linear; }
         .pm-glitch-img:nth-child(5) { animation: pm-glitch-4 2s infinite linear; background-blend-mode: overlay; background-color: #0088cc; }
+        .pm-content-col { margin-left: 3px !important; }
+        .pm-card { max-height: 550px !important; height: calc(100% - 10px) !important; }
       `}</style>
 
       {/* ── MINIMAL OVERLAY ───────────────────────── */}
       <div className="pm-overlay absolute inset-0 bg-white/40 backdrop-blur-2xl" onClick={onClose} />
 
       {/* ── THE COMPACT MONOLITH (Architectural Gutter) ── */}
-      <div className="pm-card relative w-full max-w-5xl h-full lg:max-h-[720px] bg-white border border-black/5 shadow-[0_60px_150px_rgba(0,0,0,0.06)] flex flex-col lg:flex-row overflow-hidden rounded-[2.5rem]">
-        
+      <div className="pm-card relative w-full max-w-5xl h-full lg:max-h-[710px] bg-white border border-black/5 shadow-[0_60px_150px_rgba(0,0,0,0.06)] flex flex-col lg:flex-row overflow-hidden rounded-[2.5rem]">
+
         {/* CLOSE CONTROL */}
         <button
           onClick={onClose}
@@ -104,84 +105,84 @@ export default function ProjectModal({
         </button>
 
         {/* LEFT: IMAGE MONOLITH (50%) */}
-        <div className="pm-image-wrap relative w-full lg:w-1/2 h-[40vh] lg:h-auto overflow-hidden bg-white shrink-0">
-           {[1, 2, 3, 4, 5].map((id) => (
-             <div key={id} className="pm-glitch-img absolute inset-0">
-                <Image src={project.image} alt="" fill className="object-cover" priority={id === 1} />
-             </div>
-           ))}
-           <div className="absolute inset-x-12 bottom-12 space-y-2 z-20 pointer-events-none">
-              <span className="pm-stagger block text-[9px] font-black uppercase tracking-[0.6em] text-accent">Wincore Project System</span>
-              <p className="pm-stagger text-[11px] font-black uppercase tracking-[0.3em] text-black">v. ARCHIVE 2026</p>
-           </div>
+        <div className="pm-image-wrap relative w-full lg:w-1/2 h-[calc(40vh-10px)] lg:h-auto overflow-hidden bg-white shrink-0">
+          {[1, 2, 3, 4, 5].map((id) => (
+            <div key={id} className="pm-glitch-img absolute inset-0">
+              <Image src={project.image} alt="" fill className="object-cover" priority={id === 1} />
+            </div>
+          ))}
+          <div className="absolute inset-x-12 bottom-12 space-y-2 z-20 pointer-events-none">
+            <span className="pm-stagger block text-[9px] font-black uppercase tracking-[0.6em] text-accent">Wincore Project System</span>
+            <p className="pm-stagger text-[11px] font-black uppercase tracking-[0.3em] text-black">v. ARCHIVE 2026</p>
+          </div>
         </div>
 
         {/* RIGHT: DATA ARCHITECTURE (Centered with Massive Gutter) */}
-        <div className="flex-1 flex flex-col bg-white overflow-hidden">
-           
-           {/* pl-16 lg:pl-32 ensures text is pushed far away from the left image border */}
-           <div className="flex-1 overflow-y-auto pl-16 lg:pl-32 pr-12 lg:pr-24 pt-16 lg:pt-24 scrollbar-hide space-y-16">
-              
-              {/* HEADER SECTION */}
-              <div className="pm-stagger space-y-6">
-                 <p className="text-[9px] font-black uppercase tracking-[0.5em] text-accent">Mission Objective</p>
-                 <h2 className="text-4xl lg:text-6xl font-black uppercase tracking-[-0.05em] leading-[0.85] text-black">
-                   {project.title}
-                 </h2>
-                 <div className="h-0.5 w-12 bg-accent opacity-20" />
-                 <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-black/20">{project.category}</p>
-              </div>
+        <div className="pm-content-col flex-1 flex flex-col bg-white overflow-hidden">
 
-              {/* MISSION DESCRIPTION */}
-              <div className="pm-stagger space-y-12">
-                 <p className="text-xl lg:text-2xl font-light leading-relaxed text-black/70 italic border-l-2 border-accent/20 pl-10 max-w-lg">
-                    {project.description}
-                 </p>
-                 <div className="flex flex-wrap gap-2.5 pt-4">
-                    {project.tags.map(t => (
-                      <span key={t} className="text-[8px] font-black uppercase tracking-widest bg-black/[0.04] px-6 py-3 rounded-full text-black/40">
-                        {t}
-                      </span>
-                    ))}
-                 </div>
-              </div>
+          {/* Reduced padding to bring text closer to the image as requested */}
+          <div className="flex-1 overflow-y-auto pl-6 pr-12 lg:pr-24 pt-16 lg:pt-24 scrollbar-hide space-y-16">
 
-              {/* TECHNICAL MATRIX */}
-              <div className="pm-stagger grid grid-cols-2 gap-x-16 gap-y-12 py-12 border-t border-black/5">
-                 {[
-                   { label: "Engineering", val: project.stack },
-                   { label: "Deployment", val: project.role },
-                   { label: "Timeline", val: project.duration },
-                   { label: "Operational Outcome", val: project.impact }
-                 ].map((s, i) => (
-                   <div key={i} className="space-y-4">
-                      <p className="text-[8px] font-black uppercase tracking-[0.5em] text-black/10">{s.label}</p>
-                      <p className="text-sm font-bold uppercase tracking-tight text-black">{s.val}</p>
-                   </div>
-                 ))}
-              </div>
-           </div>
+            {/* HEADER SECTION */}
+            <div className="pm-stagger space-y-6">
+              <p className="text-[9px] font-black uppercase tracking-[0.5em] text-accent">Mission Objective</p>
+              <h2 className="text-4xl lg:text-6xl font-black uppercase tracking-[-0.05em] leading-[0.85] text-black">
+                {project.title}
+              </h2>
+              <div className="h-0.5 w-12 bg-accent opacity-20" />
+              <p className="text-[10px] font-bold uppercase tracking-[0.4em] text-black/20">{project.category}</p>
+            </div>
 
-           {/* ACTION BAR (Alinged to Gutter) */}
-           <div className="pm-stagger shrink-0 pl-16 lg:pl-32 pr-12 lg:pr-24 pb-16 pt-0 flex flex-col sm:flex-row gap-6">
-              <Link
-                href="/contact"
-                className="group relative flex-[1.6] bg-black text-white h-20 rounded-2xl flex items-center justify-between px-10 overflow-hidden shadow-2xl transition-transform active:scale-95"
-                onClick={onClose}
-              >
-                 <div className="absolute inset-0 bg-accent translate-y-full group-hover:translate-y-0 transition-transform duration-700 ease-expo" />
-                 <span className="relative z-10 text-[11px] font-black uppercase tracking-[0.5em]">Initiate Briefing</span>
-                 <div className="relative z-10 w-6 h-[1.5px] bg-white group-hover:w-10 transition-all duration-700" />
-              </Link>
-              <a
-                href={project.link}
-                target="_blank"
-                rel="noopener"
-                className="group flex-1 border border-black/10 h-20 rounded-2xl flex items-center justify-center gap-4 hover:border-black transition-all"
-              >
-                 <span className="text-[11px] font-black uppercase tracking-[0.5em]">Live Site</span>
-              </a>
-           </div>
+            {/* MISSION DESCRIPTION */}
+            <div className="pm-stagger space-y-12">
+              <p className="text-xl lg:text-2xl font-light leading-relaxed text-black/70 italic border-l-2 border-accent/20 pl-10 max-w-lg">
+                {project.description}
+              </p>
+              <div className="flex flex-wrap gap-2.5 pt-4">
+                {project.tags.map(t => (
+                  <span key={t} className="text-[8px] font-black uppercase tracking-widest bg-black/[0.04] px-6 py-3 rounded-full text-black/40">
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            {/* TECHNICAL MATRIX */}
+            <div className="pm-stagger grid grid-cols-2 gap-x-16 gap-y-12 py-12 border-t border-black/5">
+              {[
+                { label: "Engineering", val: project.stack },
+                { label: "Deployment", val: project.role },
+                { label: "Timeline", val: project.duration },
+                { label: "Operational Outcome", val: project.impact }
+              ].map((s, i) => (
+                <div key={i} className="space-y-4">
+                  <p className="text-[8px] font-black uppercase tracking-[0.5em] text-black/10">{s.label}</p>
+                  <p className="text-sm font-bold uppercase tracking-tight text-black">{s.val}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ACTION BAR (Alinged to Gutter) */}
+          <div className="pm-stagger shrink-0 pl-6 pr-12 lg:pr-24 pb-16 pt-0 flex flex-col sm:flex-row gap-6">
+            <Link
+              href="/contact"
+              className="group relative flex-[1.6] bg-black text-white h-20 rounded-2xl flex items-center justify-between px-10 overflow-hidden shadow-2xl transition-transform active:scale-95"
+              onClick={onClose}
+            >
+              <div className="absolute inset-0 bg-accent translate-y-full group-hover:translate-y-0 transition-transform duration-700 ease-expo" />
+              <span className="relative z-10 text-[11px] font-black uppercase tracking-[0.5em]">Initiate Briefing</span>
+              <div className="relative z-10 w-6 h-[1.5px] bg-white group-hover:w-10 transition-all duration-700" />
+            </Link>
+            <a
+              href={project.link}
+              target="_blank"
+              rel="noopener"
+              className="group flex-1 border border-black/10 h-20 rounded-2xl flex items-center justify-center gap-4 hover:border-black transition-all"
+            >
+              <span className="text-[11px] font-black uppercase tracking-[0.5em]">Live Site</span>
+            </a>
+          </div>
 
         </div>
 
