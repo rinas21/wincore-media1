@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ArrowUpRight, Send, Sparkles } from "lucide-react";
-import { registerGsapPlugins, scheduleScrollTriggerRefresh } from "@/lib/motion";
+import { prefersReducedMotion, registerGsapPlugins, scheduleScrollTriggerRefresh } from "@/lib/motion";
 
 type SubmitState = "idle" | "loading" | "sent" | "error";
 
@@ -15,6 +15,13 @@ const SERVICES = [
   "Content & Strategy",
 ];
 
+/** Input / chip fill — explicit hex so layout never depends on theme merge quirks */
+const fieldBg = "bg-[#f4f4f5]";
+
+/** Readable gaps between words + lines (body copy) */
+const wordEase =
+  "[word-spacing:0.06em] [overflow-wrap:break-word] [word-break:normal] leading-[1.75]";
+
 export default function ContactPageContent() {
   const rootRef = useRef<HTMLElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
@@ -23,34 +30,22 @@ export default function ContactPageContent() {
   const [feedback, setFeedback] = useState("");
 
   function toggleService(svc: string) {
-    setSelectedServices(prev =>
-      prev.includes(svc) ? prev.filter(s => s !== svc) : [...prev, svc]
+    setSelectedServices((prev) =>
+      prev.includes(svc) ? prev.filter((s) => s !== svc) : [...prev, svc],
     );
   }
 
   useEffect(() => {
     registerGsapPlugins();
+    const reduced = prefersReducedMotion();
     const ctx = gsap.context(() => {
-      // 01: Line drawing effect
-      gsap.fromTo(".ct-line", 
-        { scaleX: 0, opacity: 0 }, 
-        { scaleX: 1, opacity: 1, duration: 1.8, ease: "expo.out", delay: 0.2 }
-      );
-
-      // 02: Cinematic text reveals
-      gsap.fromTo(".ct-reveal",
-        { y: 60, opacity: 0 },
-        { y: 0, opacity: 1, duration: 1.5, stagger: 0.1, ease: "power4.out", delay: 0.4 }
-      );
-
-      // 03: Field sequential reveal
-      gsap.fromTo(".ct-field",
-        { y: 30, opacity: 0 },
-        { 
-          y: 0, opacity: 1, duration: 1, stagger: 0.1, ease: "expo.out",
-          scrollTrigger: { trigger: ".ct-field-wrap", start: "top 90%" }
-        }
-      );
+      if (!reduced) {
+        gsap.fromTo(
+          ".ct-line",
+          { scaleX: 0 },
+          { scaleX: 1, duration: 0.8, ease: "expo.out", delay: 0.1 },
+        );
+      }
     }, rootRef);
 
     scheduleScrollTriggerRefresh();
@@ -66,12 +61,12 @@ export default function ContactPageContent() {
 
     if (!name || !email || !message) {
       setSubmitState("error");
-      setFeedback("Identification required.");
+      setFeedback("Please fill in all fields.");
       return;
     }
 
     setSubmitState("loading");
-    setFeedback("Syncing mission parameters...");
+    setFeedback("Opening mail…");
 
     setTimeout(() => {
       const body = [
@@ -81,173 +76,198 @@ export default function ContactPageContent() {
         `Message:`,
         message,
       ].join("\n");
-      window.location.href = `mailto:hello@wincore.media?subject=Inquiry: ${name}&body=${encodeURIComponent(body)}`;
+      window.location.href = `mailto:hello@wincore.media?subject=Inquiry: ${encodeURIComponent(name)}&body=${encodeURIComponent(body)}`;
       setSubmitState("sent");
-      setFeedback("Transmission successful.");
+      setFeedback("Check your email app.");
       formRef.current?.reset();
       setSelectedServices([]);
-    }, 1200);
+    }, 600);
   }
 
   return (
-    <section ref={rootRef} className="bg-white text-black min-h-screen relative">
-      
-      {/* ── ARCHITECTURAL GUTTER (LEFT) ──────────────── */}
-      {/* Using a fluid left-margin strategy: 10% viewport width for massive breathing room */}
-      <div className="w-full pl-[5vw] sm:pl-[8vw] lg:pl-[12vw] pr-6 sm:pr-12 md:pr-24 lg:pr-32 py-32 md:py-48 overflow-visible">
-        
-        {/* TOP LINE ACCENT */}
-        <div className="w-32 h-[1px] bg-accent mb-12 ct-line origin-left" />
-
-        {/* ── HEADER ────────────────────────────────────── */}
-        <div className="mb-32 md:mb-40 ct-reveal">
-          <p className="text-[10px] font-black uppercase tracking-[0.6em] text-accent mb-6">Uplink Initiation</p>
-          <h1 className="text-[clamp(3.5rem,12vw,10rem)] font-bold tracking-[-0.07em] leading-[0.8] uppercase">
-            Start <br />
-            <span className="text-black/5 italic font-serif lowercase font-light">Further.</span>
-          </h1>
+    <section
+      ref={rootRef}
+      className="relative isolate overflow-x-clip border-t border-black/10 bg-background pb-16 pt-6 md:pb-24 md:pt-8"
+    >
+      <div className="_container">
+        <div className="mb-8 md:mb-10">
+          <div
+            className="ct-line h-0.5 w-20 rounded-full bg-accent md:w-28"
+            style={{ transformOrigin: "left center" }}
+          />
         </div>
 
-        {/* ── MAIN GRID ─────────────────────────────────── */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-24 lg:gap-40 items-start">
-          
-          {/* INFO COLUMN (4/12) */}
-          <div className="lg:col-span-4 space-y-24 ct-reveal">
-            <div>
-              <p className="text-[9px] font-black uppercase tracking-[0.4em] text-black/20 mb-8 underline underline-offset-[12px] decoration-accent/20">Operational Node</p>
-              <a href="mailto:hello@wincore.media" className="text-3xl md:text-5xl font-black tracking-tight hover:text-accent transition-all duration-700 block leading-none">
-                hello@<br />wincore.media
-              </a>
-            </div>
+        <div className="mb-10 rounded-2xl border border-black/10 bg-white p-6 shadow-sm sm:p-8 md:mb-12 md:p-10 lg:rounded-3xl">
+          <p className="mb-3 text-[10px] font-black uppercase tracking-[0.4em] text-accent leading-normal">
+            Contact
+          </p>
+          <h1 className="font-heading max-w-3xl text-balance text-3xl font-black uppercase leading-[1.12] tracking-tight text-foreground sm:text-4xl md:text-5xl md:leading-[1.1] lg:text-5xl [word-spacing:0.02em]">
+            Let&apos;s build something
+            <br className="sm:hidden" />{" "}
+            <span>that performs.</span>
+          </h1>
+          <div className={`mt-5 max-w-xl space-y-3 text-base text-foreground/60 md:mt-6 md:text-lg ${wordEase}`}>
+            <p>
+              Share the brief: goals, timeline, and budget band.
+            </p>
+            <p>We&apos;ll reply with a clear scope and next steps.</p>
+          </div>
+        </div>
 
-            <div className="grid grid-cols-2 gap-8 pt-12 border-t border-black/5">
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-12 lg:items-start">
+          <aside className="lg:col-span-4">
+            <div className="space-y-8 rounded-2xl border border-black/10 bg-white p-6 md:p-8">
               <div>
-                <p className="text-[9px] font-black uppercase tracking-[0.4em] text-black/15 mb-4 font-serif">Presence</p>
-                <p className="text-lg font-black tracking-tighter uppercase">Colombo, LK</p>
-                <p className="text-[10px] text-black/30 mt-2 font-bold italic tracking-widest lowercase">Global Remote Node</p>
+                <p className="mb-2 text-[10px] font-black uppercase tracking-[0.35em] text-foreground/45">
+                  Email
+                </p>
+                <a
+                  href="mailto:hello@wincore.media"
+                  className="font-heading text-xl font-black tracking-tight text-foreground underline-offset-4 transition-colors hover:text-accent hover:underline md:text-2xl"
+                >
+                  hello@wincore.media
+                </a>
+              </div>
+              <div className="h-px bg-black/10" />
+              <div>
+                <p className="mb-2 text-[10px] font-black uppercase tracking-[0.35em] text-foreground/45">
+                  Studio
+                </p>
+                <p className={`text-sm font-semibold text-foreground ${wordEase}`}>
+                  Colombo · Remote worldwide
+                </p>
               </div>
               <div>
-                <p className="text-[9px] font-black uppercase tracking-[0.4em] text-black/15 mb-4 font-serif">Strategy</p>
-                <a href="https://cal.com/wincore" target="_blank" className="flex items-center gap-2 text-lg font-black hover:text-accent transition-colors group">
-                  Book Call
-                  <ArrowUpRight size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform text-accent" />
+                <p className="mb-2 text-[10px] font-black uppercase tracking-[0.35em] text-foreground/45">
+                  Schedule
+                </p>
+                <a
+                  href="https://cal.com/wincore"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-sm font-bold text-accent transition-opacity hover:opacity-80"
+                >
+                  Book a call
+                  <ArrowUpRight size={18} strokeWidth={2.5} />
                 </a>
               </div>
             </div>
+          </aside>
 
-            <div className="pt-12 opacity-10">
-              <p className="text-[9px] font-black uppercase tracking-[0.4em] mb-4">Trajectory</p>
-              <div className="flex flex-col gap-2">
-                 {['Fortune 500', 'Innovators', 'Boutique Builders'].map(t => (
-                   <span key={t} className="text-xl font-black uppercase tracking-tighter">{t}</span>
-                 ))}
-              </div>
-            </div>
-          </div>
-
-          {/* FORM COLUMN (8/12) */}
-          <div className="lg:col-span-8 w-full">
-            <form ref={formRef} onSubmit={onSubmit} className="space-y-24">
-              
-              {/* SERVICE SELECTION */}
-              <div className="space-y-12 ct-reveal">
-                <div className="flex items-center gap-4">
-                  <Sparkles size={16} className="text-accent" />
-                  <p className="text-[10px] font-black uppercase tracking-[0.5em] text-accent">Spectrum of Action *</p>
+          <div className="min-w-0 lg:col-span-8">
+            <form
+              ref={formRef}
+              onSubmit={onSubmit}
+              className="space-y-10 rounded-2xl border border-black/10 bg-white p-6 sm:p-8 md:space-y-12 md:p-10 lg:rounded-3xl"
+            >
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-accent">
+                  <Sparkles size={16} className="shrink-0" aria-hidden />
+                  <span className="text-[10px] font-black uppercase tracking-[0.35em] [word-spacing:0.12em]">
+                    Services (select any)
+                  </span>
                 </div>
-                <div className="flex flex-wrap gap-4 md:gap-8">
-                  {SERVICES.map(svc => {
+                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                  {SERVICES.map((svc) => {
                     const active = selectedServices.includes(svc);
                     return (
                       <button
                         key={svc}
                         type="button"
                         onClick={() => toggleService(svc)}
-                        className={`text-2xl md:text-5xl font-black tracking-tighter transition-all duration-700 text-left relative group ${
-                          active ? "text-black scale-[1.03]" : "text-black/5 hover:text-black/10"
+                        className={`rounded-xl border px-4 py-3 text-left text-xs font-semibold uppercase leading-snug tracking-wide [word-spacing:0.05em] transition-colors ${
+                          active
+                            ? "border-accent bg-accent text-white shadow-sm"
+                            : `border-black/10 ${fieldBg} text-foreground hover:border-accent/40`
                         }`}
                       >
-                        <span className="relative z-10">{svc}</span>
-                        {active && (
-                          <div className="absolute -bottom-2 left-0 w-full h-[3px] bg-accent ct-line origin-left" />
-                        )}
+                        {svc}
                       </button>
                     );
                   })}
                 </div>
               </div>
 
-              {/* INPUT FIELDS */}
-              <div className="ct-field-wrap space-y-20 pt-16 border-t border-black/5">
-                
-                <div className="ct-field relative group">
-                  <input 
-                    name="name" type="text" required placeholder=" "
-                    className="w-full bg-transparent py-6 text-3xl md:text-5xl font-black tracking-tight outline-none focus:text-accent transition-colors peer border-b border-black/10 focus:border-accent"
-                  />
-                  <label className="absolute left-0 top-6 text-black/10 text-3xl md:text-5xl font-black tracking-tight transition-all duration-500 pointer-events-none peer-focus:-translate-y-12 peer-focus:text-[10px] peer-focus:tracking-[0.5em] peer-focus:text-accent peer-not-placeholder-shown:-translate-y-12 peer-not-placeholder-shown:text-[10px] peer-not-placeholder-shown:tracking-[0.5em]">
-                    Identity Name *
+              <div className="ct-field-wrap space-y-8 border-t border-black/10 pt-8 md:space-y-9 md:pt-10">
+                <div className="ct-field">
+                  <label
+                    htmlFor="ct-name"
+                    className="mb-2 block text-[10px] font-black uppercase tracking-[0.35em] text-foreground/45"
+                  >
+                    Name *
                   </label>
+                  <input
+                    id="ct-name"
+                    name="name"
+                    type="text"
+                    required
+                    autoComplete="name"
+                    className={`w-full rounded-lg border border-black/10 ${fieldBg} px-3 py-3 text-base [word-spacing:0.04em] text-foreground outline-none ring-0 transition placeholder:text-foreground/35 focus:border-accent focus:ring-2 focus:ring-accent/20 md:text-lg`}
+                    placeholder="Your name"
+                  />
                 </div>
 
-                <div className="ct-field relative group">
-                  <input 
-                    name="email" type="email" required placeholder=" "
-                    className="w-full bg-transparent py-6 text-3xl md:text-5xl font-black tracking-tight outline-none focus:text-accent transition-colors peer border-b border-black/10 focus:border-accent"
-                  />
-                  <label className="absolute left-0 top-6 text-black/10 text-3xl md:text-5xl font-black tracking-tight transition-all duration-500 pointer-events-none peer-focus:-translate-y-12 peer-focus:text-[10px] peer-focus:tracking-[0.5em] peer-focus:text-accent peer-not-placeholder-shown:-translate-y-12 peer-not-placeholder-shown:text-[10px] peer-not-placeholder-shown:tracking-[0.5em]">
-                    Digital Uplink *
+                <div className="ct-field">
+                  <label
+                    htmlFor="ct-email"
+                    className="mb-2 block text-[10px] font-black uppercase tracking-[0.35em] text-foreground/45"
+                  >
+                    Email *
                   </label>
+                  <input
+                    id="ct-email"
+                    name="email"
+                    type="email"
+                    required
+                    autoComplete="email"
+                    className={`w-full rounded-lg border border-black/10 ${fieldBg} px-3 py-3 text-base [word-spacing:0.04em] text-foreground outline-none transition placeholder:text-foreground/35 focus:border-accent focus:ring-2 focus:ring-accent/20 md:text-lg`}
+                    placeholder="you@company.com"
+                  />
                 </div>
 
-                <div className="ct-field relative group pt-4">
-                  <textarea 
-                    name="message" required rows={4} placeholder=" "
-                    className="w-full bg-transparent py-6 text-3xl md:text-5xl font-black tracking-tight outline-none focus:text-accent transition-colors peer resize-none border-b border-black/10 focus:border-accent"
-                  />
-                  <label className="absolute left-0 top-6 text-black/10 text-3xl md:text-5xl font-black tracking-tight transition-all duration-500 pointer-events-none peer-focus:-translate-y-16 peer-focus:text-[10px] peer-focus:tracking-[0.5em] peer-focus:text-accent peer-not-placeholder-shown:-translate-y-16 peer-not-placeholder-shown:text-[10px] peer-not-placeholder-shown:tracking-[0.5em]">
-                    Vision Mission Overview *
+                <div className="ct-field">
+                  <label
+                    htmlFor="ct-message"
+                    className="mb-2 block text-[10px] font-black uppercase tracking-[0.35em] text-foreground/45"
+                  >
+                    Message *
                   </label>
+                  <textarea
+                    id="ct-message"
+                    name="message"
+                    required
+                    rows={5}
+                    className={`w-full resize-y rounded-lg border border-black/10 ${fieldBg} px-3 py-3 text-base leading-[1.75] [word-spacing:0.05em] text-foreground outline-none transition placeholder:text-foreground/35 focus:border-accent focus:ring-2 focus:ring-accent/20 md:text-lg`}
+                    placeholder="Project goals, timeline, budget…"
+                  />
                 </div>
               </div>
 
-              {/* ACTION FOOTER */}
-              <div className="pt-24 flex flex-col md:flex-row items-start md:items-center justify-between gap-16 border-t border-black/10">
-                 <div className="flex flex-col gap-1 opacity-20 hover:opacity-100 transition-opacity">
-                    <p className="text-[10px] font-black uppercase tracking-[0.5em] text-accent">Wincore Studio</p>
-                    <p className="text-[10px] font-bold italic lowercase">selective partnerships &middot; world wide</p>
-                 </div>
-
-                 {/* No-Crop Button Wrapper */}
-                 <div className="w-full sm:w-auto overflow-visible">
-                    <button
-                      type="submit"
-                      disabled={submitState === "loading"}
-                      className="group relative h-28 w-full sm:min-w-[400px] rounded-[1rem] bg-black text-white px-12 overflow-hidden shadow-2xl transition-all duration-700 active:scale-95 disabled:opacity-50"
-                    >
-                      <div className="absolute inset-0 bg-accent translate-y-full transition-transform duration-700 ease-expo group-hover:translate-y-0" />
-                      <div className="relative z-10 flex items-center justify-between gap-12">
-                        {submitState === "loading" ? (
-                          <div className="h-6 w-6 border-2 border-white/20 border-t-white rounded-full animate-spin mx-auto" />
-                        ) : (
-                           <>
-                            <div className="text-left">
-                               <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-40 mb-1">Authorization</p>
-                               <span className="text-[14px] font-black uppercase tracking-[0.4em]">Establish Link</span>
-                            </div>
-                            <Send size={24} className="transition-all duration-700 group-hover:translate-x-4 group-hover:-translate-y-4 text-accent" />
-                           </>
-                        )}
-                      </div>
-                    </button>
-                 </div>
+              <div className="flex flex-col gap-6 border-t border-black/10 pt-8 sm:flex-row sm:items-center sm:justify-between">
+                <p className={`max-w-sm text-xs text-foreground/50 ${wordEase}`}>
+                  We usually reply within two business days.
+                </p>
+                <button
+                  type="submit"
+                  disabled={submitState === "loading"}
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-accent px-8 py-3.5 text-[11px] font-black uppercase tracking-[0.25em] text-white shadow-md shadow-accent/25 transition hover:opacity-95 disabled:opacity-50 sm:w-auto sm:min-w-[220px]"
+                >
+                  {submitState === "loading" ? (
+                    "Sending…"
+                  ) : (
+                    <>
+                      Send message
+                      <Send size={17} />
+                    </>
+                  )}
+                </button>
               </div>
 
-              {feedback && (
-                <div className="text-[10px] font-black uppercase tracking-[0.5em] text-accent animate-pulse pt-8 text-left">
-                   &raquo; {feedback}
-                </div>
-              )}
+              {feedback ? (
+                <p className="text-center text-[10px] font-black uppercase tracking-[0.3em] text-accent sm:text-left">
+                  {feedback}
+                </p>
+              ) : null}
             </form>
           </div>
         </div>

@@ -88,35 +88,16 @@ section {
   margin-bottom: 0;
 }
 
-/* Contact page: keep minimum breathing room globally */
-.ct-hero-title,
-.ct-fade-up,
-.ct-info-block,
-.ct-form-panel,
-.ct-form-row {
-  margin: 3px;
-}
+/* Contact: horizontal padding + 3px text rules live in ContactPageContent.tsx (Tailwind utilities). */
 
-.ct-form-panel {
-  overflow: visible;
-}
-
-.ct-form-row input,
-.ct-form-row textarea,
-.ct-form-row select {
-  padding-left: 3px;
-  padding-right: 3px;
-}
-
-/* Services intro spacing controlled globally */
+/* Services intro: vertical rhythm only (horizontal alignment comes from ._container) */
 .svc-intro {
-  margin: 5px;
-  margin-bottom: 5rem;
+  margin-bottom: clamp(3.25rem, 6vw, 5rem);
 }
 
 @media (min-width: 768px) {
   .svc-intro {
-    margin-bottom: 6rem;
+    margin-bottom: clamp(4rem, 7vw, 6rem);
   }
 }
 
