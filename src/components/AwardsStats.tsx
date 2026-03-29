@@ -168,7 +168,7 @@ export default function AwardsStats() {
       <div className="_container relative z-10 font-sans">
 
         {/* Header Section */}
-        <div className="aw-header-container mb-20 lg:mb-28 flex flex-col lg:flex-row items-start lg:items-end justify-between gap-12 px-4 md:px-0">
+        <div className="aw-header-container mb-20 lg:mb-28 flex flex-col lg:flex-row items-start lg:items-end justify-between gap-12">
           <div className="max-w-3xl">
             <span className="aw-fade-up mb-8 block text-xs font-bold uppercase tracking-[0.2em] text-accent">
               Track Record
@@ -184,7 +184,7 @@ export default function AwardsStats() {
         </div>
 
         {/* Desktop Interactive Accordion Gallery */}
-        <div className="aw-accordion-container hidden lg:flex w-full h-[650px] xl:h-[750px] gap-4 mb-20 px-4 md:px-0">
+        <div className="aw-accordion-container hidden lg:flex w-full h-[650px] xl:h-[750px] gap-4 mb-20">
           {stats.map((stat, i) => (
             <div
               key={i}
@@ -236,7 +236,7 @@ export default function AwardsStats() {
         </div>
 
         {/* Mobile Accordion Interaction */}
-        <div className="aw-accordion-mobile lg:hidden flex flex-col w-full px-4 md:px-0 gap-3 mb-10">
+        <div className="aw-accordion-mobile lg:hidden flex flex-col w-full gap-3 mb-10">
           {stats.map((stat, i) => (
             <div
               key={i}

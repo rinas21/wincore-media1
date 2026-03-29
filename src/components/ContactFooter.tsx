@@ -44,36 +44,6 @@ export default function ContactFooter() {
 
     const ctx = gsap.context(() => {
       gsap.fromTo(
-        ".cf-kicker",
-        { y: reduced ? 0 : 20, opacity: reduced ? 1 : 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: reduced ? 0 : 0.8,
-          ease: "expo.out",
-          clearProps: "transform,opacity",
-          scrollTrigger: { trigger: ".cf-kicker", scroller, start: "top 98%", once: true },
-        },
-      );
-
-      const titleLines = gsap.utils.toArray<HTMLElement>(".cf-title-line");
-      titleLines.forEach((el, i) => {
-        gsap.fromTo(
-          el,
-          { yPercent: reduced ? 0 : 110, opacity: reduced ? 1 : 0 },
-          {
-            yPercent: 0,
-            opacity: 1,
-            duration: reduced ? 0 : 1,
-            ease: "expo.out",
-            delay: i * 0.08,
-            clearProps: "transform,opacity",
-            scrollTrigger: { trigger: el, scroller, start: "top 98%", once: true },
-          },
-        );
-      });
-
-      gsap.fromTo(
         ".cf-contact-block",
         { y: reduced ? 0 : 36, opacity: reduced ? 1 : 0 },
         {
@@ -138,22 +108,8 @@ export default function ContactFooter() {
 
       <div className="_container relative z-10">
         {/* ── Main Contact Section ── */}
-        <div className="mb-24 flex flex-col items-center justify-center text-center md:mb-40">
-          <span className="cf-kicker mb-10 text-[11px] font-black uppercase leading-[1.4] tracking-[0.5em] text-accent">
-            Secure your advantage
-          </span>
-          <h2 className="mb-20 pb-1 text-[10vw] font-black uppercase leading-[0.92] tracking-tighter md:text-[8vw]">
-            <div className="overflow-hidden">
-              <span className="cf-title-line block text-foreground">Next-Gen</span>
-            </div>
-            <div className="flex items-center justify-center gap-6 overflow-hidden">
-              <span className="cf-title-line block italic text-transparent [-webkit-text-stroke:1px_rgba(0,0,0,0.15)] md:[-webkit-text-stroke:2px_rgba(0,0,0,0.15)]">
-                Impact
-              </span>
-            </div>
-          </h2>
+        {/* ── Main Contact Section removed as per request ── */}
 
-        </div>
 
         {/* ── Massive Brand Centerpiece ── */}
         <div className="cf-reveal mb-20 md:mb-32">

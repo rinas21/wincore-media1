@@ -156,7 +156,7 @@ export default function WorkCarousel() {
   return (
     <section ref={sectionRef} className="relative bg-white py-16 md:py-24 overflow-visible">
       
-      <div className="max-w-[1600px] mx-auto px-6 sm:px-12 lg:px-24">
+      <div className="_container relative">
         
         {/* HEADER AREA */}
         <div className="mb-16 flex flex-col items-start gap-6">

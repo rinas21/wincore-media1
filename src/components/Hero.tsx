@@ -726,7 +726,7 @@ export default function Hero() {
       <section
         id="hero-section"
         ref={introRef}
-        className="relative flex min-h-[100svh] flex-col justify-center bg-background px-5 pt-16 pb-8 sm:px-6 md:px-10 md:pt-20 md:pb-10 lg:px-12"
+        className="relative flex min-h-[100svh] flex-col justify-center bg-background pt-16 pb-8 md:pt-20 md:pb-10"
       >
         {/* tftl-style soft top wash + floating tip badges */}
         <div
@@ -747,13 +747,13 @@ export default function Hero() {
 
         <div className="pointer-events-none absolute inset-0 z-[2] bg-[radial-gradient(ellipse_85%_55%_at_50%_35%,transparent_0%,rgba(255,255,255,0.2)_70%,rgba(255,255,255,0.8)_100%)]" />
 
-        <div className="hero-content-layer _container relative z-10 mx-auto w-full max-w-[1240px]">
+        <div className="hero-content-layer _container relative z-10 mx-auto w-full max-w-[1440px]">
           <div className="grid min-h-[min(78vh,820px)] grid-cols-1 items-start gap-10 md:gap-12 lg:grid-cols-12 lg:gap-12 lg:items-center">
 
             {/* ── LEFT column ── */}
             <div className="hero-left-col flex flex-col text-left lg:col-span-6">
 
-              <p className="hero-eyebrow mb-5 text-[10px] font-black uppercase tracking-[0.5em] text-black/40">
+              <p className="hero-eyebrow mb-6 text-[13px] md:text-[14px] font-black uppercase tracking-[0.45em] text-black/40">
                 <span className="hero-eyebrow-part inline-block">Wincore · </span>
                 <span className="hero-eyebrow-part inline-block text-accent/90">Colombo &amp; global</span>
               </p>
@@ -761,7 +761,7 @@ export default function Hero() {
               {/*
                 Lines 1–2: .hero-line-split → SplitType words. Line 3: gradient word in .hero-performs-inner (no split).
               */}
-              <h1 className="hero-headline font-heading text-[2.1rem] font-black uppercase leading-[1.02] tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-[3.35rem] lg:leading-[1.05]">
+              <h1 className="hero-headline font-heading text-[2.75rem] font-black uppercase leading-[0.98] tracking-tight text-foreground sm:text-6xl md:text-7xl lg:text-[4.75rem] lg:leading-[0.95]">
                 <span className="hero-line block overflow-hidden pb-[0.2em]">
                   <span className="hero-line-inner hero-line-split block">Creative digital</span>
                 </span>
@@ -777,30 +777,50 @@ export default function Hero() {
                 </span>
               </h1>
 
-              <div className="hero-sub mt-7 max-w-xl text-base font-light leading-relaxed text-black/45 md:mt-8 md:text-lg">
+              <div className="hero-sub mt-8 max-w-2xl text-[1.125rem] font-light leading-relaxed text-black/55 md:mt-10 md:text-[1.35rem] lg:text-[1.45rem]">
                 <p className="hero-sub-line">
                   Brand systems, motion, WebGL, and AI-accelerated delivery — one team, one standard.
                 </p>
                 <p className="hero-sub-line mt-3">
                   Built for clarity, speed, and measurable outcomes.
                 </p>
-                <div className="hero-sub-line mt-8 flex flex-wrap gap-2.5">
-                  {HERO_TIPS.map((tip) => (
-                    <span
-                      key={tip.text}
-                      className="inline-flex items-center rounded-full px-3.5 py-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-widest shadow-sm transition-transform hover:scale-[1.03]"
-                      style={{ background: tip.bg, color: tip.color }}
-                    >
-                      {tip.text}
-                    </span>
-                  ))}
+                <div className="hero-sub-line mt-12 flex flex-col gap-6">
+                  <div className="flex flex-wrap gap-2.5">
+                    {HERO_TIPS.map((tip) => (
+                      <span
+                        key={tip.text}
+                        className="inline-flex items-center rounded-full px-3.5 py-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-widest shadow-sm transition-transform hover:scale-[1.03]"
+                        style={{ background: tip.bg, color: tip.color }}
+                      >
+                        {tip.text}
+                      </span>
+                    ))}
+                  </div>
+
+                  {/* New Triple Kicker */}
+                  <div className="hero-plus-kicker mt-4 flex flex-col md:flex-row md:items-center gap-6 md:gap-12 border-t border-black/5 pt-10">
+                    <div className="flex flex-col gap-1.5">
+                      <span className="text-[10px] font-black uppercase tracking-[0.4em] text-black/25">Studio</span>
+                      <span className="text-[13px] font-bold uppercase tracking-widest text-foreground/70">Creative digital studio</span>
+                    </div>
+                    <div className="hidden md:block w-px h-8 bg-black/5" />
+                    <div className="flex flex-col gap-1.5">
+                      <span className="text-[10px] font-black uppercase tracking-[0.4em] text-accent/40">Core</span>
+                      <span className="text-[13px] font-bold uppercase tracking-widest text-accent/80">WebGL · Motion · AI</span>
+                    </div>
+                    <div className="hidden md:block w-px h-8 bg-black/5" />
+                    <div className="flex flex-col gap-1.5">
+                      <span className="text-[10px] font-black uppercase tracking-[0.4em] text-black/25">Presence</span>
+                      <span className="text-[13px] font-bold uppercase tracking-widest text-foreground/70">Colombo &amp; global</span>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* ── RIGHT column (side card) ── */}
             <aside className="hero-right-col hero-side-card lg:col-span-6 lg:self-center">
-              <div className="hero-why-card relative overflow-visible rounded-[2.5rem] border border-black/[0.06] bg-gradient-to-br from-white via-white to-black/[0.02] px-8 pt-10 pb-10 pr-8 shadow-[0_24px_48px_rgba(0,0,0,0.04)] sm:px-10 sm:pt-12 sm:pb-12 md:px-12 md:pt-14 md:pb-14 lg:px-14 lg:pt-16 lg:pb-16 lg:pl-[4.25rem] lg:pr-10">
+              <div className="hero-why-card relative overflow-visible rounded-[2.5rem] border border-black/[0.06] bg-gradient-to-br from-white via-white to-black/[0.02] px-6 pt-10 pb-10 shadow-[0_24px_48px_rgba(0,0,0,0.04)] sm:px-8 sm:pt-12 sm:pb-12 md:px-10 md:pt-14 md:pb-14 lg:px-12 lg:pt-16 lg:pb-16 lg:pl-[4.25rem] lg:pr-10">
                 <div className="hero-why-glow pointer-events-none absolute -right-12 -top-12 h-56 w-56 rounded-full bg-accent/10 opacity-90" />
 
                 <header className="hero-why-header mb-10 flex items-center gap-6 md:mb-12">
@@ -959,7 +979,7 @@ export default function Hero() {
       {/* ── Reel section ── */}
       <section
         ref={reelRef}
-        className="hero-reel-block relative border-t border-black/5 bg-background px-5 py-12 sm:px-6 md:px-[5vw] md:py-16"
+        className="hero-reel-block relative border-t border-black/5 bg-background py-12 md:py-16"
       >
         <div className="_container mx-auto mb-8 flex flex-col gap-3 text-center md:flex-row md:items-end md:justify-between md:text-left">
           <div>
@@ -969,26 +989,30 @@ export default function Hero() {
             </h2>
           </div>
           <p className="reel-copy max-w-md text-sm text-foreground/50 md:text-base">
-            A short reel — hover for colour, tap to expand on desktop.
+            Showcasing our primary creative vision — engineering immersive digital flagships.
           </p>
         </div>
 
-        <div className="reel-video-shell group relative mx-auto max-w-6xl overflow-hidden rounded-2xl border border-black/10 bg-muted md:rounded-3xl">
-          <div className="pointer-events-none absolute inset-0 z-10 grid grid-cols-4 grid-rows-2 opacity-30">
+        <div className="reel-video-shell group relative mx-auto max-w-6xl overflow-hidden rounded-2xl border border-black/10 bg-black md:rounded-3xl">
+          <div className="pointer-events-none absolute inset-0 z-10 grid grid-cols-4 grid-rows-2 opacity-10">
             {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="border-[0.5px] border-black/[0.08]" />
+              <div key={i} className="border-[0.5px] border-white/[0.08]" />
             ))}
           </div>
 
           <div className="relative aspect-video w-full md:aspect-[21/9] md:min-h-[320px]">
             <video
-              autoPlay loop muted playsInline preload="metadata"
-              className={`h-full w-full object-cover transition-transform duration-[2s] ${expanded ? "scale-100" : "scale-[1.02]"
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="auto"
+              className={`h-full w-full object-cover transition-transform duration-[2s] ${expanded ? "scale-100" : "scale-[1.05]"
                 }`}
             >
-              <source src="https://player.vimeo.com/progressive_redirect/playback/1099987160/rendition/720p/file.mp4?loc=external&signature=ceda14c660b13b7ba561223c92a43810b5248f73298bd2068a52665a249d0e20" type="video/mp4" />
+              <source src="https://videos.pexels.com/video-files/5849501/5849501-uhd_2560_1440_24fps.mp4" type="video/mp4" />
             </video>
-            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/10" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-40 hover:opacity-10 transition-opacity duration-700" />
             <button
               type="button"
               onClick={() => setExpanded((v) => !v)}

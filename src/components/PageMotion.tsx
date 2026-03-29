@@ -64,26 +64,20 @@ export default function PageMotion({ children }: PageMotionProps) {
       sections.forEach((section, index) => {
         gsap.fromTo(
           section,
-          // from — must re-specify so GSAP doesn't try to tween from the
-          // already-resolved clearProps on a previous scroll.
           {
             autoAlpha: 0,
-            y: 16,
+            y: 20,
           },
           {
             autoAlpha: 1,
             y: 0,
-            duration: 1.1,
-            delay: index === 0 ? 0.12 : 0,
+            duration: 0.9,
+            delay: index === 0 ? 0.05 : 0,
             ease: "expo.out",
-            immediateRender: false,
-            clearProps: "transform",
+            clearProps: "all",
             scrollTrigger: {
               trigger: section,
-              // Relaxed the start threshold slightly to ensure late-page elements (like footers) 
-              // fire even if they are already visible without much scroll room remaining.
-              start: index === 0 ? "top 98%" : "top 95%",
-              end: "top 65%",
+              start: "top bottom",
               once: true,
               scroller,
             },

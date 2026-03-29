@@ -15,7 +15,7 @@
 }
 
 .is-inner-page {
-  padding-top: 117px;
+  padding-top: 100px;
 }
 
 @media (min-width: 768px) {
@@ -176,7 +176,7 @@ section {
   grid-template-columns: repeat(1, minmax(0, 1fr));
   transform-origin: top right;
   transform: skewY(-4.398705355deg);
-  margin: 0 6.4vw 0 28%;
+  margin: 0 5% 0 8%;
   gap: 3vw;
   list-style: none;
   padding: 0;
@@ -416,8 +416,8 @@ section {
 @media (min-width: 300px) {
   .brand-codepen-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 3vw;
-    margin: 0 3.9vw 0 15vw;
+    gap: 4vw;
+    margin: 0 4% 0 10%;
   }
 
   .brand-card-details {
@@ -517,24 +517,24 @@ h1, h2, h3, h4, h5, h6 {
 /* Horizontal rhythm: keep type and cards off the viewport edge */
 ._container {
   width: 100%;
-  max-width: 1240px;
+  max-width: 1440px;
   margin-left: auto;
   margin-right: auto;
-  padding-left: 1.75rem;
-  padding-right: 1.75rem;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
 }
 
 @media (min-width: 768px) {
   ._container {
-    padding-left: 3.5rem;
-    padding-right: 3.5rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
   }
 }
 
 @media (min-width: 1280px) {
   ._container {
-    padding-left: 4rem;
-    padding-right: 4rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
   }
 }
 
@@ -597,6 +597,21 @@ h1, h2, h3, h4, h5, h6 {
 .service-modal-body {
   padding: 2rem 1.5rem;
 }
+
+/* ── Contact Form Overrides ── */
+.ct-field input,
+.ct-field textarea {
+  margin: 10px !important;
+  padding: 22px !important;
+  font-size: 1.25rem !important;
+}
+
+.ct-field label {
+  font-size: 15px !important;
+  margin-bottom: 10px !important;
+  letter-spacing: 0.35em !important;
+}
+
 
 .service-modal-footer {
   padding-bottom: max(0.9rem, env(safe-area-inset-bottom));

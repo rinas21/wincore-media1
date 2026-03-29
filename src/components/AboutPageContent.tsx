@@ -222,33 +222,34 @@ export default function AboutPageContent() {
     <div ref={containerRef} className="bg-background min-h-screen text-foreground">
       
       {/* 1. HERO SECTION */}
-      <section className="relative px-6 pt-40 pb-20 md:px-12 md:pt-56 md:pb-32 lg:px-24 overflow-hidden">
+      <section className="relative pt-40 pb-32 md:pt-56 md:pb-48 overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(0,191,255,0.05),transparent_70%)] pointer-events-none" />
         
-        <div className="max-w-[1400px] mx-auto relative z-10">
+        <div className="_container relative z-10">
           <p className="abt-hero-fade text-[10px] md:text-[11px] font-black uppercase tracking-[0.4em] text-accent mb-6 md:mb-10">
             About Wincore
           </p>
-          <h1 className="abt-hero-title font-heading text-[12vw] md:text-[8vw] lg:text-[7rem] font-black uppercase leading-[0.9] tracking-tighter mb-8 md:mb-12">
-            boutique standard. <br />
-            <span className="text-black/20 italic font-light tracking-tight">global execution.</span>
+          <h1 className="abt-hero-title font-heading text-[12vw] md:text-[8vw] lg:text-[7rem] font-black uppercase leading-[0.9] tracking-tighter mb-8 md:mb-12 whitespace-normal sm:whitespace-nowrap overflow-visible">
+            boutique standard.{" "}
+            <span className="text-foreground/15 italic font-light tracking-tight">global execution.</span>
           </h1>
-          <div className="abt-hero-fade flex flex-col md:flex-row md:items-end justify-between gap-10 border-t border-black/10 pt-10">
-            <p className="text-lg md:text-xl font-light text-black/60 max-w-2xl leading-relaxed">
+          <div className="abt-hero-fade flex flex-col md:flex-row md:items-end justify-between gap-12 border-t border-foreground/10 pt-20">
+            <p className="text-xl md:text-2xl font-light text-foreground/60 max-w-3xl leading-relaxed">
               We are a collective of digital craftsmen focused on pushing visual boundaries.
               By blending high-end aesthetic design with mercilessly fast engineering, we position our clients at the forefront of their industries.
             </p>
-            <div className="flex flex-col gap-2">
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black/30">Headquarters</span>
-              <span className="text-base font-medium">Colombo, Sri Lanka</span>
+            <div className="flex flex-col gap-3 shrink-0">
+              <span className="text-[11px] font-black uppercase tracking-[0.3em] text-foreground/30">Headquarters</span>
+              <span className="text-lg font-bold tracking-tight">Colombo · Sri Lanka</span>
             </div>
           </div>
         </div>
       </section>
 
       {/* 2. SHOWCASE MEDIA */}
-      <section className="px-5 md:px-10 lg:px-12 pb-24 md:pb-40">
-        <div className="abt-hero-media relative w-full h-[60vh] md:h-[80vh] rounded-[2.5rem] overflow-hidden bg-black/5">
+      <section className="pt-24 pb-24 md:pt-32 md:pb-48">
+        <div className="_container">
+          <div className="abt-hero-media relative w-full h-[60vh] md:h-[80vh] rounded-[2.5rem] overflow-hidden bg-black/5">
           <Image
             src="https://images.unsplash.com/photo-1600607686527-6fb886090705?auto=format&fit=crop&q=80"
             alt="Wincore Culture"
@@ -257,14 +258,15 @@ export default function AboutPageContent() {
             priority
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+          </div>
         </div>
       </section>
 
       {/* 3. PHILOSOPHY */}
-      <section className="px-6 md:px-12 lg:px-24 pb-32 md:pb-48">
-        <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24">
+      <section className="pb-32 md:pb-48">
+        <div className="_container grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24">
           <div className="lg:col-span-5">
-            <h2 className="text-[3rem] md:text-[4rem] font-black uppercase leading-[0.95] tracking-tighter text-foreground mb-6">
+            <h2 className="text-[3.5rem] md:text-[5rem] lg:text-[6.5rem] font-black uppercase leading-[0.88] tracking-tighter text-foreground mb-8">
               Our <br /> Manifesto
             </h2>
             <p className="text-base text-black/50 font-light leading-relaxed max-w-sm">
@@ -292,27 +294,27 @@ export default function AboutPageContent() {
       </section>
 
       {/* 4. THE JOURNEY (HOW WE WORK) */}
-      <section className="px-6 md:px-12 lg:px-24 pb-32 md:pb-48 mt-12 md:mt-24">
-        <div className="max-w-[1400px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24">
+      <section className="pb-32 md:pb-48 mt-12 md:mt-24">
+        <div className="_container grid grid-cols-1 lg:grid-cols-12 gap-16 lg:gap-24">
           <div className="lg:col-span-5">
             <p className="text-[11px] font-black uppercase tracking-[0.4em] text-accent mb-6">
               How we work
             </p>
-            <h2 className="text-[3rem] md:text-[4.5rem] font-black uppercase leading-[0.95] tracking-tighter text-foreground mb-6">
+            <h2 className="text-[3.5rem] md:text-[5rem] font-black uppercase leading-[0.88] tracking-tighter text-foreground mb-10">
               Discover <br />
-              <span className="text-black/20 italic">&rarr;</span> Design <br />
-              <span className="text-black/20 italic">&rarr;</span> Deploy
+              <span className="text-foreground/15 italic">&rarr;</span> Design <br />
+              <span className="text-foreground/15 italic">&rarr;</span> Deploy
             </h2>
-            <div className="mt-12 md:mt-20 bg-black/[0.03] rounded-3xl p-8 border border-black/5 relative overflow-hidden group">
+            <div className="mt-12 md:mt-20 bg-foreground/[0.03] rounded-3xl p-8 border border-foreground/5 relative overflow-hidden group">
               <div className="absolute inset-0 bg-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               <div className="relative z-10">
-                <p className="text-[11px] font-black uppercase tracking-[0.2em] text-black/40 mb-3">Next step</p>
-                <p className="text-xl md:text-2xl font-bold tracking-tight mb-8">Tell us what you&apos;re building &mdash; we&apos;ll scope it.</p>
+                <p className="text-[11px] font-[1000] uppercase tracking-[0.3em] text-foreground/30 mb-4">Next step</p>
+                <p className="text-2xl md:text-3xl font-bold tracking-tight mb-10 leading-tight">Tell us what you&apos;re building &mdash; we&apos;ll scope it.</p>
                 <Link
                   href="/contact"
-                  className="group/btn relative inline-flex items-center justify-center gap-3 overflow-hidden rounded-xl bg-black px-6 py-4 transition-all duration-300 hover:shadow-[0_15px_30px_rgba(0,0,0,0.15)]"
+                  className="group/btn relative inline-flex items-center justify-center gap-4 overflow-hidden rounded-full bg-foreground px-10 py-5 transition-all duration-300 hover:shadow-[0_15px_35px_rgba(0,0,0,0.2)]"
                 >
-                  <span className="relative z-10 text-[10px] font-black uppercase tracking-[0.2em] text-white">
+                  <span className="relative z-10 text-[11px] font-[1000] uppercase tracking-[0.3em] text-background">
                     Start the journey
                   </span>
                   <div className="absolute inset-0 bg-accent translate-y-[100%] transition-transform duration-500 group-hover/btn:translate-y-0" />
@@ -351,39 +353,43 @@ export default function AboutPageContent() {
       </section>
 
       {/* 5. THE SQUAD */}
-      <section className="px-6 md:px-12 lg:px-24 pb-32 md:pb-48 bg-black/[0.02] rounded-t-[3rem] md:rounded-t-[5rem] pt-24 md:pt-32 border-t border-black/5">
-        <div className="max-w-[1400px] mx-auto">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-20 md:mb-28">
-            <div>
-              <p className="text-[11px] font-black uppercase tracking-[0.4em] text-accent mb-5">
+      <section className="pb-32 md:pb-48 bg-foreground/[0.02] rounded-t-[3rem] md:rounded-t-[5rem] pt-24 md:pt-40 border-t border-foreground/5">
+        <div className="_container">
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-12 mb-20 md:mb-32">
+            <div className="max-w-4xl">
+              <p className="text-[12px] font-black uppercase tracking-[0.5em] text-accent mb-6">
                 The Architects
               </p>
-              <h2 className="text-[3rem] md:text-[5rem] font-black uppercase leading-[0.95] tracking-tighter">
+              <h2 className="text-[3.5rem] md:text-[6.5rem] font-black uppercase leading-[0.88] tracking-tighter">
                 Meet the Team
               </h2>
             </div>
-            <p className="max-w-md text-base text-black/50 font-light leading-relaxed">
+            <p className="max-w-md text-lg text-foreground/50 font-medium leading-relaxed border-l border-accent/20 pl-8">
               A boutique squad means zero bloat and direct communication. You work closely with the people who actually build your product.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 md:gap-10">
             {TEAM.map((member, i) => (
-              <div key={i} className="abt-team-card group relative flex flex-col gap-6">
-                <div className="relative aspect-[3/4] w-full overflow-hidden rounded-[2rem] bg-black/10">
+              <div key={i} className="abt-team-card group relative flex flex-col gap-8">
+                <div className="relative aspect-[4/5] w-full overflow-hidden rounded-[2.5rem] bg-foreground/10 shadow-lg shadow-black/5">
                   <Image
                     src={member.image}
                     alt={member.name}
                     fill
-                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                    className="object-cover object-center transition-transform duration-1000 ease-out group-hover:scale-105"
+                    sizes="(max-width: 639px) 100vw, (max-width: 1023px) 50vw, 25vw"
+                    className="object-cover object-center transition-transform duration-[1.5s] cubic-bezier(0.2, 1, 0.3, 1) group-hover:scale-110"
                   />
-                  <div className="absolute inset-0 bg-black/10 transition-opacity duration-500 group-hover:opacity-0" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-40 group-hover:opacity-20 transition-opacity duration-700" />
+                  
+                  <div className="absolute bottom-6 left-6 right-6 translate-y-2 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-500">
+                    <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white">Full Bio &rarr;</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-2xl font-bold tracking-tight mb-1">{member.name}</h3>
-                  <p className="text-[10px] font-black uppercase tracking-[0.3em] text-accent mb-4">{member.role}</p>
-                  <p className="text-sm font-light leading-relaxed text-black/50 line-clamp-3">
+                <div className="px-2">
+                  <h3 className="text-3xl font-black tracking-tighter mb-1 transition-colors group-hover:text-accent">{member.name}</h3>
+                  <p className="text-[11px] font-[1000] uppercase tracking-[0.35em] text-accent mb-5">{member.role}</p>
+                  <p className="text-base font-medium leading-[1.6] text-foreground/50">
                     {member.desc}
                   </p>
                 </div>
@@ -394,8 +400,8 @@ export default function AboutPageContent() {
       </section>
 
       {/* 5. CTA SECTION */}
-      <section className="px-6 py-24 md:py-40 md:px-12 lg:px-24 bg-white relative overflow-hidden">
-        <div className="max-w-[1400px] mx-auto flex flex-col items-center text-center">
+      <section className="py-24 md:py-40 bg-white relative overflow-hidden">
+        <div className="_container flex flex-col items-center text-center">
           <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-accent/10 flex items-center justify-center mb-8 border border-accent/20">
             <ArrowRight className="text-accent" size={28} />
           </div>

@@ -5,6 +5,7 @@ import CustomCursor from "@/components/CustomCursor";
 import Header from "@/components/Header";
 import Preloader from "@/components/Preloader";
 import GrainOverlay from "@/components/GrainOverlay";
+import ContactFooter from "@/components/ContactFooter";
 
 export const metadata: Metadata = {
   title: "Wincore — Award-Winning Creative Digital Agency | Colombo & Global",
@@ -40,6 +41,7 @@ export default function RootLayout({
           <CustomCursor />
           <Header />
           {children}
+          <ContactFooter />
         </ClientProvider>
       </body>
     </html>

@@ -61,7 +61,7 @@ export default function Header() {
     <>
       <header
         ref={headerRef}
-        className="fixed top-0 left-0 z-[100] flex w-full items-center justify-between border-b border-black/[0.06] bg-background/80 px-5 py-5 backdrop-blur-xl sm:px-8 md:px-12"
+        className="fixed top-1.5 left-1.5 right-1.5 z-[100] flex items-center justify-between border border-black/[0.05] bg-background/85 px-5 py-4 backdrop-blur-2xl rounded-2xl transition-all duration-300 md:px-12 lg:px-16"
       >
         <Link href="/" className="group flex items-center gap-1.5 md:gap-2.5 transition-transform hover:scale-[1.02]" onClick={() => setIsMenuOpen(false)}>
           <span className="text-xl md:text-2xl lg:text-3xl font-extrabold tracking-tight text-foreground">

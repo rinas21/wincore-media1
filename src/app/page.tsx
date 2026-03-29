@@ -4,7 +4,6 @@ import WorkCarousel from "@/components/WorkCarousel";
 import AwardsStats from "@/components/AwardsStats";
 import ServiceCards from "@/components/ServiceCards";
 import AboutTeaser from "@/components/AboutTeaser";
-import ContactFooter from "@/components/ContactFooter";
 import PageMain from "@/components/PageMain";
 import PageMotion from "@/components/PageMotion";
 
@@ -27,9 +26,6 @@ export default function Home() {
         </div>
         <div className="page-motion-item" data-page-motion>
           <AboutTeaser />
-        </div>
-        <div className="page-motion-item relative z-20">
-          <ContactFooter />
         </div>
       </PageMotion>
     </PageMain>

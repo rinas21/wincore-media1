@@ -410,7 +410,7 @@ export default function ServicesPageContent() {
 
       <div className="_container relative z-10">
         <header className="svc-intro">
-          <div className="relative overflow-hidden rounded-[1.75rem] border border-black/10 bg-white px-6 py-12 shadow-[0_32px_80px_-20px_rgba(0,0,0,0.12)] transition-shadow duration-500 hover:shadow-[0_40px_90px_-18px_rgba(0,0,0,0.14)] sm:px-9 sm:py-14 md:px-12 md:py-16 lg:px-16 lg:py-20 xl:px-[4.25rem] xl:py-[5.25rem]">
+          <div className="relative overflow-hidden rounded-[1.75rem] border border-black/10 bg-white px-4 py-10 shadow-[0_32px_80px_-20px_rgba(0,0,0,0.12)] transition-shadow duration-500 hover:shadow-[0_40px_90px_-18px_rgba(0,0,0,0.14)] sm:px-9 sm:py-14 md:px-12 md:py-16 lg:px-16 lg:py-20 xl:px-[4.25rem] xl:py-[5.25rem] box-content m-[9px] p-[2px]">
             <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/35 to-transparent" />
             <div className="absolute left-0 top-0 h-full w-px bg-gradient-to-b from-accent/80 via-accent/25 to-transparent lg:left-9 xl:left-11" />
             <div className="grid grid-cols-1 gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(260px,340px)] lg:items-start lg:gap-x-14 xl:gap-x-20">
@@ -495,13 +495,13 @@ export default function ServicesPageContent() {
           {SERVICES.map((service, index) => {
             const Icon = service.icon;
             const layoutClass =
-                  index === 0 || index === 3
-                ? "lg:col-span-4 lg:min-h-[440px]"
-                : "lg:col-span-2 lg:min-h-[440px]";
+              index % 4 === 0 || index % 4 === 3
+                ? "lg:col-span-4 lg:min-h-[560px]"
+                : "lg:col-span-2 lg:min-h-[560px]";
             return (
               <article
                 key={service.title}
-                className={`svc-card group relative isolate flex min-h-[360px] flex-col overflow-hidden rounded-[1.5rem] border border-white/10 bg-black text-white shadow-[0_28px_64px_rgba(0,0,0,0.18)] ring-1 ring-black/20 transition-all duration-500 hover:border-accent/50 hover:shadow-[0_44px_100px_rgba(0,0,0,0.26)] md:min-h-[400px] ${layoutClass}`}
+                className={`svc-card group relative isolate flex min-h-[440px] flex-col overflow-hidden rounded-[2rem] border border-white/10 bg-black text-white shadow-[0_28px_64px_rgba(0,0,0,0.18)] ring-1 ring-black/20 transition-all duration-500 hover:border-accent/50 hover:shadow-[0_44px_100px_rgba(0,0,0,0.26)] md:min-h-[520px] ${layoutClass}`}
                 style={{ transformStyle: "preserve-3d" }}
               >
                 <div
