@@ -145,14 +145,14 @@ section {
 
 /* Contact: horizontal padding + 3px text rules live in ContactPageContent.tsx (Tailwind utilities). */
 
-/* Services intro: vertical rhythm only (horizontal alignment comes from ._container) */
+/* Services intro: clear separation from scrolling ticker + next section */
 .svc-intro {
-  margin-bottom: clamp(3.25rem, 6vw, 5rem);
+  margin-bottom: clamp(4rem, 9vw, 6.5rem);
 }
 
 @media (min-width: 768px) {
   .svc-intro {
-    margin-bottom: clamp(4rem, 7vw, 6rem);
+    margin-bottom: clamp(5rem, 10vw, 8rem);
   }
 }
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 import type { ComponentType } from "react";
 import gsap from "gsap";
 import {
@@ -97,6 +97,30 @@ export default function ServicesPageContent() {
   const rootRef = useRef<HTMLElement>(null);
   const glowRef = useRef<HTMLDivElement>(null);
 
+  /* Hero: set initial states before paint so line-mask reveal does not flash. */
+  useLayoutEffect(() => {
+    if (prefersReducedMotion()) return;
+    registerGsapPlugins();
+    gsap.set(
+      [
+        ".svc-hero .svc-kicker",
+        ".svc-hero .svc-title-line-inner",
+        ".svc-hero .svc-lead",
+        ".svc-hero .svc-kicker-rule",
+      ],
+      { opacity: 0 },
+    );
+    gsap.set(".svc-hero .svc-title-line-inner", {
+      yPercent: 100,
+      filter: "blur(12px)",
+    });
+    gsap.set(".svc-hero .svc-kicker", { y: 20 });
+    gsap.set(".svc-hero .svc-lead", { y: 32 });
+    gsap.set(".svc-hero .svc-meta-label", { y: 14, opacity: 0 });
+    gsap.set(".svc-hero .svc-meta-value", { y: 18, opacity: 0 });
+    gsap.set(".svc-hero .svc-kicker-rule", { scaleX: 0 });
+  }, []);
+
   useEffect(() => {
     registerGsapPlugins();
     const scroller = getScroller();
@@ -107,25 +131,61 @@ export default function ServicesPageContent() {
     const CARD_SHADOW_REST = "0 28px 64px rgba(0,0,0,0.18)";
 
     const ctx = gsap.context(() => {
-      // --- Hero: entrance on load (does not depend on scroll) ---
+      // --- Hero: load timeline (mask-style lines + staggered meta) ---
       if (!reduced) {
+        const heroEase = "power4.out" as const;
         const tl = gsap.timeline({
-          defaults: { ease: "expo.out" },
-          delay: 0.12,
+          defaults: { ease: heroEase },
+          delay: 0.08,
         });
-        tl.from(".svc-orb", { opacity: 0, scale: 0.92, duration: 1 }, 0)
-          .from(".svc-kicker", { opacity: 0, y: 14, duration: 0.55 }, 0.12)
-          .from(
-            ".svc-title-line",
-            { opacity: 0, y: 28, duration: 0.75, stagger: 0.1 },
-            0.18,
+
+        tl.fromTo(
+          ".svc-orb",
+          { opacity: 0, scale: 0.88 },
+          { opacity: 1, scale: 1, duration: 1.15, ease: "expo.out" },
+          0,
+        )
+          .to(
+            ".svc-hero .svc-kicker",
+            { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" },
+            0.12,
           )
-          .from(".svc-lead", { opacity: 0, y: 16, duration: 0.65 }, "-=0.28")
-          .from(
-            ".svc-meta-item",
-            { opacity: 0, y: 14, duration: 0.5, stagger: 0.09 },
-            "-=0.18",
+          .to(
+            ".svc-hero .svc-kicker-rule",
+            { opacity: 1, scaleX: 1, duration: 0.8, ease: "power3.out", transformOrigin: "0% 50%" },
+            0.34,
+          )
+          .to(
+            ".svc-hero .svc-title-line-inner",
+            {
+              opacity: 1,
+              yPercent: 0,
+              filter: "blur(0px)",
+              duration: 1.12,
+              stagger: 0.16,
+              ease: heroEase,
+            },
+            0.2,
+          )
+          .to(
+            ".svc-hero .svc-lead",
+            { opacity: 1, y: 0, duration: 0.92, ease: "power3.out" },
+            0.58,
+          )
+          .to(
+            ".svc-hero .svc-meta-label",
+            { opacity: 1, y: 0, duration: 0.6, stagger: 0.09, ease: "power3.out" },
+            0.48,
+          )
+          .to(
+            ".svc-hero .svc-meta-value",
+            { opacity: 1, y: 0, duration: 0.68, stagger: 0.1, ease: "power3.out" },
+            0.56,
           );
+
+        tl.eventCallback("onComplete", () => {
+          gsap.set(".svc-hero .svc-title-line-inner", { clearProps: "transform,filter" });
+        });
 
         if (glowRef.current) {
           gsap.to(glowRef.current, {
@@ -140,9 +200,11 @@ export default function ServicesPageContent() {
         gsap.set(
           [
             ".svc-kicker",
-            ".svc-title-line",
+            ".svc-title-line-inner",
             ".svc-lead",
-            ".svc-meta-item",
+            ".svc-meta-label",
+            ".svc-meta-value",
+            ".svc-kicker-rule",
             ".svc-orb",
           ],
           { clearProps: "all" },
@@ -158,19 +220,19 @@ export default function ServicesPageContent() {
           const content = card.querySelector<HTMLElement>(".svc-card-content");
           const focus = card.querySelector<HTMLElement>(".svc-card-focus");
 
+          /* Y only — never hide with opacity:0 (ScrollTrigger misses left cards invisible). */
           gsap.fromTo(
             card,
-            { opacity: 0, y: 56 },
+            { y: 40 },
             {
-              opacity: 1,
               y: 0,
-              duration: 0.85,
-              delay: Math.min(i * 0.05, 0.25),
+              duration: 0.75,
+              delay: Math.min(i * 0.04, 0.2),
               ease: "power3.out",
               scrollTrigger: {
                 trigger: card,
                 scroller,
-                start: "top 88%",
+                start: "top 92%",
                 once: true,
                 invalidateOnRefresh: true,
               },
@@ -180,39 +242,17 @@ export default function ServicesPageContent() {
           if (content) {
             gsap.fromTo(
               content,
-              { y: 16, opacity: 0 },
+              { y: 20 },
               {
                 y: 0,
-                opacity: 1,
-                duration: 0.6,
-                delay: 0.08 + Math.min(i * 0.03, 0.12),
+                duration: 0.55,
+                delay: 0.06 + Math.min(i * 0.03, 0.1),
                 ease: "power2.out",
                 scrollTrigger: {
                   trigger: card,
                   scroller,
-                  start: "top 86%",
+                  start: "top 92%",
                   once: true,
-                  invalidateOnRefresh: true,
-                },
-              },
-            );
-          }
-
-          /* Single scroll-linked effect: background parallax only (no card scrub). */
-          if (bg) {
-            gsap.fromTo(
-              bg,
-              { scale: 1.16, yPercent: 8 },
-              {
-                scale: 1,
-                yPercent: -6,
-                ease: "none",
-                scrollTrigger: {
-                  trigger: card,
-                  scroller,
-                  start: "top bottom",
-                  end: "bottom top",
-                  scrub: 1,
                   invalidateOnRefresh: true,
                 },
               },
@@ -240,13 +280,21 @@ export default function ServicesPageContent() {
 
           const onPointerEnter = () => {
             gsap.to(card, {
-              y: -6,
-              scale: 1.01,
-              boxShadow: "0 24px 60px rgba(0,0,0,0.12)",
-              duration: 0.45,
+              y: -8,
+              scale: 1.015,
+              boxShadow: "0 32px 72px rgba(0,0,0,0.22)",
+              duration: 0.5,
               ease: "power2.out",
               overwrite: "auto",
             });
+            if (bg) {
+              gsap.to(bg, {
+                scale: 1.07,
+                duration: 0.65,
+                ease: "power2.out",
+                overwrite: "auto",
+              });
+            }
           };
 
           const onPointerLeave = () => {
@@ -256,10 +304,18 @@ export default function ServicesPageContent() {
               boxShadow: CARD_SHADOW_REST,
               rotationX: 0,
               rotationY: 0,
-              duration: 0.45,
+              duration: 0.5,
               ease: "power2.out",
               overwrite: "auto",
             });
+            if (bg) {
+              gsap.to(bg, {
+                scale: 1,
+                duration: 0.65,
+                ease: "power2.out",
+                overwrite: "auto",
+              });
+            }
           };
 
           card.addEventListener("pointerenter", onPointerEnter);
@@ -322,30 +378,13 @@ export default function ServicesPageContent() {
           );
 
         gsap.fromTo(
-          ".svc-process-line-fill",
-          { scaleY: 0 },
-          {
-            scaleY: 1,
-            ease: "none",
-            scrollTrigger: {
-              trigger: ".svc-process-journey",
-              scroller,
-              start: "top 58%",
-              end: "bottom 62%",
-              scrub: 0.65,
-              invalidateOnRefresh: true,
-            },
-          },
-        );
-
-        gsap.fromTo(
           ".svc-process-node",
-          { opacity: 0, y: 52 },
+          { opacity: 0, y: 40 },
           {
             opacity: 1,
             y: 0,
-            duration: 0.88,
-            stagger: 0.2,
+            duration: 0.75,
+            stagger: 0.16,
             ease: "power3.out",
             scrollTrigger: {
               trigger: ".svc-process-journey",
@@ -358,14 +397,14 @@ export default function ServicesPageContent() {
         );
 
         gsap.fromTo(
-          ".svc-process-node-marker",
-          { scale: 0.35, opacity: 0 },
+          ".svc-process-node-num",
+          { opacity: 0, y: 12 },
           {
-            scale: 1,
             opacity: 1,
-            duration: 0.58,
-            stagger: 0.16,
-            ease: "back.out(1.55)",
+            y: 0,
+            duration: 0.5,
+            stagger: 0.12,
+            ease: "power2.out",
             scrollTrigger: {
               trigger: ".svc-process-journey",
               scroller,
@@ -395,14 +434,13 @@ export default function ServicesPageContent() {
           },
         );
       } else {
-        gsap.set(".svc-process-line-fill", { scaleY: 1 });
         gsap.set(
           [
             ".svc-process-kicker",
             ".svc-process-title",
             ".svc-process-lead",
             ".svc-process-node",
-            ".svc-process-node-marker",
+            ".svc-process-node-num",
             ".svc-process-connector",
           ],
           { clearProps: "all" },
@@ -497,7 +535,7 @@ export default function ServicesPageContent() {
   return (
     <section
       ref={rootRef}
-      className="relative overflow-x-clip overflow-y-visible border-t border-black/5 bg-[linear-gradient(180deg,var(--background)_0%,#fafafa_12%,var(--background)_38%,#f8f9fa_100%)] pb-36 pt-10 md:pb-48 md:pt-12 lg:pb-60 lg:pt-16"
+      className="relative overflow-x-clip overflow-y-visible border-t border-black/5 bg-[linear-gradient(180deg,var(--background)_0%,#fafafa_12%,var(--background)_38%,#f8f9fa_100%)] pb-36 pt-16 md:pb-48 md:pt-20 lg:pb-60 lg:pt-24"
       aria-label="Services overview"
     >
       {/* Ambient + grid */}
@@ -520,89 +558,105 @@ export default function ServicesPageContent() {
       </div>
 
       <div className="_container relative z-10">
-        <header className="svc-intro">
-          <div className="relative w-full max-w-full overflow-hidden rounded-[1.75rem] border border-black/10 bg-white px-5 py-12 shadow-[0_24px_64px_-18px_rgba(0,0,0,0.1)] transition-shadow duration-500 hover:shadow-[0_32px_72px_-16px_rgba(0,0,0,0.12)] sm:px-9 sm:py-14 md:px-12 md:py-16 lg:px-16 lg:py-20 xl:px-[4rem] xl:py-[5rem]">
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/35 to-transparent" />
-            <div className="absolute left-0 top-0 h-full w-px bg-gradient-to-b from-accent/80 via-accent/25 to-transparent lg:left-9 xl:left-11" />
-            <div className="grid grid-cols-1 gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(260px,340px)] lg:items-start lg:gap-x-14 xl:gap-x-20">
-              <div className="min-w-0 pl-4 sm:pl-6 lg:pl-10 xl:pl-12">
-                <p className="svc-kicker mb-8 text-[10px] font-black uppercase leading-[1.5] tracking-[0.42em] text-accent md:mb-10">
+        <header className="svc-intro svc-hero">
+          <div className="grid grid-cols-1 gap-14 border-t border-black/[0.07] pt-16 md:gap-16 md:pt-20 lg:grid-cols-[minmax(0,1fr)_minmax(280px,400px)] lg:items-start lg:gap-x-20 lg:pt-24 xl:gap-x-28">
+            <div className="min-w-0">
+              <div className="mb-10 md:mb-12">
+                <p className="svc-kicker mb-5 text-[11px] font-black uppercase leading-[1.45] tracking-[0.36em] text-accent sm:text-xs md:mb-6 md:tracking-[0.38em]">
                   Services
                 </p>
-                <h1 className="font-heading text-[1.85rem] font-black uppercase leading-[1.12] tracking-tight text-foreground sm:text-[2.35rem] md:text-5xl md:leading-[1.08] lg:text-[3.15rem] lg:leading-[1.06]">
-                  <span className="svc-title-line block">
+                <div
+                  className="svc-kicker-rule h-[2px] w-16 max-w-full rounded-full bg-accent sm:w-20 md:h-[3px] md:w-24"
+                  aria-hidden
+                />
+              </div>
+              <h1 className="font-heading text-[2.15rem] font-black uppercase leading-[1.08] tracking-tight text-foreground sm:text-[2.65rem] sm:leading-[1.06] md:text-[3.25rem] md:leading-[1.04] lg:text-[clamp(2.85rem,4.5vw,4rem)] lg:leading-[1.02]">
+                <span className="svc-title-line block overflow-hidden pb-[0.1em]">
+                  <span className="svc-title-line-inner block will-change-[transform,filter]">
                     Built to scale{" "}
                     <span className="text-secondary italic">modern</span> brands.
                   </span>
-                  <span className="svc-title-line mt-6 block max-w-[26ch] text-base font-black uppercase leading-[1.4] tracking-[0.06em] text-foreground/50 sm:mt-7 sm:max-w-none sm:text-lg sm:leading-[1.45] md:mt-8 md:text-xl md:leading-[1.4] lg:text-[1.35rem]">
+                </span>
+                <span className="svc-title-line mt-7 block max-w-[28ch] overflow-hidden pb-[0.1em] text-lg font-black uppercase leading-[1.35] tracking-[0.05em] text-foreground/55 sm:mt-8 sm:max-w-none sm:text-xl sm:leading-[1.4] md:mt-10 md:text-2xl md:leading-[1.38] lg:mt-12 lg:text-[clamp(1.5rem,2vw,1.85rem)]">
+                  <span className="svc-title-line-inner block will-change-[transform,filter]">
                     Strategy, craft &amp; AI — end to end.
                   </span>
-                </h1>
-                <p className="svc-lead mt-10 max-w-xl text-base leading-[1.75] text-foreground/50 md:mt-12 md:max-w-2xl md:text-lg md:leading-[1.72]">
-                  Wincore delivers digital-first branding, motion, performance, and immersive
-                  web. One partner, one bar for quality.
-                </p>
-              </div>
-
-              <aside
-                className="svc-meta-row flex flex-col rounded-2xl border border-black/10 bg-muted/50 p-8 pt-10 ring-1 ring-black/5 lg:rounded-3xl lg:p-9 lg:pt-10 xl:p-10"
-                aria-label="At a glance"
-              >
-                <div className="svc-meta-item flex flex-col gap-2.5 border-b border-black/10 pb-8 lg:pb-9">
-                  <span className="text-[9px] font-black uppercase tracking-[0.38em] text-foreground/40">
-                    Location
-                  </span>
-                  <span className="text-[15px] font-medium leading-snug tracking-tight text-foreground/90">
-                    Colombo &amp; remote
-                  </span>
-                </div>
-                <div className="svc-meta-item flex flex-col gap-2.5 border-b border-black/10 py-8 lg:py-9">
-                  <span className="text-[9px] font-black uppercase tracking-[0.38em] text-foreground/40">
-                    Focus
-                  </span>
-                  <span className="text-[15px] font-medium leading-snug tracking-tight text-accent">
-                    WebGL · AI · Motion
-                  </span>
-                </div>
-                <div className="svc-meta-item flex flex-col gap-2.5 pt-8 lg:pt-9">
-                  <span className="text-[9px] font-black uppercase tracking-[0.38em] text-foreground/40">
-                    Delivery
-                  </span>
-                  <span className="text-[15px] font-medium leading-snug tracking-tight text-foreground/90">
-                    Strategy-led
-                  </span>
-                </div>
-              </aside>
+                </span>
+              </h1>
+              <p className="svc-lead mt-12 max-w-2xl text-lg leading-[1.82] text-foreground/50 md:mt-14 md:max-w-[52ch] md:text-xl md:leading-[1.78] lg:text-[1.35rem] lg:leading-[1.76]">
+                Wincore delivers digital-first branding, motion, performance, and immersive
+                web. One partner, one bar for quality.
+              </p>
             </div>
+
+            <aside
+              className="svc-meta-row flex flex-col gap-0 border-t border-black/10 pt-12 lg:border-l lg:border-t-0 lg:border-black/10 lg:pl-14 lg:pt-2 xl:pl-16"
+              aria-label="At a glance"
+            >
+              <div className="svc-meta-item flex flex-col gap-3 border-b border-black/10 py-8 first:pt-0 lg:gap-3.5 lg:py-9">
+                <span className="svc-meta-label text-[10px] font-black uppercase tracking-[0.32em] text-foreground/45 md:text-[11px] md:tracking-[0.34em]">
+                  Location
+                </span>
+                <span className="svc-meta-value text-lg font-semibold leading-snug tracking-tight text-foreground md:text-xl">
+                  Colombo &amp; remote
+                </span>
+              </div>
+              <div className="svc-meta-item flex flex-col gap-3 border-b border-black/10 py-8 lg:gap-3.5 lg:py-9">
+                <span className="svc-meta-label text-[10px] font-black uppercase tracking-[0.32em] text-foreground/45 md:text-[11px] md:tracking-[0.34em]">
+                  Focus
+                </span>
+                <span className="svc-meta-value text-lg font-semibold leading-snug tracking-tight text-accent md:text-xl">
+                  WebGL · AI · Motion
+                </span>
+              </div>
+              <div className="svc-meta-item flex flex-col gap-3 py-8 pb-0 lg:gap-3.5 lg:py-9">
+                <span className="svc-meta-label text-[10px] font-black uppercase tracking-[0.32em] text-foreground/45 md:text-[11px] md:tracking-[0.34em]">
+                  Delivery
+                </span>
+                <span className="svc-meta-value text-lg font-semibold leading-snug tracking-tight text-foreground md:text-xl">
+                  Strategy-led
+                </span>
+              </div>
+            </aside>
           </div>
         </header>
 
-        <section className="svc-cap-section mt-6 mb-16 md:mt-10 md:mb-24" aria-labelledby="svc-cap-heading">
-          <div className="svc-fade-up flex flex-col gap-6 border-b border-black/10 pb-8 md:flex-row md:items-end md:justify-between md:gap-10 md:pb-10">
-            <div className="max-w-2xl space-y-4">
-              <span className="text-[10px] font-black uppercase tracking-[0.42em] text-accent">
-                What we deliver
-              </span>
-              <div className="space-y-3">
-                <h2
-                  id="svc-cap-heading"
-                  className="text-[1.75rem] font-black uppercase leading-[1.08] tracking-tight text-foreground sm:text-3xl md:text-[2.25rem]"
-                >
-                  Capabilities
-                </h2>
-                <p className="max-w-lg text-sm leading-relaxed text-foreground/50 md:text-base">
-                  Brand, motion, product, and growth—structured so every engagement stays clear,
-                  fast, and accountable.
-                </p>
+        <section
+          className="svc-cap-section mt-24 mb-20 md:mt-32 md:mb-28 lg:mt-36"
+          aria-labelledby="svc-cap-heading"
+        >
+          <div className="svc-fade-up border-t border-black/[0.08] pt-14 md:pt-20 lg:pt-24">
+            <div className="flex flex-col gap-14 lg:flex-row lg:items-end lg:justify-between lg:gap-16">
+              <div className="max-w-3xl space-y-6 md:space-y-7">
+                <span className="block text-[11px] font-black uppercase tracking-[0.38em] text-accent md:text-xs md:tracking-[0.4em]">
+                  What we deliver
+                </span>
+                <div className="space-y-5 md:space-y-6">
+                  <h2
+                    id="svc-cap-heading"
+                    className="font-heading text-[2.1rem] font-black uppercase leading-[1.04] tracking-tight text-foreground sm:text-[2.5rem] md:text-[3rem] md:leading-[1.02] lg:text-[3.25rem]"
+                  >
+                    Capabilities
+                  </h2>
+                  <p className="max-w-2xl text-[1.05rem] leading-[1.75] text-foreground/55 md:text-lg md:leading-[1.72] lg:text-xl lg:leading-[1.68]">
+                    Brand, motion, product, and growth—structured so every engagement stays clear,
+                    fast, and accountable.
+                  </p>
+                </div>
+              </div>
+              <div className="flex shrink-0 flex-col gap-2 lg:items-end lg:pb-1">
+                <span className="font-heading text-[clamp(2.75rem,8vw,4.5rem)] font-black leading-none tracking-tighter text-foreground/[0.12]">
+                  06
+                </span>
+                <span className="text-[11px] font-black uppercase tracking-[0.42em] text-foreground/40 md:text-xs">
+                  disciplines
+                </span>
               </div>
             </div>
-            <p className="shrink-0 text-[10px] font-black uppercase tracking-[0.4em] text-foreground/35 md:text-right">
-              06 disciplines
-            </p>
           </div>
         </section>
 
-        <div className="svc-card-grid mb-32 grid grid-cols-1 gap-8 perspective-[1400px] sm:grid-cols-2 sm:gap-9 md:mb-40 md:gap-9 lg:mb-48 lg:grid-cols-6 lg:gap-10">
+        <div className="svc-card-grid mb-0 mt-14 grid grid-cols-1 gap-16 perspective-[1400px] sm:grid-cols-2 sm:gap-x-12 sm:gap-y-18 md:mt-20 md:gap-x-14 md:gap-y-20 lg:grid-cols-6 lg:gap-x-16 lg:gap-y-24">
           {SERVICES.map((service, index) => {
             const Icon = service.icon;
             const layoutClass =
@@ -612,45 +666,64 @@ export default function ServicesPageContent() {
             return (
               <article
                 key={service.title}
-                className={`svc-card group relative isolate flex min-h-[440px] flex-col overflow-hidden rounded-[2rem] border border-white/10 bg-black text-white shadow-[0_28px_64px_rgba(0,0,0,0.18)] ring-1 ring-black/20 md:min-h-[520px] ${layoutClass}`}
+                className={`svc-card group relative isolate mx-auto flex w-full max-w-[720px] min-h-[460px] flex-col rounded-[2rem] border border-black/10 bg-zinc-900/95 p-6 text-white shadow-[0_20px_50px_-12px_rgba(0,0,0,0.28)] sm:max-w-none sm:rounded-[2.25rem] sm:p-7 md:min-h-[520px] md:p-9 lg:rounded-[2.5rem] lg:p-10 ${layoutClass}`}
                 style={{ transformStyle: "preserve-3d" }}
               >
-                <div
-                  className="svc-card-bg absolute inset-0 bg-cover bg-center"
-                  style={{ backgroundImage: `url(${service.image})` }}
-                  aria-hidden="true"
-                />
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/74 via-black/34 to-black/22" />
-                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,var(--accent-radial-card),transparent_62%)] opacity-70 transition-opacity duration-700 group-hover:opacity-100" />
-                <div className="svc-card-focus pointer-events-none absolute inset-0 bg-gradient-to-br from-accent/12 via-transparent to-transparent opacity-0" />
-                <div className="pointer-events-none absolute inset-x-5 top-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent opacity-80 transition-opacity duration-500 group-hover:via-white/70 sm:inset-x-7" />
-
-                <div className="pointer-events-none absolute right-3 top-2 z-10 font-heading text-[2.75rem] font-black leading-none tracking-tighter text-white/15 sm:right-5 sm:top-4 sm:text-[3.25rem] md:text-[4rem]">
-                  {String(index + 1).padStart(2, "0")}
-                </div>
-
-                <div className="svc-card-content relative z-10 mt-auto px-6 pb-8 pt-14 sm:px-8 sm:pb-10 sm:pt-16 md:px-9 md:pb-11 md:pt-[5.25rem]">
-                  <div className="mb-7 flex items-start justify-between gap-4">
-                    <span className="rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 text-[9px] font-black uppercase leading-[1.3] tracking-[0.28em] text-white/90 backdrop-blur-md">
-                      {service.link ? "Platform" : "Service"}
-                    </span>
-                    <div className="rounded-2xl border border-white/18 bg-white/10 p-3 text-white shadow-lg shadow-black/25 transition-all duration-500 group-hover:scale-110 group-hover:border-accent/55 group-hover:bg-accent group-hover:text-white group-hover:shadow-xl group-hover:shadow-accent/30">
-                      <Icon size={20} />
+                {/* Outer p-* = margin from card edge; inner p-* = gutter around image */}
+                <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[1.25rem] bg-zinc-950 ring-1 ring-white/[0.12] sm:rounded-[1.5rem] md:rounded-[1.75rem] lg:rounded-[2rem]">
+                  {/* Outer air: space between inner shell and photo frame (always visible) */}
+                  <div className="p-5 sm:p-6 md:p-8 lg:p-10">
+                    {/* Photo sits inset so margin shows as zinc band around image */}
+                    <div className="relative w-full overflow-hidden rounded-2xl bg-zinc-900 ring-1 ring-white/[0.08] sm:rounded-[1.35rem]">
+                      <div className="relative aspect-[16/10] min-h-[210px] w-full md:aspect-[16/9] md:min-h-[240px] lg:min-h-[260px]">
+                        <div className="absolute inset-4 overflow-hidden rounded-xl sm:inset-5 md:inset-6 lg:inset-8">
+                          <div
+                            className="svc-card-bg absolute inset-0 bg-cover bg-center will-change-transform"
+                            style={{
+                              backgroundImage: `url(${service.image})`,
+                              transformOrigin: "50% 50%",
+                            }}
+                            aria-hidden="true"
+                          />
+                          <div className="pointer-events-none absolute inset-0 rounded-xl bg-gradient-to-t from-zinc-950/90 via-black/15 to-transparent" />
+                          <div className="pointer-events-none absolute inset-0 rounded-xl bg-gradient-to-b from-black/25 to-transparent" />
+                          <div className="svc-card-focus pointer-events-none absolute inset-0 rounded-xl bg-gradient-to-br from-accent/20 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                          {/* Line + index: padded from image edge, not the card border */}
+                          <div className="pointer-events-none absolute inset-0 p-4 sm:p-5 md:p-6 lg:p-7">
+                            <div className="h-px w-full max-w-[min(100%,14rem)] bg-gradient-to-r from-transparent via-white/45 to-transparent" />
+                            <div className="flex justify-end pt-2 sm:pt-3">
+                              <span className="font-heading text-[2.5rem] font-black leading-none tracking-tighter text-white/50 drop-shadow-md sm:text-[3.25rem] md:text-[3.75rem] lg:text-[4.25rem]">
+                                {String(index + 1).padStart(2, "0")}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  <h3 className="mb-3.5 text-[1.25rem] font-black leading-[1.2] tracking-tight text-white md:text-[1.5rem] md:leading-[1.18]">
+                  <div className="svc-card-content relative z-10 flex flex-1 flex-col border-t border-white/10 bg-zinc-950 px-10 py-12 sm:px-12 sm:py-14 md:px-16 md:py-16 lg:px-20 lg:py-20 xl:px-24">
+                  <div className="mb-9 flex items-start justify-between gap-6 md:mb-10">
+                    <span className="rounded-full border border-white/30 bg-white/10 px-5 py-2.5 text-[11px] font-black uppercase leading-[1.35] tracking-[0.2em] text-white md:text-xs md:tracking-[0.22em]">
+                      {service.link ? "Platform" : "Service"}
+                    </span>
+                    <div className="rounded-2xl border border-white/25 bg-white/5 p-4 text-white transition-all duration-500 group-hover:scale-110 group-hover:border-accent/70 group-hover:bg-accent group-hover:shadow-lg group-hover:shadow-accent/30">
+                      <Icon size={26} />
+                    </div>
+                  </div>
+
+                  <h3 className="mb-5 text-[1.55rem] font-black leading-[1.18] tracking-tight text-white sm:text-[1.7rem] md:mb-6 md:text-[1.9rem] md:leading-[1.12] lg:text-[2.05rem]">
                     {service.title}
                   </h3>
-                  <p className="mb-7 max-w-[52ch] text-[13px] leading-[1.7] text-white/85 md:text-[15px]">
+                  <p className="mb-10 max-w-[52ch] text-base leading-[1.82] text-zinc-100 md:mb-11 md:text-lg md:leading-[1.78] lg:text-xl lg:leading-[1.75]">
                     {service.summary}
                   </p>
 
-                  <ul className="mb-7 flex flex-wrap gap-2">
+                  <ul className="mb-11 flex flex-wrap gap-3 md:mb-12 md:gap-3.5">
                     {service.outcomes.map((outcome) => (
                       <li
                         key={outcome}
-                        className="rounded-full border border-white/18 bg-white/10 px-3.5 py-1.5 text-[10px] font-black uppercase leading-[1.2] tracking-[0.12em] text-white/92"
+                        className="rounded-full border border-white/25 bg-white/10 px-5 py-2 text-[11px] font-black uppercase leading-[1.25] tracking-[0.1em] text-white md:text-xs md:tracking-[0.12em]"
                       >
                         {outcome}
                       </li>
@@ -661,32 +734,33 @@ export default function ServicesPageContent() {
                     <ButtonPrimary
                       href={service.link}
                       external
-                      className="gap-2 rounded-full border border-accent/70 bg-accent px-5 py-2.5 text-[10px] font-black uppercase tracking-[0.26em] text-white shadow-md shadow-accent/15 active:scale-[0.98]"
+                      className="gap-2.5 rounded-full border border-accent/70 bg-accent px-8 py-3.5 text-[11px] font-black uppercase tracking-[0.24em] text-white shadow-lg shadow-accent/20 active:scale-[0.98] md:text-xs"
                     >
                       WinPro AI
-                      <ArrowUpRight size={13} />
+                      <ArrowUpRight size={15} />
                     </ButtonPrimary>
                   ) : (
-                    <span className="text-[10px] font-black uppercase leading-[1.4] tracking-[0.25em] text-white/74">
+                    <span className="text-xs font-black uppercase leading-[1.45] tracking-[0.22em] text-zinc-300 md:text-sm md:tracking-[0.25em]">
                       Strategy-led
                     </span>
                   )}
+                  </div>
                 </div>
               </article>
             );
           })}
         </div>
 
-        <div className="svc-process-cta-stack flex flex-col gap-[clamp(2.75rem,7vw,5.5rem)] pt-4 md:gap-[clamp(3.25rem,8vw,6.5rem)] md:pt-6 lg:pt-8">
-        <div className="svc-process-container relative rounded-[1.75rem] border border-black/[0.07] bg-foreground/[0.02] px-5 py-12 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] sm:px-8 sm:py-14 md:px-10 md:py-16 lg:rounded-[2rem] lg:px-12 lg:py-20">
-          <div className="svc-process-intro flex max-w-3xl flex-col gap-8 pb-16 md:gap-10 md:pb-20 lg:gap-12 lg:pb-28">
-            <span className="svc-process-kicker block text-[10px] font-black uppercase tracking-[0.42em] text-accent">
+        <div className="svc-process-cta-stack flex flex-col gap-[clamp(3rem,8vw,6rem)] border-t border-black/[0.08] pt-24 md:gap-[clamp(3.5rem,9vw,7rem)] md:pt-36 lg:pt-44">
+        <div className="svc-process-container relative">
+          <div className="svc-process-intro flex max-w-3xl flex-col gap-8 pb-14 md:gap-10 md:pb-20 lg:gap-12 lg:pb-24">
+            <span className="svc-process-kicker block text-[11px] font-black uppercase tracking-[0.38em] text-accent md:text-xs">
               How we work
             </span>
-            <h2 className="svc-process-title font-heading text-[2rem] font-black uppercase leading-[1.05] tracking-tighter text-foreground sm:text-[2.5rem] md:text-[3rem] md:leading-[1.02] lg:text-[3.5rem]">
+            <h2 className="svc-process-title font-heading text-[2.25rem] font-black uppercase leading-[1.06] tracking-tighter text-foreground sm:text-[2.75rem] md:text-[3.35rem] md:leading-[1.03] lg:text-[3.75rem]">
               Process &amp; scope
             </h2>
-            <p className="svc-process-lead max-w-2xl text-base leading-[1.95] text-foreground/55 md:text-lg md:leading-[1.88]">
+            <p className="svc-process-lead max-w-2xl text-[1.05rem] leading-[1.9] text-foreground/60 md:text-lg md:leading-[1.88] lg:text-xl">
               We collapse timelines by focusing only on what matters: discovering the edge, designing
               the system, and deploying for growth.
             </p>
@@ -694,32 +768,20 @@ export default function ServicesPageContent() {
 
           <div className="svc-process-track">
             <div className="svc-process-journey relative">
-              {/* Timeline rail — desktop only */}
-              <div
-                className="pointer-events-none absolute left-[27px] top-6 bottom-6 hidden w-[2px] rounded-full bg-black/10 md:block md:left-[39px]"
-                aria-hidden
-              />
-              <div
-                className="svc-process-line-fill pointer-events-none absolute left-[27px] top-6 bottom-6 hidden w-[2px] origin-top scale-y-0 rounded-full bg-accent shadow-[0_0_20px_rgba(0,0,0,0.06)] md:block md:left-[39px]"
-                aria-hidden
-              />
-
-              <div className="relative z-[1] flex flex-col gap-20 sm:gap-24 md:gap-32 lg:gap-40">
+              <div className="flex flex-col">
                 {PROCESS.map((phase) => (
                   <article
                     key={phase.step}
-                    className="svc-process-node group flex gap-8 sm:gap-10 md:gap-14 md:items-start"
+                    className="svc-process-node group grid grid-cols-1 gap-8 border-b border-black/10 py-12 last:border-b-0 sm:grid-cols-[5.5rem_minmax(0,1fr)] sm:gap-10 sm:py-14 md:grid-cols-[6.5rem_minmax(0,1fr)] md:gap-14 md:py-16 lg:grid-cols-[7.5rem_minmax(0,1fr)] lg:gap-16 lg:py-18"
                   >
-                    <div className="svc-process-node-marker relative z-[2] flex h-[3.25rem] w-[3.25rem] shrink-0 items-center justify-center rounded-2xl border border-black/10 bg-background shadow-[0_8px_32px_-6px_rgba(0,0,0,0.1)] ring-1 ring-black/[0.05] transition-all duration-500 group-hover:-translate-y-1 group-hover:border-accent/45 group-hover:shadow-[0_16px_48px_-12px_rgba(0,0,0,0.14)] md:h-20 md:w-20">
-                      <span className="font-heading text-[10px] font-black tracking-[0.22em] text-accent md:text-[11px]">
-                        {phase.step}
-                      </span>
+                    <div className="svc-process-node-num font-heading text-xs font-black tracking-[0.2em] text-accent sm:pt-1 sm:text-right md:text-sm md:tracking-[0.22em]">
+                      {phase.step}
                     </div>
-                    <div className="min-w-0 flex-1 flex flex-col gap-6 pt-0.5 md:gap-8 md:pt-3">
-                      <h3 className="font-heading text-[clamp(1.65rem,4.2vw,2.85rem)] font-black uppercase leading-[0.98] tracking-tighter text-foreground transition-colors duration-300 group-hover:text-accent">
+                    <div className="min-w-0 flex flex-col gap-6 md:gap-7">
+                      <h3 className="font-heading text-[clamp(1.6rem,3.9vw,2.75rem)] font-black uppercase leading-[1.02] tracking-tighter text-foreground transition-colors duration-300 group-hover:text-accent">
                         {phase.title}
                       </h3>
-                      <p className="max-w-xl text-[15px] leading-[1.9] text-foreground/50 md:text-lg md:leading-[1.85]">
+                      <p className="max-w-xl text-base leading-[1.85] text-foreground/50 md:text-lg md:leading-[1.82]">
                         {phase.text}
                       </p>
                     </div>
@@ -729,15 +791,13 @@ export default function ServicesPageContent() {
             </div>
           </div>
 
-          <div className="svc-process-connector-wrap py-20 md:py-28 lg:py-36" aria-hidden>
-            <div className="svc-process-connector mx-auto h-px max-w-2xl bg-gradient-to-r from-transparent via-accent/35 to-transparent" />
+          <div className="svc-process-connector-wrap py-14 md:py-20 lg:py-24" aria-hidden>
+            <div className="svc-process-connector mx-auto h-px max-w-md bg-gradient-to-r from-transparent via-black/15 to-transparent md:max-w-lg" />
           </div>
         </div>
 
-        <div className="svc-cta relative isolate overflow-hidden rounded-[1.75rem] border border-black/[0.08] bg-gradient-to-br from-white via-white to-muted/30 shadow-[0_32px_64px_-28px_rgba(0,0,0,0.14)] ring-1 ring-black/[0.04] sm:rounded-[2rem]">
-          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,var(--accent-gradient-slice)_0%,transparent_50%)] opacity-90" />
-          <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-accent/[0.07] blur-3xl" aria-hidden />
-          <div className="svc-cta-inner relative flex flex-col gap-20 px-8 py-20 sm:px-12 sm:py-24 md:gap-24 md:px-16 md:py-28 lg:flex-row lg:items-end lg:justify-between lg:gap-28 lg:px-20 lg:py-32 xl:px-24">
+        <div className="svc-cta relative">
+          <div className="svc-cta-inner flex flex-col gap-14 border-t border-black/[0.08] pt-14 md:gap-20 md:pt-20 lg:flex-row lg:items-end lg:justify-between lg:gap-24 lg:pt-24">
             <div className="max-w-2xl flex flex-col gap-8 md:gap-10 lg:gap-12">
               <p className="svc-cta-kicker text-[10px] font-black uppercase tracking-[0.45em] text-accent">
                 Next step
