@@ -156,6 +156,47 @@ section {
   }
 }
 
+/*
+ * Service cards: labels on the image panel.
+ * Use inset (not padding on a full-bleed flex child) so spacing stays measurable from the
+ * rounded frame edge and does not read as flush after transforms/rounding.
+ */
+.svc-card-media__safe {
+  position: absolute;
+  z-index: 3;
+  box-sizing: border-box;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: stretch;
+  inset: clamp(1.5rem, 5.2vmin, 2.25rem);
+}
+
+@media (min-width: 640px) {
+  .svc-card-media__safe {
+    inset: clamp(1.75rem, 4.8vmin, 2.75rem);
+  }
+}
+
+@media (min-width: 768px) {
+  .svc-card-media__safe {
+    inset: clamp(2rem, 4.2vmin, 3.25rem);
+  }
+}
+
+@media (min-width: 1024px) {
+  .svc-card-media__safe {
+    inset: clamp(2.25rem, 3.8vmin, 3.5rem);
+  }
+}
+
+@media (min-width: 1280px) {
+  .svc-card-media__safe {
+    inset: clamp(2.5rem, 3.5vmin, 3.75rem);
+  }
+}
+
 /* Works cards: refer.html-inspired skew + lift interaction */
 .wc-refer-card {
   transform-origin: top right;

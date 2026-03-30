@@ -656,7 +656,7 @@ export default function ServicesPageContent() {
           </div>
         </section>
 
-        <div className="svc-card-grid mb-0 mt-14 grid grid-cols-1 gap-16 perspective-[1400px] sm:grid-cols-2 sm:gap-x-12 sm:gap-y-18 md:mt-20 md:gap-x-14 md:gap-y-20 lg:grid-cols-6 lg:gap-x-16 lg:gap-y-24">
+        <div className="svc-card-grid mb-0 mt-14 grid grid-cols-1 gap-16 perspective-[1400px] sm:grid-cols-2 sm:gap-x-12 sm:gap-y-20 md:mt-20 md:gap-x-14 md:gap-y-20 lg:grid-cols-6 lg:gap-x-16 lg:gap-y-24">
           {SERVICES.map((service, index) => {
             const Icon = service.icon;
             const layoutClass =
@@ -672,11 +672,12 @@ export default function ServicesPageContent() {
                 {/* Outer p-* = margin from card edge; inner p-* = gutter around image */}
                 <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-[1.25rem] bg-zinc-950 ring-1 ring-white/[0.12] sm:rounded-[1.5rem] md:rounded-[1.75rem] lg:rounded-[2rem]">
                   {/* Outer air: space between inner shell and photo frame (always visible) */}
-                  <div className="p-5 sm:p-6 md:p-8 lg:p-10">
+                  <div className="p-6 sm:p-8 md:p-10 lg:p-12">
                     {/* Photo sits inset so margin shows as zinc band around image */}
                     <div className="relative w-full overflow-hidden rounded-2xl bg-zinc-900 ring-1 ring-white/[0.08] sm:rounded-[1.35rem]">
                       <div className="relative aspect-[16/10] min-h-[210px] w-full md:aspect-[16/9] md:min-h-[240px] lg:min-h-[260px]">
-                        <div className="absolute inset-4 overflow-hidden rounded-xl sm:inset-5 md:inset-6 lg:inset-8">
+                        {/* Photo only (inset); label layer uses .svc-card-media__safe (inset in CSS) */}
+                        <div className="absolute inset-6 overflow-hidden rounded-lg sm:inset-7 sm:rounded-xl md:inset-8 lg:inset-10 lg:rounded-[1.05rem]">
                           <div
                             className="svc-card-bg absolute inset-0 bg-cover bg-center will-change-transform"
                             style={{
@@ -685,24 +686,23 @@ export default function ServicesPageContent() {
                             }}
                             aria-hidden="true"
                           />
-                          <div className="pointer-events-none absolute inset-0 rounded-xl bg-gradient-to-t from-zinc-950/90 via-black/15 to-transparent" />
-                          <div className="pointer-events-none absolute inset-0 rounded-xl bg-gradient-to-b from-black/25 to-transparent" />
-                          <div className="svc-card-focus pointer-events-none absolute inset-0 rounded-xl bg-gradient-to-br from-accent/20 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-                          {/* Line + index: padded from image edge, not the card border */}
-                          <div className="pointer-events-none absolute inset-0 p-4 sm:p-5 md:p-6 lg:p-7">
-                            <div className="h-px w-full max-w-[min(100%,14rem)] bg-gradient-to-r from-transparent via-white/45 to-transparent" />
-                            <div className="flex justify-end pt-2 sm:pt-3">
-                              <span className="font-heading text-[2.5rem] font-black leading-none tracking-tighter text-white/50 drop-shadow-md sm:text-[3.25rem] md:text-[3.75rem] lg:text-[4.25rem]">
-                                {String(index + 1).padStart(2, "0")}
-                              </span>
-                            </div>
+                          <div className="pointer-events-none absolute inset-0 rounded-[inherit] bg-gradient-to-t from-zinc-950/90 via-black/15 to-transparent" />
+                          <div className="pointer-events-none absolute inset-0 rounded-[inherit] bg-gradient-to-b from-black/25 to-transparent" />
+                          <div className="svc-card-focus pointer-events-none absolute inset-0 rounded-[inherit] bg-gradient-to-br from-accent/20 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+                        </div>
+                        <div className="svc-card-media__safe">
+                          <div className="h-px w-full max-w-[min(100%,15rem)] shrink-0 bg-gradient-to-r from-transparent via-white/45 to-transparent sm:max-w-[16rem]" />
+                          <div className="flex shrink-0 justify-end">
+                            <span className="font-heading text-[2.5rem] font-black leading-none tracking-tighter text-white/50 drop-shadow-md sm:text-[3.25rem] md:text-[3.75rem] lg:text-[4.25rem]">
+                              {String(index + 1).padStart(2, "0")}
+                            </span>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  <div className="svc-card-content relative z-10 flex flex-1 flex-col border-t border-white/10 bg-zinc-950 px-10 py-12 sm:px-12 sm:py-14 md:px-16 md:py-16 lg:px-20 lg:py-20 xl:px-24">
+                  <div className="svc-card-content relative z-10 flex flex-1 flex-col border-t border-white/10 bg-zinc-950 px-12 py-14 sm:px-16 sm:py-16 md:px-20 md:py-20 lg:px-24 lg:py-20 xl:px-28">
                   <div className="mb-9 flex items-start justify-between gap-6 md:mb-10">
                     <span className="rounded-full border border-white/30 bg-white/10 px-5 py-2.5 text-[11px] font-black uppercase leading-[1.35] tracking-[0.2em] text-white md:text-xs md:tracking-[0.22em]">
                       {service.link ? "Platform" : "Service"}
