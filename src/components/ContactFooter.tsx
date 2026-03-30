@@ -101,7 +101,7 @@ export default function ContactFooter() {
     <footer
       ref={footerRef}
       id="contact"
-      className="relative overflow-hidden bg-background pb-12 pt-24 md:pb-16 md:pt-32"
+      className="relative overflow-hidden border-t border-black/[0.04] bg-background pb-12 pt-28 md:pb-16 md:pt-36 lg:pt-40"
     >
       {/* Decorative dynamic element */}
       <div className="pointer-events-none absolute right-[-10vw] top-0 h-[60vw] w-[60vw] rounded-full bg-accent/[0.03] blur-[120px]" />

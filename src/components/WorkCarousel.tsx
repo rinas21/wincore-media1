@@ -104,19 +104,9 @@ export default function WorkCarousel() {
 
     const ctx = gsap.context(() => {
       const cards = gsap.utils.toArray<HTMLElement>(".wc-card-wrapper");
-      
-      cards.forEach((card, i) => {
-        if (reduced) return;
 
-        // Perspective Entrance
-        gsap.fromTo(card, 
-          { y: 150, opacity: 0, rotateX: 10, scale: 0.95 },
-          { 
-            y: 0, opacity: 1, rotateX: 0, scale: 1, 
-            duration: 1.5, ease: "expo.out",
-            scrollTrigger: { trigger: card, scroller, start: "top 95%", once: true }
-          }
-        );
+      cards.forEach((card) => {
+        if (reduced) return;
 
         // Hover Parallax Tilt
         const inner = card.querySelector(".wc-inner");
@@ -161,16 +151,16 @@ export default function WorkCarousel() {
         {/* HEADER AREA */}
         <div className="mb-16 flex flex-col items-start gap-6">
           <div className="space-y-1">
-             <div className="flex items-center gap-4">
+             <div data-reveal className="flex items-center gap-4">
                <div className="w-10 h-[1px] bg-accent" />
                <span className="text-[10px] font-black uppercase tracking-[0.5em] text-accent">Wincore Archives</span>
              </div>
-             <h2 className="text-[12vw] md:text-[8rem] lg:text-[10rem] font-black leading-[0.8] tracking-[-0.07em] uppercase">
+             <h2 data-reveal className="text-[12vw] md:text-[8rem] lg:text-[10rem] font-black leading-[0.8] tracking-[-0.07em] uppercase">
                 Works <br />
                 <span className="text-black/5 italic font-serif lowercase font-light">that lead.</span>
              </h2>
           </div>
-          <p className="max-w-md text-xl font-light leading-relaxed text-black/40">
+          <p data-reveal className="max-w-md text-xl font-light leading-relaxed text-black/40">
              Navigate through our primary digital orbit. Each project represent a milestone in Wincore Media engineering.
           </p>
         </div>
@@ -180,8 +170,9 @@ export default function WorkCarousel() {
           {PROJECTS.map((p, i) => {
              const isEven = i % 2 === 0;
              return (
-               <div 
-                 key={p.id} 
+               <div
+                 key={p.id}
+                 data-reveal
                  className={`wc-card-wrapper col-span-1 md:col-span-10 ${isEven ? 'md:col-start-1 text-left' : 'md:col-start-3 text-right'} perspective-[2000px]`}
                >
                  <button 

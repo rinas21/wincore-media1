@@ -2,16 +2,9 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import gsap from "gsap";
-import SplitType from "split-type";
 import Image from "next/image";
-import Link from "next/link";
 import { ArrowUpRight, X } from "lucide-react";
-import {
-  registerGsapPlugins,
-  getScroller,
-  scheduleScrollTriggerRefresh,
-  prefersReducedMotion,
-} from "@/lib/motion";
+import { ButtonPrimary } from "@/components/ui/ButtonPrimary";
 
 type ServiceDetail = {
   num: string;
@@ -361,23 +354,22 @@ function ServiceModal({
             </button>
 
             {service.link ? (
-              <a
+              <ButtonPrimary
                 href={service.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2.5 rounded-full bg-accent px-10 py-3.5 text-[10px] font-black uppercase tracking-[0.35em] text-white transition-transform hover:scale-[1.02] active:scale-[0.98]"
+                external
+                className="rounded-full bg-accent px-10 py-3.5 text-[10px] font-black uppercase tracking-[0.35em] text-white shadow-md shadow-accent/20 active:scale-[0.98]"
               >
                 {service.linkLabel ?? "Explore"}
                 <ArrowUpRight size={13} />
-              </a>
+              </ButtonPrimary>
             ) : (
-              <Link
+              <ButtonPrimary
                 href="/contact"
-                className="inline-flex items-center justify-center gap-2.5 rounded-full bg-accent px-10 py-3.5 text-[10px] font-black uppercase tracking-[0.35em] text-white transition-transform hover:scale-[1.02] active:scale-[0.98]"
+                className="rounded-full bg-accent px-10 py-3.5 text-[10px] font-black uppercase tracking-[0.35em] text-white shadow-md shadow-accent/20 active:scale-[0.98]"
               >
                 Start a project
                 <ArrowUpRight size={13} />
-              </Link>
+              </ButtonPrimary>
             )}
           </div>
 
@@ -392,79 +384,6 @@ export default function ServiceCards() {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [modalService, setModalService] = useState<ServiceDetail | null>(null);
   const sectionRef = useRef<HTMLElement>(null);
-  const headingRef = useRef<HTMLHeadingElement>(null);
-
-  useEffect(() => {
-    registerGsapPlugins();
-    const scroller = getScroller();
-    const reduced = prefersReducedMotion();
-    if (!headingRef.current) return;
-
-    const splits: SplitType[] = [];
-    const split = new SplitType(headingRef.current, { types: "chars" });
-    splits.push(split);
-
-    const ctx = gsap.context(() => {
-      if (split.chars) {
-        gsap.fromTo(
-          split.chars,
-          { yPercent: reduced ? 0 : 115, opacity: reduced ? 1 : 0 },
-          {
-            yPercent: 0,
-            opacity: 1,
-            duration: reduced ? 0 : 0.95,
-            stagger: 0.016,
-            ease: "expo.out",
-            clearProps: "transform,opacity",
-            scrollTrigger: {
-              trigger: headingRef.current,
-              scroller,
-              start: "top 82%",
-              once: true,
-            },
-          },
-        );
-      }
-
-      gsap.fromTo(
-        ".sc-kicker",
-        { y: reduced ? 0 : 20, opacity: reduced ? 1 : 0 },
-        {
-          y: 0, opacity: 1, duration: 0.75, ease: "power3.out",
-          scrollTrigger: { trigger: ".sc-kicker", scroller, start: "top 90%", once: true },
-        },
-      );
-
-      gsap.fromTo(
-        ".sc-sub",
-        { y: reduced ? 0 : 24, opacity: reduced ? 1 : 0 },
-        {
-          y: 0, opacity: 1, duration: 0.85, ease: "power3.out",
-          scrollTrigger: { trigger: ".sc-sub", scroller, start: "top 88%", once: true },
-        },
-      );
-
-      const rows = gsap.utils.toArray<HTMLElement>(".sc-row");
-      rows.forEach((row, i) => {
-        gsap.fromTo(
-          row,
-          { y: reduced ? 0 : 48, opacity: reduced ? 1 : 0 },
-          {
-            y: 0, opacity: 1, duration: 0.9, ease: "power3.out",
-            delay: i * 0.04,
-            scrollTrigger: { trigger: row, scroller, start: "top 92%", once: true },
-          },
-        );
-      });
-    }, sectionRef);
-
-    scheduleScrollTriggerRefresh();
-
-    return () => {
-      splits.forEach((s) => s.revert());
-      ctx.revert();
-    };
-  }, []);
 
   const openModal = useCallback((s: ServiceDetail) => setModalService(s), []);
   const closeModal = useCallback(() => setModalService(null), []);
@@ -486,18 +405,24 @@ export default function ServiceCards() {
           <div className="mb-20 flex flex-col gap-8 md:mb-28 md:flex-row md:items-end md:justify-between md:gap-12">
             <div>
               {/* kicker — matches site standard exactly */}
-              <p className="sc-kicker mb-8 text-[11px] font-black uppercase leading-[1.4] tracking-[0.5em] text-accent">
+              <p
+                data-reveal
+                className="sc-kicker mb-8 text-[11px] font-black uppercase leading-[1.4] tracking-[0.5em] text-accent"
+              >
                 Core Capabilities
               </p>
               <h2
-                ref={headingRef}
+                data-reveal
                 className="pb-1 text-[13vw] font-black uppercase leading-[0.94] tracking-tight text-foreground md:text-[7vw]"
               >
                 Building<br />
                 <span className="text-black/[0.07] italic">Impact</span>
               </h2>
             </div>
-            <p className="sc-sub max-w-[38ch] text-base font-light leading-[1.75] text-black/45 md:text-lg md:text-right">
+            <p
+              data-reveal
+              className="sc-sub max-w-[38ch] text-base font-light leading-[1.75] text-black/45 md:text-lg md:text-right"
+            >
               We bridge AI precision with cinematic strategy. Every service is built as a growth layer, not a one-off task.
             </p>
           </div>
@@ -509,6 +434,7 @@ export default function ServiceCards() {
               return (
                 <div
                   key={s.title}
+                  data-reveal
                   className="sc-row group relative cursor-pointer overflow-hidden"
                   onClick={() => openModal(s)}
                   role="button"

@@ -11,9 +11,7 @@ export default function AboutPage() {
   return (
     <PageMain>
       <PageMotion>
-        <div className="page-motion-item" data-page-motion>
-          <AboutPageContent />
-        </div>
+        <AboutPageContent />
       </PageMotion>
     </PageMain>
   );

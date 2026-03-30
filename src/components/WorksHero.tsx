@@ -70,12 +70,12 @@ export default function WorksHero() {
       ref={rootRef}
       className="relative min-h-[90vh] flex flex-col items-center justify-center overflow-hidden bg-background px-5 pt-40 pb-16 sm:px-6 md:px-10 md:pt-48 md:pb-20 lg:px-12"
     >
-      <div className="absolute inset-0 z-[1] bg-[radial-gradient(circle_at_center,rgba(0,136,204,0.06)_0%,rgba(255,255,255,0.9)_72%)]" />
+      <div className="absolute inset-0 z-[1] bg-[radial-gradient(circle_at_center,var(--accent-radial-works)_0%,rgba(255,255,255,0.9)_72%)]" />
       
       <div className="relative z-10 w-full max-w-[1240px] text-center">
         <div ref={titleRef} className="flex flex-col items-center">
           <span className="hero-sub mb-8 inline-flex items-center gap-4 rounded-full bg-black/[0.04] px-6 py-2.5">
-            <span className="w-2.5 h-2.5 rounded-full bg-accent shadow-[0_0_15px_rgba(0,136,204,0.5)] animate-pulse" />
+            <span className="w-2.5 h-2.5 rounded-full bg-accent shadow-[var(--shadow-accent-dot-sm)] animate-pulse" />
             <span className="text-[11px] font-black uppercase leading-[1.4] tracking-[0.42em] text-black/40">Selected Archive 2024</span>
           </span>
           

@@ -1,6 +1,7 @@
 import RecognitionBar from "@/components/RecognitionBar";
 import ServicesPageContent from "@/components/ServicesPageContent";
 import PageMain from "@/components/PageMain";
+import PageMotion from "@/components/PageMotion";
 
 export const metadata = {
   title: "Services — Wincore",
@@ -10,9 +11,13 @@ export const metadata = {
 
 export default function ServicesPage() {
   return (
-    <PageMain>
+    <PageMain variant="inner">
       <RecognitionBar />
-      <ServicesPageContent />
+      <PageMotion>
+        <div className="page-motion-item" data-page-motion="tier2">
+          <ServicesPageContent />
+        </div>
+      </PageMotion>
     </PageMain>
   );
 }

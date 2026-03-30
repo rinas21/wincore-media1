@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
+import { accentRgba } from "@/lib/accent";
 
 export default function CustomCursor() {
   const cursorRef = useRef<HTMLDivElement>(null);
@@ -39,12 +40,12 @@ export default function CustomCursor() {
 
     const onEnter = () => {
       gsap.to(cursor, { scale: 0.5, opacity: 0.5, duration: 0.2 });
-      gsap.to(ring, { scale: 1.2, borderColor: "rgba(0,191,255,0.85)", duration: 0.25 });
+      gsap.to(ring, { scale: 1.2, borderColor: accentRgba(0.85), duration: 0.25 });
     };
 
     const onLeave = () => {
       gsap.to(cursor, { scale: 1, opacity: 1, duration: 0.2 });
-      gsap.to(ring, { scale: 1, borderColor: "rgba(0,191,255,0.35)", duration: 0.25 });
+      gsap.to(ring, { scale: 1, borderColor: accentRgba(0.35), duration: 0.25 });
     };
 
     window.addEventListener("mousemove", move);

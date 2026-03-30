@@ -5,6 +5,46 @@
   --foreground: #0a0a0a;
   --accent: #0088cc; /* Slightly deeper blue for better contrast on white */
   --secondary: #6e563a;
+
+  /* Type scale (12 / 14 / 16 / 20 / 28 / 40px) — mapped in @theme as text-xs … text-2xl */
+  --type-xs: 0.75rem;
+  --type-sm: 0.875rem;
+  --type-base: 1rem;
+  --type-lg: 1.25rem;
+  --type-xl: 1.75rem;
+  --type-2xl: 2.5rem;
+
+  /* Neutral surfaces (avoid one-off hex in components) */
+  --surface-muted: #f4f4f5;
+  --foreground-wash-4: color-mix(in srgb, var(--foreground) 4%, transparent);
+  --foreground-wash-6: color-mix(in srgb, var(--foreground) 6%, transparent);
+
+  /* Secondary wash for tags/pills (single source: --secondary) */
+  --secondary-wash: color-mix(in srgb, var(--secondary) 15%, transparent);
+
+  /* Accent-derived — gradients, glows, strokes (single source: --accent) */
+  --accent-tip-bg: color-mix(in srgb, var(--accent) 8%, transparent);
+  --accent-tip-bg-soft: color-mix(in srgb, var(--accent) 6%, transparent);
+  --accent-wash-top: color-mix(in srgb, var(--accent) 5%, transparent);
+  --accent-radial-card: color-mix(in srgb, var(--accent) 28%, transparent);
+  --accent-gradient-slice: color-mix(in srgb, var(--accent) 5%, transparent);
+  --accent-radial-works: color-mix(in srgb, var(--accent) 6%, transparent);
+  --accent-preloader-pill: color-mix(in srgb, var(--accent) 20%, transparent);
+  --accent-preloader-pill-2: color-mix(in srgb, var(--accent) 12%, transparent);
+
+  --shadow-accent-dot: 0 0 18px color-mix(in srgb, var(--accent) 25%, transparent);
+  --shadow-accent-dot-sm: 0 0 15px color-mix(in srgb, var(--accent) 50%, transparent);
+  --shadow-accent-kpi: 0 45px 100px color-mix(in srgb, var(--accent) 8%, transparent);
+  --shadow-accent-icon: 0 8px 16px color-mix(in srgb, var(--accent) 25%, transparent);
+  --shadow-accent-approach: 0 16px 40px color-mix(in srgb, var(--accent) 14%, transparent);
+  --shadow-accent-approach-scroll: 0 18px 44px color-mix(in srgb, var(--accent) 15%, transparent);
+  --shadow-accent-cta: 0 8px 20px color-mix(in srgb, var(--accent) 35%, transparent);
+  --shadow-accent-journey: 0 16px 32px color-mix(in srgb, var(--accent) 15%, transparent);
+  --shadow-accent-preloader: 0 0 20px color-mix(in srgb, var(--accent) 75%, transparent);
+  --shadow-accent-glow: 0 0 24px color-mix(in srgb, var(--accent) 40%, transparent);
+
+  /* Accent gradient stops (no raw rgba blues) */
+  --accent-grad-bright: color-mix(in srgb, var(--accent) 80%, white);
 }
 
 @theme {
@@ -12,6 +52,14 @@
   --color-foreground: var(--foreground);
   --color-accent: var(--accent);
   --color-secondary: var(--secondary);
+  --color-muted: var(--surface-muted);
+
+  --text-xs: var(--type-xs);
+  --text-sm: var(--type-sm);
+  --text-base: var(--type-base);
+  --text-lg: var(--type-lg);
+  --text-xl: var(--type-xl);
+  --text-2xl: var(--type-2xl);
 }
 
 .is-inner-page {
@@ -54,6 +102,7 @@ body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: 'Satoshi', sans-serif;
+  font-size: var(--type-base);
   line-height: 1.5;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
@@ -79,12 +128,18 @@ section {
   position: relative;
 }
 
+/* Primary CTA — hover motion via GSAP in components/ui/ButtonPrimary.tsx */
+.btn-primary {
+  transform: translateZ(0);
+}
+
 /* Page section rhythm (used by PageMotion wrappers) */
 .page-motion-item {
   margin-bottom: clamp(3.5rem, 8vw, 5rem);
 }
 
-.page-motion-item:last-child {
+/* Only strip margin when there are multiple motion blocks; a single block needs bottom rhythm */
+.page-motion-item:last-child:not(:only-child) {
   margin-bottom: 0;
 }
 
@@ -366,7 +421,7 @@ section {
 .svc-card:hover .svc-glitch__img:nth-child(5) {
   animation-name: svc-glitch-4;
   background-blend-mode: overlay;
-  background-color: rgba(0, 136, 204, 0.45);
+  background-color: color-mix(in srgb, var(--accent) 45%, transparent);
 }
 
 @keyframes svc-glitch-1 {
@@ -733,9 +788,48 @@ h1, h2, h3, h4, h5, h6 {
   border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
+/* About: team portraits — faces stay visible in fixed aspect frames */
+.abt-team-card img,
+.abt-photo-card img {
+  object-fit: cover;
+  object-position: center top;
+}
+
+/* About page team: photo→copy gap (spacing under grid is Tailwind on .abt-team-grid-wrap) */
+.abt-team-photoWrap {
+  flex-shrink: 0;
+  margin-bottom: clamp(1.5rem, 3vw, 2.25rem);
+}
+.abt-team-copy {
+  padding-top: 0.125rem;
+}
+
+/* Home About teaser: stacked cards — space between photo block and name block */
+.abt-photo-stack {
+  display: flex;
+  flex-direction: column;
+}
+.abt-photo-stack__media {
+  flex-shrink: 0;
+}
+.abt-photo-stack__meta {
+  flex: 1;
+  padding: 1.25rem 1.25rem 1.35rem;
+  border-top: 1px solid color-mix(in srgb, var(--foreground) 8%, transparent);
+}
+@media (min-width: 768px) {
+  .abt-photo-stack__meta {
+    padding: 1.5rem 1.5rem 1.65rem;
+  }
+}
+
 /* Contact page FX cards: scoped, borderless, brand-adapted */
 .contact-fx-box {
-  --card-grad: linear-gradient(315deg, rgba(0, 136, 204, 0.9), rgba(0, 208, 255, 0.8));
+  --card-grad: linear-gradient(
+    315deg,
+    color-mix(in srgb, var(--accent) 90%, transparent),
+    var(--accent-grad-bright)
+  );
   position: relative;
   isolation: isolate;
   overflow: hidden;

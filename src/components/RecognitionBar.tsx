@@ -55,7 +55,7 @@ export default function RecognitionBar() {
   }, []);
 
   return (
-    <div className="group relative overflow-hidden border-y border-black/5 bg-background py-10 md:py-16">
+    <div data-reveal className="group relative overflow-hidden border-y border-black/5 bg-background py-10 md:py-16">
       <div className="relative">
         <div ref={trackRef} className="flex w-max will-change-transform">
           {/* One measured strip, duplicated for seamless loop */}
@@ -65,7 +65,7 @@ export default function RecognitionBar() {
                 <span className="text-xl font-black uppercase italic tracking-tighter text-black/15 transition-colors duration-700 group-hover:text-black/35 md:text-4xl lg:text-5xl">
                   {item}
                 </span>
-                <span className="h-2 w-2 shrink-0 rounded-full bg-accent shadow-[0_0_18px_rgba(0,191,255,0.25)] md:h-2.5 md:w-2.5" />
+                <span className="h-2 w-2 shrink-0 rounded-full bg-accent shadow-[var(--shadow-accent-dot)] md:h-2.5 md:w-2.5" />
               </div>
             ))}
           </div>
@@ -75,7 +75,7 @@ export default function RecognitionBar() {
                 <span className="text-xl font-black uppercase italic tracking-tighter text-black/15 md:text-4xl lg:text-5xl">
                   {item}
                 </span>
-                <span className="h-2 w-2 shrink-0 rounded-full bg-accent shadow-[0_0_18px_rgba(0,191,255,0.25)] md:h-2.5 md:w-2.5" />
+                <span className="h-2 w-2 shrink-0 rounded-full bg-accent shadow-[var(--shadow-accent-dot)] md:h-2.5 md:w-2.5" />
               </div>
             ))}
           </div>

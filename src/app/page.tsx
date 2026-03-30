@@ -12,19 +12,19 @@ export default function Home() {
     <PageMain variant="home">
       <Hero />
       <PageMotion>
-        <div className="page-motion-item" data-page-motion>
+        <div className="page-motion-item" data-page-motion="tier2">
           <RecognitionBar />
         </div>
-        <div className="page-motion-item" data-page-motion>
+        <div className="page-motion-item" data-page-motion="tier1">
           <WorkCarousel />
         </div>
-        <div className="page-motion-item" data-page-motion>
+        <div className="page-motion-item" data-page-motion="tier2">
           <AwardsStats />
         </div>
-        <div className="page-motion-item" data-page-motion>
+        <div className="page-motion-item" data-page-motion="tier1">
           <ServiceCards />
         </div>
-        <div className="page-motion-item" data-page-motion>
+        <div className="page-motion-item" data-page-motion="tier1">
           <AboutTeaser />
         </div>
       </PageMotion>

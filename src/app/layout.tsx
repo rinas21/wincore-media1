@@ -41,6 +41,11 @@ export default function RootLayout({
           <CustomCursor />
           <Header />
           {children}
+          {/* Fixed block: margin on <footer> can collapse with last section — spacer guarantees a gap */}
+          <div
+            className="cf-footer-gap min-h-[clamp(2.5rem,6vw,5rem)] shrink-0 bg-background"
+            aria-hidden
+          />
           <ContactFooter />
         </ClientProvider>
       </body>

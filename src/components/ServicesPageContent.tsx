@@ -1,10 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef } from "react";
 import type { ComponentType } from "react";
 import gsap from "gsap";
-import ScrollTrigger from "gsap/ScrollTrigger";
 import {
   ArrowUpRight,
   Bot,
@@ -14,7 +12,13 @@ import {
   Sparkles,
   Video,
 } from "lucide-react";
-import { registerGsapPlugins, getScroller, prefersReducedMotion } from "@/lib/motion";
+import {
+  registerGsapPlugins,
+  getScroller,
+  prefersReducedMotion,
+  scheduleScrollTriggerRefresh,
+} from "@/lib/motion";
+import { ButtonPrimary } from "@/components/ui/ButtonPrimary";
 
 type ServiceItem = {
   title: string;
@@ -99,27 +103,28 @@ export default function ServicesPageContent() {
     const reduced = prefersReducedMotion();
     const coarsePointer =
       typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches;
-    const cardHoverCleanups: Array<() => void> = [];
+    const cardPointerCleanups: Array<() => void> = [];
+    const CARD_SHADOW_REST = "0 28px 64px rgba(0,0,0,0.18)";
 
     const ctx = gsap.context(() => {
       // --- Hero: entrance on load (does not depend on scroll) ---
       if (!reduced) {
         const tl = gsap.timeline({
           defaults: { ease: "expo.out" },
-          delay: 0.05,
+          delay: 0.12,
         });
-        tl.from(".svc-orb", { opacity: 0, scale: 0.85, duration: 1.2 }, 0)
-          .from(".svc-kicker", { opacity: 0, y: 18, duration: 0.65 }, 0.15)
+        tl.from(".svc-orb", { opacity: 0, scale: 0.92, duration: 1 }, 0)
+          .from(".svc-kicker", { opacity: 0, y: 14, duration: 0.55 }, 0.12)
           .from(
             ".svc-title-line",
-            { opacity: 0, y: 36, duration: 0.85, stagger: 0.12 },
-            0.22,
+            { opacity: 0, y: 28, duration: 0.75, stagger: 0.1 },
+            0.18,
           )
-          .from(".svc-lead", { opacity: 0, y: 20, duration: 0.8 }, "-=0.35")
+          .from(".svc-lead", { opacity: 0, y: 16, duration: 0.65 }, "-=0.28")
           .from(
             ".svc-meta-item",
-            { opacity: 0, y: 18, duration: 0.55, stagger: 0.11 },
-            "-=0.2",
+            { opacity: 0, y: 14, duration: 0.5, stagger: 0.09 },
+            "-=0.18",
           );
 
         if (glowRef.current) {
@@ -147,7 +152,7 @@ export default function ServicesPageContent() {
       // --- Cards: per-card scroll reveal (Lenis needs explicit scroller) ---
       if (!reduced) {
         const cards = gsap.utils.toArray<HTMLElement>(".svc-card");
-        gsap.set(cards, { force3D: true });
+        gsap.set(cards, { force3D: true, transformPerspective: 1200 });
         cards.forEach((card, i) => {
           const bg = card.querySelector<HTMLElement>(".svc-card-bg");
           const content = card.querySelector<HTMLElement>(".svc-card-content");
@@ -155,27 +160,17 @@ export default function ServicesPageContent() {
 
           gsap.fromTo(
             card,
-            {
-              opacity: 0,
-              y: 88,
-              scale: 0.9,
-              rotateX: 8,
-              transformOrigin: "50% 0%",
-              clipPath: "inset(18% 0 0 0 round 1.5rem)",
-            },
+            { opacity: 0, y: 56 },
             {
               opacity: 1,
               y: 0,
-              scale: 1,
-              rotateX: 0,
-              clipPath: "inset(0% 0 0 0 round 1.5rem)",
-              duration: 1.05,
-              delay: i * 0.06,
-              ease: "power4.out",
+              duration: 0.85,
+              delay: Math.min(i * 0.05, 0.25),
+              ease: "power3.out",
               scrollTrigger: {
                 trigger: card,
                 scroller,
-                start: "top 90%",
+                start: "top 88%",
                 once: true,
                 invalidateOnRefresh: true,
               },
@@ -185,17 +180,17 @@ export default function ServicesPageContent() {
           if (content) {
             gsap.fromTo(
               content,
-              { y: 24, opacity: 0 },
+              { y: 16, opacity: 0 },
               {
                 y: 0,
                 opacity: 1,
-                duration: 0.75,
-                delay: 0.1 + i * 0.04,
-                ease: "power3.out",
+                duration: 0.6,
+                delay: 0.08 + Math.min(i * 0.03, 0.12),
+                ease: "power2.out",
                 scrollTrigger: {
                   trigger: card,
                   scroller,
-                  start: "top 88%",
+                  start: "top 86%",
                   once: true,
                   invalidateOnRefresh: true,
                 },
@@ -203,19 +198,7 @@ export default function ServicesPageContent() {
             );
           }
 
-          gsap.to(card, {
-            yPercent: -2.5,
-            ease: "none",
-            scrollTrigger: {
-              trigger: card,
-              scroller,
-              start: "top bottom",
-              end: "bottom top",
-              scrub: 1.05,
-              invalidateOnRefresh: true,
-            },
-          });
-
+          /* Single scroll-linked effect: background parallax only (no card scrub). */
           if (bg) {
             gsap.fromTo(
               bg,
@@ -236,32 +219,58 @@ export default function ServicesPageContent() {
             );
           }
 
-          ScrollTrigger.create({
-            trigger: card,
-            scroller,
-            start: "top 62%",
-            end: "bottom 38%",
-            onEnter: () => {
-              gsap.to(card, { scale: 1.025, duration: 0.45, ease: "power3.out" });
-              if (focus) gsap.to(focus, { opacity: 1, duration: 0.45, ease: "power3.out" });
-            },
-            onEnterBack: () => {
-              gsap.to(card, { scale: 1.025, duration: 0.45, ease: "power3.out" });
-              if (focus) gsap.to(focus, { opacity: 1, duration: 0.45, ease: "power3.out" });
-            },
-            onLeave: () => {
-              gsap.to(card, { scale: 1, duration: 0.4, ease: "power2.out" });
-              if (focus) gsap.to(focus, { opacity: 0, duration: 0.35, ease: "power2.out" });
-            },
-            onLeaveBack: () => {
-              gsap.to(card, { scale: 1, duration: 0.4, ease: "power2.out" });
-              if (focus) gsap.to(focus, { opacity: 0, duration: 0.35, ease: "power2.out" });
-            },
+          if (focus) {
+            gsap
+              .timeline({
+                scrollTrigger: {
+                  trigger: card,
+                  scroller,
+                  start: "top 62%",
+                  end: "bottom 38%",
+                  toggleActions: "play reverse play reverse",
+                },
+              })
+              .fromTo(
+                focus,
+                { opacity: 0 },
+                { opacity: 1, duration: 0.45, ease: "power2.out" },
+                0,
+              );
+          }
+
+          const onPointerEnter = () => {
+            gsap.to(card, {
+              y: -6,
+              scale: 1.01,
+              boxShadow: "0 24px 60px rgba(0,0,0,0.12)",
+              duration: 0.45,
+              ease: "power2.out",
+              overwrite: "auto",
+            });
+          };
+
+          const onPointerLeave = () => {
+            gsap.to(card, {
+              y: 0,
+              scale: 1,
+              boxShadow: CARD_SHADOW_REST,
+              rotationX: 0,
+              rotationY: 0,
+              duration: 0.45,
+              ease: "power2.out",
+              overwrite: "auto",
+            });
+          };
+
+          card.addEventListener("pointerenter", onPointerEnter);
+          card.addEventListener("pointerleave", onPointerLeave);
+          cardPointerCleanups.push(() => {
+            card.removeEventListener("pointerenter", onPointerEnter);
+            card.removeEventListener("pointerleave", onPointerLeave);
           });
 
+          /* Fine pointer only: subtle 3D tilt (rotation only — avoids fighting hover y/scale). */
           if (!coarsePointer) {
-            const xTo = gsap.quickTo(card, "x", { duration: 0.35, ease: "power3.out" });
-            const yTo = gsap.quickTo(card, "y", { duration: 0.35, ease: "power3.out" });
             const rxTo = gsap.quickTo(card, "rotationX", { duration: 0.45, ease: "power3.out" });
             const ryTo = gsap.quickTo(card, "rotationY", { duration: 0.45, ease: "power3.out" });
 
@@ -269,51 +278,135 @@ export default function ServicesPageContent() {
               const rect = card.getBoundingClientRect();
               const nx = (e.clientX - rect.left) / Math.max(rect.width, 1) - 0.5;
               const ny = (e.clientY - rect.top) / Math.max(rect.height, 1) - 0.5;
-              xTo(nx * 5);
-              yTo(ny * 5);
               rxTo(-ny * 4);
               ryTo(nx * 5);
             };
 
-            const onLeave = () => {
-              xTo(0);
-              yTo(0);
-              rxTo(0);
-              ryTo(0);
-            };
-
             card.addEventListener("pointermove", onMove);
-            card.addEventListener("pointerleave", onLeave);
-            cardHoverCleanups.push(() => {
+            cardPointerCleanups.push(() => {
               card.removeEventListener("pointermove", onMove);
-              card.removeEventListener("pointerleave", onLeave);
             });
           }
         });
       }
 
-      // --- Process steps (subtle scroll-in only; no line scrub) ---
+      // --- Process: intro + journey line scrub + step reveals ---
       if (!reduced) {
-        const processNodes = gsap.utils.toArray<HTMLElement>(".svc-process-node");
-        processNodes.forEach((node, i) => {
-          gsap.fromTo(
-            node,
-            { opacity: 0, y: 28 },
-            {
-              opacity: 1,
-              y: 0,
-              duration: 0.65,
-              delay: i * 0.06,
-              ease: "power3.out",
-              scrollTrigger: {
-                trigger: node,
-                scroller,
-                start: "top 88%",
-                once: true,
-              },
+        gsap
+          .timeline({
+            scrollTrigger: {
+              trigger: ".svc-process-intro",
+              scroller,
+              start: "top 80%",
+              once: true,
+              invalidateOnRefresh: true,
             },
+          })
+          .fromTo(
+            ".svc-process-kicker",
+            { opacity: 0, y: 22 },
+            { opacity: 1, y: 0, duration: 0.55, ease: "power3.out" },
+            0,
+          )
+          .fromTo(
+            ".svc-process-title",
+            { opacity: 0, y: 32 },
+            { opacity: 1, y: 0, duration: 0.72, ease: "power3.out" },
+            0.1,
+          )
+          .fromTo(
+            ".svc-process-lead",
+            { opacity: 0, y: 24 },
+            { opacity: 1, y: 0, duration: 0.65, ease: "power2.out" },
+            0.22,
           );
-        });
+
+        gsap.fromTo(
+          ".svc-process-line-fill",
+          { scaleY: 0 },
+          {
+            scaleY: 1,
+            ease: "none",
+            scrollTrigger: {
+              trigger: ".svc-process-journey",
+              scroller,
+              start: "top 58%",
+              end: "bottom 62%",
+              scrub: 0.65,
+              invalidateOnRefresh: true,
+            },
+          },
+        );
+
+        gsap.fromTo(
+          ".svc-process-node",
+          { opacity: 0, y: 52 },
+          {
+            opacity: 1,
+            y: 0,
+            duration: 0.88,
+            stagger: 0.2,
+            ease: "power3.out",
+            scrollTrigger: {
+              trigger: ".svc-process-journey",
+              scroller,
+              start: "top 78%",
+              once: true,
+              invalidateOnRefresh: true,
+            },
+          },
+        );
+
+        gsap.fromTo(
+          ".svc-process-node-marker",
+          { scale: 0.35, opacity: 0 },
+          {
+            scale: 1,
+            opacity: 1,
+            duration: 0.58,
+            stagger: 0.16,
+            ease: "back.out(1.55)",
+            scrollTrigger: {
+              trigger: ".svc-process-journey",
+              scroller,
+              start: "top 76%",
+              once: true,
+              invalidateOnRefresh: true,
+            },
+          },
+        );
+
+        gsap.fromTo(
+          ".svc-process-connector",
+          { scaleX: 0, opacity: 0 },
+          {
+            scaleX: 1,
+            opacity: 1,
+            duration: 1,
+            ease: "power3.out",
+            transformOrigin: "50% 50%",
+            scrollTrigger: {
+              trigger: ".svc-process-connector-wrap",
+              scroller,
+              start: "top 88%",
+              once: true,
+              invalidateOnRefresh: true,
+            },
+          },
+        );
+      } else {
+        gsap.set(".svc-process-line-fill", { scaleY: 1 });
+        gsap.set(
+          [
+            ".svc-process-kicker",
+            ".svc-process-title",
+            ".svc-process-lead",
+            ".svc-process-node",
+            ".svc-process-node-marker",
+            ".svc-process-connector",
+          ],
+          { clearProps: "all" },
+        );
       }
 
       // --- Section headings (scroll) ---
@@ -321,12 +414,12 @@ export default function ServicesPageContent() {
         gsap.utils.toArray<HTMLElement>(".svc-fade-up").forEach((el) => {
           gsap.fromTo(
             el,
-            { opacity: 0, y: 28 },
+            { opacity: 0, y: 22 },
             {
               opacity: 1,
               y: 0,
-              duration: 0.72,
-              ease: "power3.out",
+              duration: 0.65,
+              ease: "power2.out",
               scrollTrigger: {
                 trigger: el,
                 scroller,
@@ -339,20 +432,43 @@ export default function ServicesPageContent() {
         });
       }
 
-      // --- CTA ---
-      gsap.from(".svc-cta-inner", {
-        opacity: reduced ? 1 : 0,
-        y: reduced ? 0 : 28,
-        scale: reduced ? 1 : 0.99,
-        duration: reduced ? 0 : 0.85,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: ".svc-cta",
-          scroller,
-          start: "top 88%",
-          once: true,
-        },
-      });
+      // --- CTA (staggered copy + button) ---
+      if (!reduced) {
+        gsap
+          .timeline({
+            scrollTrigger: {
+              trigger: ".svc-cta",
+              scroller,
+              start: "top 82%",
+              once: true,
+              invalidateOnRefresh: true,
+            },
+          })
+          .fromTo(
+            ".svc-cta-kicker",
+            { opacity: 0, y: 22 },
+            { opacity: 1, y: 0, duration: 0.55, ease: "power3.out" },
+            0,
+          )
+          .fromTo(
+            ".svc-cta-headline",
+            { opacity: 0, y: 36 },
+            { opacity: 1, y: 0, duration: 0.75, ease: "power3.out" },
+            0.12,
+          )
+          .fromTo(
+            ".svc-cta-lead",
+            { opacity: 0, y: 26 },
+            { opacity: 1, y: 0, duration: 0.65, ease: "power2.out" },
+            0.24,
+          )
+          .fromTo(
+            ".svc-cta-btn",
+            { opacity: 0, y: 28 },
+            { opacity: 1, y: 0, duration: 0.62, ease: "power3.out" },
+            0.38,
+          );
+      }
 
       // Subtle parallax on section glow (scroll-linked)
       if (!reduced && glowRef.current) {
@@ -370,15 +486,10 @@ export default function ServicesPageContent() {
       }
     }, rootRef);
 
-    const refresh = () => ScrollTrigger.refresh();
-    requestAnimationFrame(refresh);
-    const t1 = window.setTimeout(refresh, 120);
-    const t2 = window.setTimeout(refresh, 450);
+    scheduleScrollTriggerRefresh();
 
     return () => {
-      window.clearTimeout(t1);
-      window.clearTimeout(t2);
-      cardHoverCleanups.forEach((fn) => fn());
+      cardPointerCleanups.forEach((fn) => fn());
       ctx.revert();
     };
   }, []);
@@ -386,7 +497,7 @@ export default function ServicesPageContent() {
   return (
     <section
       ref={rootRef}
-      className="relative overflow-hidden border-t border-black/5 bg-[linear-gradient(180deg,var(--background)_0%,#fafafa_12%,var(--background)_38%,#f8f9fa_100%)] pb-24 pt-14 md:pb-32 md:pt-16 lg:pb-40 lg:pt-20"
+      className="relative overflow-x-clip overflow-y-visible border-t border-black/5 bg-[linear-gradient(180deg,var(--background)_0%,#fafafa_12%,var(--background)_38%,#f8f9fa_100%)] pb-36 pt-10 md:pb-48 md:pt-12 lg:pb-60 lg:pt-16"
       aria-label="Services overview"
     >
       {/* Ambient + grid */}
@@ -410,7 +521,7 @@ export default function ServicesPageContent() {
 
       <div className="_container relative z-10">
         <header className="svc-intro">
-          <div className="relative overflow-hidden rounded-[1.75rem] border border-black/10 bg-white px-4 py-10 shadow-[0_32px_80px_-20px_rgba(0,0,0,0.12)] transition-shadow duration-500 hover:shadow-[0_40px_90px_-18px_rgba(0,0,0,0.14)] sm:px-9 sm:py-14 md:px-12 md:py-16 lg:px-16 lg:py-20 xl:px-[4.25rem] xl:py-[5.25rem] box-content m-[9px] p-[2px]">
+          <div className="relative w-full max-w-full overflow-hidden rounded-[1.75rem] border border-black/10 bg-white px-5 py-12 shadow-[0_24px_64px_-18px_rgba(0,0,0,0.1)] transition-shadow duration-500 hover:shadow-[0_32px_72px_-16px_rgba(0,0,0,0.12)] sm:px-9 sm:py-14 md:px-12 md:py-16 lg:px-16 lg:py-20 xl:px-[4rem] xl:py-[5rem]">
             <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-accent/35 to-transparent" />
             <div className="absolute left-0 top-0 h-full w-px bg-gradient-to-b from-accent/80 via-accent/25 to-transparent lg:left-9 xl:left-11" />
             <div className="grid grid-cols-1 gap-14 lg:grid-cols-[minmax(0,1fr)_minmax(260px,340px)] lg:items-start lg:gap-x-14 xl:gap-x-20">
@@ -466,7 +577,7 @@ export default function ServicesPageContent() {
           </div>
         </header>
 
-        <section className="svc-cap-section mb-16 md:mb-20" aria-labelledby="svc-cap-heading">
+        <section className="svc-cap-section mt-6 mb-16 md:mt-10 md:mb-24" aria-labelledby="svc-cap-heading">
           <div className="svc-fade-up flex flex-col gap-6 border-b border-black/10 pb-8 md:flex-row md:items-end md:justify-between md:gap-10 md:pb-10">
             <div className="max-w-2xl space-y-4">
               <span className="text-[10px] font-black uppercase tracking-[0.42em] text-accent">
@@ -491,7 +602,7 @@ export default function ServicesPageContent() {
           </div>
         </section>
 
-        <div className="svc-card-grid mb-24 grid grid-cols-1 gap-7 perspective-[1400px] sm:grid-cols-2 sm:gap-8 md:mb-28 md:gap-8 lg:mb-32 lg:grid-cols-6 lg:gap-9">
+        <div className="svc-card-grid mb-32 grid grid-cols-1 gap-8 perspective-[1400px] sm:grid-cols-2 sm:gap-9 md:mb-40 md:gap-9 lg:mb-48 lg:grid-cols-6 lg:gap-10">
           {SERVICES.map((service, index) => {
             const Icon = service.icon;
             const layoutClass =
@@ -501,7 +612,7 @@ export default function ServicesPageContent() {
             return (
               <article
                 key={service.title}
-                className={`svc-card group relative isolate flex min-h-[440px] flex-col overflow-hidden rounded-[2rem] border border-white/10 bg-black text-white shadow-[0_28px_64px_rgba(0,0,0,0.18)] ring-1 ring-black/20 transition-all duration-500 hover:border-accent/50 hover:shadow-[0_44px_100px_rgba(0,0,0,0.26)] md:min-h-[520px] ${layoutClass}`}
+                className={`svc-card group relative isolate flex min-h-[440px] flex-col overflow-hidden rounded-[2rem] border border-white/10 bg-black text-white shadow-[0_28px_64px_rgba(0,0,0,0.18)] ring-1 ring-black/20 md:min-h-[520px] ${layoutClass}`}
                 style={{ transformStyle: "preserve-3d" }}
               >
                 <div
@@ -510,7 +621,7 @@ export default function ServicesPageContent() {
                   aria-hidden="true"
                 />
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/74 via-black/34 to-black/22" />
-                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,rgba(0,191,255,0.28),transparent_62%)] opacity-70 transition-opacity duration-700 group-hover:opacity-100" />
+                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,var(--accent-radial-card),transparent_62%)] opacity-70 transition-opacity duration-700 group-hover:opacity-100" />
                 <div className="svc-card-focus pointer-events-none absolute inset-0 bg-gradient-to-br from-accent/12 via-transparent to-transparent opacity-0" />
                 <div className="pointer-events-none absolute inset-x-5 top-0 h-px bg-gradient-to-r from-transparent via-white/50 to-transparent opacity-80 transition-opacity duration-500 group-hover:via-white/70 sm:inset-x-7" />
 
@@ -547,15 +658,14 @@ export default function ServicesPageContent() {
                   </ul>
 
                   {service.link ? (
-                    <a
+                    <ButtonPrimary
                       href={service.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 rounded-full border border-accent/70 bg-accent px-5 py-2.5 text-[10px] font-black uppercase tracking-[0.26em] text-white transition-transform hover:scale-[1.03]"
+                      external
+                      className="gap-2 rounded-full border border-accent/70 bg-accent px-5 py-2.5 text-[10px] font-black uppercase tracking-[0.26em] text-white shadow-md shadow-accent/15 active:scale-[0.98]"
                     >
                       WinPro AI
                       <ArrowUpRight size={13} />
-                    </a>
+                    </ButtonPrimary>
                   ) : (
                     <span className="text-[10px] font-black uppercase leading-[1.4] tracking-[0.25em] text-white/74">
                       Strategy-led
@@ -567,68 +677,87 @@ export default function ServicesPageContent() {
           })}
         </div>
 
-        <div className="svc-process-container relative mb-32 md:mb-44 lg:mb-52">
-          {/* Intro: full-width stack, generous vertical rhythm */}
-          <div className="svc-fade-up max-w-3xl space-y-7 pb-20 md:space-y-9 md:pb-24 lg:pb-28">
-            <span className="block text-[10px] font-black uppercase tracking-[0.42em] text-accent">
+        <div className="svc-process-cta-stack flex flex-col gap-[clamp(2.75rem,7vw,5.5rem)] pt-4 md:gap-[clamp(3.25rem,8vw,6.5rem)] md:pt-6 lg:pt-8">
+        <div className="svc-process-container relative rounded-[1.75rem] border border-black/[0.07] bg-foreground/[0.02] px-5 py-12 shadow-[inset_0_1px_0_rgba(255,255,255,0.6)] sm:px-8 sm:py-14 md:px-10 md:py-16 lg:rounded-[2rem] lg:px-12 lg:py-20">
+          <div className="svc-process-intro flex max-w-3xl flex-col gap-8 pb-16 md:gap-10 md:pb-20 lg:gap-12 lg:pb-28">
+            <span className="svc-process-kicker block text-[10px] font-black uppercase tracking-[0.42em] text-accent">
               How we work
             </span>
-            <h2 className="font-heading text-[2rem] font-black uppercase leading-[1.05] tracking-tighter text-foreground sm:text-[2.5rem] md:text-[3rem] md:leading-[1.02] lg:text-[3.5rem]">
+            <h2 className="svc-process-title font-heading text-[2rem] font-black uppercase leading-[1.05] tracking-tighter text-foreground sm:text-[2.5rem] md:text-[3rem] md:leading-[1.02] lg:text-[3.5rem]">
               Process &amp; scope
             </h2>
-            <p className="max-w-2xl text-base leading-[1.85] text-foreground/55 md:text-lg md:leading-[1.8]">
+            <p className="svc-process-lead max-w-2xl text-base leading-[1.95] text-foreground/55 md:text-lg md:leading-[1.88]">
               We collapse timelines by focusing only on what matters: discovering the edge, designing
               the system, and deploying for growth.
             </p>
           </div>
 
-          {/* Steps: three clear cards, no cramped connector lines */}
           <div className="svc-process-track">
-            <div className="grid grid-cols-1 gap-12 sm:gap-14 md:grid-cols-3 md:gap-8 lg:gap-10 xl:gap-12">
-              {PROCESS.map((phase) => (
-                <div
-                  key={phase.step}
-                  className="svc-process-node group flex h-full flex-col rounded-2xl border border-black/10 bg-white p-8 shadow-[0_2px_24px_-4px_rgba(0,0,0,0.06)] transition-shadow duration-300 hover:shadow-[0_12px_40px_-8px_rgba(0,0,0,0.1)] sm:p-9 md:p-8 lg:p-10"
-                >
-                  <div className="svc-process-dot mb-8 flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-accent/25 bg-accent/5 text-xs font-black tracking-widest text-accent md:mb-9 md:h-14 md:w-14">
-                    <span>{phase.step}</span>
-                  </div>
-                  <div className="space-y-5">
-                    <h4 className="text-xl font-black uppercase tracking-tighter text-foreground transition-colors duration-300 group-hover:text-accent md:text-[1.35rem] lg:text-2xl">
-                      {phase.title}
-                    </h4>
-                    <p className="text-[15px] leading-[1.85] text-foreground/50 md:text-base md:leading-[1.8] lg:text-[17px]">
-                      {phase.text}
-                    </p>
-                  </div>
-                </div>
-              ))}
+            <div className="svc-process-journey relative">
+              {/* Timeline rail — desktop only */}
+              <div
+                className="pointer-events-none absolute left-[27px] top-6 bottom-6 hidden w-[2px] rounded-full bg-black/10 md:block md:left-[39px]"
+                aria-hidden
+              />
+              <div
+                className="svc-process-line-fill pointer-events-none absolute left-[27px] top-6 bottom-6 hidden w-[2px] origin-top scale-y-0 rounded-full bg-accent shadow-[0_0_20px_rgba(0,0,0,0.06)] md:block md:left-[39px]"
+                aria-hidden
+              />
+
+              <div className="relative z-[1] flex flex-col gap-20 sm:gap-24 md:gap-32 lg:gap-40">
+                {PROCESS.map((phase) => (
+                  <article
+                    key={phase.step}
+                    className="svc-process-node group flex gap-8 sm:gap-10 md:gap-14 md:items-start"
+                  >
+                    <div className="svc-process-node-marker relative z-[2] flex h-[3.25rem] w-[3.25rem] shrink-0 items-center justify-center rounded-2xl border border-black/10 bg-background shadow-[0_8px_32px_-6px_rgba(0,0,0,0.1)] ring-1 ring-black/[0.05] transition-all duration-500 group-hover:-translate-y-1 group-hover:border-accent/45 group-hover:shadow-[0_16px_48px_-12px_rgba(0,0,0,0.14)] md:h-20 md:w-20">
+                      <span className="font-heading text-[10px] font-black tracking-[0.22em] text-accent md:text-[11px]">
+                        {phase.step}
+                      </span>
+                    </div>
+                    <div className="min-w-0 flex-1 flex flex-col gap-6 pt-0.5 md:gap-8 md:pt-3">
+                      <h3 className="font-heading text-[clamp(1.65rem,4.2vw,2.85rem)] font-black uppercase leading-[0.98] tracking-tighter text-foreground transition-colors duration-300 group-hover:text-accent">
+                        {phase.title}
+                      </h3>
+                      <p className="max-w-xl text-[15px] leading-[1.9] text-foreground/50 md:text-lg md:leading-[1.85]">
+                        {phase.text}
+                      </p>
+                    </div>
+                  </article>
+                ))}
+              </div>
             </div>
+          </div>
+
+          <div className="svc-process-connector-wrap py-20 md:py-28 lg:py-36" aria-hidden>
+            <div className="svc-process-connector mx-auto h-px max-w-2xl bg-gradient-to-r from-transparent via-accent/35 to-transparent" />
           </div>
         </div>
 
-        <div className="svc-cta relative isolate mt-4 overflow-hidden rounded-3xl border border-black/10 bg-white shadow-[0_28px_72px_-20px_rgba(0,0,0,0.1)]">
-          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,rgba(0,136,204,0.05)_0%,transparent_45%)]" />
-          <div className="svc-cta-inner relative flex flex-col gap-14 px-8 py-16 sm:px-12 sm:py-20 md:gap-16 md:px-16 md:py-24 lg:flex-row lg:items-end lg:justify-between lg:gap-20 lg:px-20 lg:py-28 xl:px-24">
-            <div className="max-w-2xl space-y-10">
-              <p className="text-[10px] font-black uppercase tracking-[0.45em] text-accent">
+        <div className="svc-cta relative isolate overflow-hidden rounded-[1.75rem] border border-black/[0.08] bg-gradient-to-br from-white via-white to-muted/30 shadow-[0_32px_64px_-28px_rgba(0,0,0,0.14)] ring-1 ring-black/[0.04] sm:rounded-[2rem]">
+          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,var(--accent-gradient-slice)_0%,transparent_50%)] opacity-90" />
+          <div className="pointer-events-none absolute -right-24 -top-24 h-64 w-64 rounded-full bg-accent/[0.07] blur-3xl" aria-hidden />
+          <div className="svc-cta-inner relative flex flex-col gap-20 px-8 py-20 sm:px-12 sm:py-24 md:gap-24 md:px-16 md:py-28 lg:flex-row lg:items-end lg:justify-between lg:gap-28 lg:px-20 lg:py-32 xl:px-24">
+            <div className="max-w-2xl flex flex-col gap-8 md:gap-10 lg:gap-12">
+              <p className="svc-cta-kicker text-[10px] font-black uppercase tracking-[0.45em] text-accent">
                 Next step
               </p>
-              <p className="font-heading text-[1.75rem] font-black uppercase leading-[1.18] tracking-tight text-foreground sm:text-3xl md:text-[2.25rem] md:leading-[1.14] lg:text-[2.5rem]">
+              <p className="svc-cta-headline font-heading text-[1.75rem] font-black uppercase leading-[1.18] tracking-tight text-foreground sm:text-3xl md:text-[2.25rem] md:leading-[1.14] lg:text-[2.5rem]">
                 Tell us what you&apos;re building — we&apos;ll scope it.
               </p>
-              <p className="max-w-xl text-base leading-[1.85] text-foreground/50 md:text-lg md:leading-[1.8]">
+              <p className="svc-cta-lead max-w-xl text-base leading-[1.95] text-foreground/50 md:text-lg md:leading-[1.88]">
                 Share goals, timeline, and budget band—we reply with a clear path forward.
               </p>
             </div>
-            <Link
+            <ButtonPrimary
               href="/contact"
-              className="inline-flex shrink-0 items-center justify-center gap-3 self-start rounded-full bg-accent px-12 py-[1.125rem] text-[11px] font-black uppercase tracking-[0.28em] text-white shadow-md shadow-accent/25 transition-transform hover:scale-[1.02] active:scale-[0.98] lg:self-end"
+              className="svc-cta-btn shrink-0 self-start rounded-full bg-accent px-12 py-[1.125rem] text-[11px] font-black uppercase tracking-[0.28em] text-white shadow-md shadow-accent/25 active:scale-[0.98] lg:self-end"
             >
               Start a project
               <ArrowUpRight size={18} strokeWidth={2.25} />
-            </Link>
+            </ButtonPrimary>
           </div>
+        </div>
         </div>
       </div>
     </section>

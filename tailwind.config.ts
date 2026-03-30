@@ -13,7 +13,7 @@ const config: Config = {
         foreground: "#0a0a0a",
         accent: "#0088cc",
         secondary: "#6e563a",
-        muted: "#f4f4f5",
+        muted: "var(--surface-muted)",
       },
       fontFamily: {
         sans: ["var(--font-satoshi)", "Inter", "sans-serif"],

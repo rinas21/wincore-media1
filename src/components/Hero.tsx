@@ -19,6 +19,8 @@ import {
 import { useLenis } from "@/context/LenisContext";
 import { usePreloaderDone } from "@/context/PreloaderContext";
 import SplitType from "split-type";
+import { ButtonPrimary } from "@/components/ui/ButtonPrimary";
+import { accentRgba } from "@/lib/accent";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -27,9 +29,9 @@ const ctaHover =
 
 /** TFTL-style floating hero badges — accent pills (reference: tftl-agency/components/Hero.tsx) */
 const HERO_TIPS: { text: string; bg: string; color: string }[] = [
-  { text: "Creative digital studio", bg: "rgba(0,136,204,0.08)", color: "#0a0a0a" },
-  { text: "WebGL · Motion · AI", bg: "rgba(0,0,0,0.04)", color: "#0a0a0a" },
-  { text: "Colombo & global", bg: "rgba(0,136,204,0.06)", color: "#0a0a0a" },
+  { text: "Creative digital studio", bg: "var(--accent-tip-bg)", color: "var(--foreground)" },
+  { text: "WebGL · Motion · AI", bg: "var(--foreground-wash-4)", color: "var(--foreground)" },
+  { text: "Colombo & global", bg: "var(--accent-tip-bg-soft)", color: "var(--foreground)" },
 ];
 
 const HeroScene = dynamic(() => import("@/components/hero/HeroScene"), {
@@ -123,6 +125,8 @@ export default function Hero() {
     let cleanupGlintHover: (() => void) | undefined;
     const splits: SplitType[] = [];
 
+    let kpiCountScrollTrigger: ScrollTrigger | undefined;
+
     const ctx = gsap.context(() => {
       const root = introRef.current;
       if (!root) return;
@@ -164,7 +168,14 @@ export default function Hero() {
         gsap.set(wordEls, { y: "0.65em", opacity: 0 });
       }
 
-      const HEADLINE_START = 0.42;
+      const EYEBROW_STAGGER = 0.09;
+      const EYEBROW_DUR = 0.58;
+      const eyebrowCount = root.querySelectorAll(".hero-eyebrow-part").length || 2;
+      const lastEyebrowEnd =
+        EYEBROW_STAGGER * Math.max(0, eyebrowCount - 1) + EYEBROW_DUR;
+      const HEADLINE_GAP = 0.12;
+      const HEADLINE_START = lastEyebrowEnd + HEADLINE_GAP;
+
       const WORD_STAGGER = 0.07;
       const WORD_DURATION = 0.62;
       const lastWordT =
@@ -173,15 +184,25 @@ export default function Hero() {
           : HEADLINE_START;
       const performsInAt = wordEls.length ? lastWordT : HEADLINE_START;
       const performsDone = performsInAt + 0.72;
-      const headlineEnd = (wordEls.length ? performsDone : HEADLINE_START + 0.55) + 0.04;
+
+      let performsDoneLine = HEADLINE_START;
+      if (useLineFallback) {
+        performsDoneLine = HEADLINE_START + 0.95 + 0.12 + 0.78;
+      }
+      const CANVAS_GAP = 0.12;
+      const CANVAS_IN_DUR = 0.88;
+      const canvasStart = (useLineFallback ? performsDoneLine : performsDone) + CANVAS_GAP;
+      const proofStart = canvasStart + CANVAS_IN_DUR + 0.08;
 
       const tl = gsap.timeline({ delay: 0.08, defaults: { ease: "power3.out" } });
 
+      tl.addLabel("intro", 0);
       tl.to(
         ".hero-eyebrow-part, .hero-tag-pill",
-        { autoAlpha: 1, y: 0, duration: 0.58, stagger: 0.09, ease: "power3.out" },
+        { autoAlpha: 1, y: 0, duration: EYEBROW_DUR, stagger: EYEBROW_STAGGER, ease: "power3.out" },
         0,
       );
+      tl.addLabel("headline", HEADLINE_START);
 
       if (useLineFallback) {
         tl.to(
@@ -224,32 +245,69 @@ export default function Hero() {
         );
       }
 
+      /* Canvas enters after headline (ambient depth, not competing with type) */
       tl.fromTo(
         ".hero-canvas-wrap",
         { autoAlpha: 0, scale: 1.04 },
-        { autoAlpha: 1, scale: 1, duration: 1.05, ease: "power3.out" },
-        0.42,
+        { autoAlpha: 1, scale: 1, duration: CANVAS_IN_DUR, ease: "power3.out" },
+        canvasStart,
       );
 
+      tl.addLabel("proof", proofStart);
       tl.to(
         ".hero-sub-line",
         { autoAlpha: 1, y: 0, duration: 0.72, stagger: 0.14, ease: "power3.out" },
-        headlineEnd,
+        proofStart,
       );
 
       tl.from(
-        ".hero-side-card, .hero-kpi-card",
+        ".hero-side-card",
         {
           opacity: 0,
           scale: 0.95,
           y: 20,
           duration: 0.75,
-          stagger: 0.2,
           ease: "back.out(1.5)",
         },
         ">",
       );
 
+      tl.from(
+        ".hero-kpi-card",
+        {
+          opacity: 0,
+          scale: 0.95,
+          y: 20,
+          duration: 0.75,
+          stagger: 0.18,
+          ease: "back.out(1.5)",
+        },
+        ">-0.12",
+      );
+
+      /* Count-up is scroll-triggered, but registration waits until KPI cards have entered (after headline/proof). */
+      tl.call(
+        () => {
+          if (!introRef.current) return;
+          kpiCountScrollTrigger = ScrollTrigger.create({
+            trigger: introRef.current.querySelector(".hero-kpi-card") ?? introRef.current,
+            start: "top 85%",
+            once: true,
+            scroller: getScroller(),
+            onEnter: () => {
+              if (!hasCountedRef.current && introRef.current) {
+                hasCountedRef.current = true;
+                startCountUp(introRef.current);
+              }
+            },
+          });
+          scheduleScrollTriggerRefresh();
+        },
+        undefined,
+        ">",
+      );
+
+      tl.addLabel("cta");
       tl.to(
         ".hero-action-btn",
         { autoAlpha: 1, y: 0, duration: 0.45, stagger: 0.1, ease: "power2.out" },
@@ -257,11 +315,21 @@ export default function Hero() {
       );
 
       tl.add(() => {
-        if (!hasCountedRef.current && introRef.current) {
-          hasCountedRef.current = true;
-          startCountUp(introRef.current);
-        }
-      });
+        const cta = root.querySelector<HTMLElement>(".hero-cta");
+        if (!cta) return;
+        gsap.fromTo(
+          cta,
+          { scale: 0.95 },
+          {
+            scale: 1.02,
+            duration: 0.4,
+            ease: "power2.out",
+            repeat: 1,
+            yoyo: true,
+            transformOrigin: "50% 50%",
+          },
+        );
+      }, ">");
 
       tl.to(".hero-scroll-hint", { autoAlpha: 1, duration: 0.45, ease: "power2.out" }, ">");
 
@@ -441,6 +509,7 @@ export default function Hero() {
     }
 
     return () => {
+      kpiCountScrollTrigger?.kill();
       splits.forEach((s) => s.revert());
       cleanupGlintHover?.();
       cleanupMagnetic?.();
@@ -479,6 +548,17 @@ export default function Hero() {
       scheduleScrollTriggerRefresh();
       return () => ctx.revert();
     }
+
+    const heroPin = ScrollTrigger.create({
+      trigger: introRef.current,
+      start: "top top",
+      end: "+=600",
+      pin: true,
+      pinSpacing: true,
+      anticipatePin: 1,
+      scroller,
+      id: "hero-pin",
+    });
 
     const ctx = gsap.context(() => {
       // hero content fades on scroll
@@ -653,7 +733,7 @@ export default function Hero() {
       // Keep Process CTA alive through the hero scroll range.
       gsap.to(".hero-approach-btn", {
         y: -5,
-        boxShadow: "0 18px 44px rgba(0,191,255,0.15)",
+        boxShadow: `0 18px 44px ${accentRgba(0.15)}`,
         ease: "none",
         scrollTrigger: {
           trigger: introRef.current,
@@ -676,21 +756,25 @@ export default function Hero() {
         },
       });
 
-      // WebGL canvas fades out
-      gsap.to(".hero-canvas-wrap", {
-        opacity: 0.08,
-        scale: 1.05,
-        rotation: 0.3,
-        ease: "none",
-        immediateRender: false,
-        scrollTrigger: {
-          trigger: introRef.current,
-          scroller,
-          start: "top top",
-          end: "bottom top",
-          scrub: 0.9,
+      // WebGL canvas — subtle fade during hero pin (depth beat; not a second story layer)
+      gsap.fromTo(
+        ".hero-canvas-wrap",
+        { opacity: 1, scale: 1, rotation: 0 },
+        {
+          opacity: 0.14,
+          scale: 1.035,
+          rotation: 0.12,
+          ease: "none",
+          immediateRender: false,
+          scrollTrigger: {
+            trigger: introRef.current,
+            scroller,
+            start: "top top",
+            end: "+=600",
+            scrub: 0.65,
+          },
         },
-      });
+      );
     }, introRef);
 
     // ── reel section ──────────────────────────────────────────────────────
@@ -718,7 +802,11 @@ export default function Hero() {
     }, reelRef);
 
     scheduleScrollTriggerRefresh();
-    return () => { ctx.revert(); ctxReel.revert(); };
+    return () => {
+      heroPin.kill();
+      ctx.revert();
+      ctxReel.revert();
+    };
   }, [lenis, entranceUnlocked]);
 
   return (
@@ -753,7 +841,7 @@ export default function Hero() {
             {/* ── LEFT column ── */}
             <div className="hero-left-col flex flex-col text-left lg:col-span-6">
 
-              <p className="hero-eyebrow mb-6 text-[13px] md:text-[14px] font-black uppercase tracking-[0.45em] text-black/40">
+              <p className="hero-eyebrow mb-5 text-sm font-black uppercase tracking-[0.45em] text-black/40">
                 <span className="hero-eyebrow-part inline-block">Wincore · </span>
                 <span className="hero-eyebrow-part inline-block text-accent/90">Colombo &amp; global</span>
               </p>
@@ -761,7 +849,7 @@ export default function Hero() {
               {/*
                 Lines 1–2: .hero-line-split → SplitType words. Line 3: gradient word in .hero-performs-inner (no split).
               */}
-              <h1 className="hero-headline font-heading text-[2.75rem] font-black uppercase leading-[0.98] tracking-tight text-foreground sm:text-6xl md:text-7xl lg:text-[4.75rem] lg:leading-[0.95]">
+              <h1 className="hero-headline font-heading text-[2.75rem] font-black uppercase leading-[0.98] tracking-tight text-foreground sm:text-6xl md:text-7xl lg:text-[4.25rem] lg:leading-[0.95]">
                 <span className="hero-line block overflow-hidden pb-[0.2em]">
                   <span className="hero-line-inner hero-line-split block">Creative digital</span>
                 </span>
@@ -777,19 +865,19 @@ export default function Hero() {
                 </span>
               </h1>
 
-              <div className="hero-sub mt-8 max-w-2xl text-[1.125rem] font-light leading-relaxed text-black/55 md:mt-10 md:text-[1.35rem] lg:text-[1.45rem]">
+              <div className="hero-sub mt-5 max-w-xl text-base font-light leading-relaxed text-black/55 md:mt-6 md:text-lg">
                 <p className="hero-sub-line">
                   Brand systems, motion, WebGL, and AI-accelerated delivery — one team, one standard.
                 </p>
-                <p className="hero-sub-line mt-3">
+                <p className="hero-sub-line mt-2.5">
                   Built for clarity, speed, and measurable outcomes.
                 </p>
-                <div className="hero-sub-line mt-12 flex flex-col gap-6">
+                <div className="hero-sub-line mt-8 flex flex-col gap-5">
                   <div className="flex flex-wrap gap-2.5">
                     {HERO_TIPS.map((tip) => (
                       <span
                         key={tip.text}
-                        className="inline-flex items-center rounded-full px-3.5 py-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-widest shadow-sm transition-transform hover:scale-[1.03]"
+                        className="inline-flex items-center rounded-full px-3.5 py-1.5 text-xs font-bold uppercase tracking-widest shadow-sm transition-transform hover:scale-[1.03]"
                         style={{ background: tip.bg, color: tip.color }}
                       >
                         {tip.text}
@@ -798,20 +886,20 @@ export default function Hero() {
                   </div>
 
                   {/* New Triple Kicker */}
-                  <div className="hero-plus-kicker mt-4 flex flex-col md:flex-row md:items-center gap-6 md:gap-12 border-t border-black/5 pt-10">
+                  <div className="hero-plus-kicker mt-3 flex flex-col md:flex-row md:items-center gap-5 md:gap-10 border-t border-black/5 pt-6 md:pt-7">
                     <div className="flex flex-col gap-1.5">
-                      <span className="text-[10px] font-black uppercase tracking-[0.4em] text-black/25">Studio</span>
-                      <span className="text-[13px] font-bold uppercase tracking-widest text-foreground/70">Creative digital studio</span>
+                      <span className="text-xs font-black uppercase tracking-[0.4em] text-black/25">Studio</span>
+                      <span className="text-sm font-bold uppercase tracking-widest text-foreground/70">Creative digital studio</span>
                     </div>
                     <div className="hidden md:block w-px h-8 bg-black/5" />
                     <div className="flex flex-col gap-1.5">
-                      <span className="text-[10px] font-black uppercase tracking-[0.4em] text-accent/40">Core</span>
-                      <span className="text-[13px] font-bold uppercase tracking-widest text-accent/80">WebGL · Motion · AI</span>
+                      <span className="text-xs font-black uppercase tracking-[0.4em] text-accent/40">Core</span>
+                      <span className="text-sm font-bold uppercase tracking-widest text-accent/80">WebGL · Motion · AI</span>
                     </div>
                     <div className="hidden md:block w-px h-8 bg-black/5" />
                     <div className="flex flex-col gap-1.5">
-                      <span className="text-[10px] font-black uppercase tracking-[0.4em] text-black/25">Presence</span>
-                      <span className="text-[13px] font-bold uppercase tracking-widest text-foreground/70">Colombo &amp; global</span>
+                      <span className="text-xs font-black uppercase tracking-[0.4em] text-black/25">Presence</span>
+                      <span className="text-sm font-bold uppercase tracking-widest text-foreground/70">Colombo &amp; global</span>
                     </div>
                   </div>
                 </div>
@@ -836,7 +924,7 @@ export default function Hero() {
                       data-index={idx}
                     >
                       <div className="flex items-start gap-5 py-1">
-                        <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-black/[0.03] transition-all duration-500 group-hover/row:scale-110 group-hover/row:bg-accent group-hover/row:shadow-[0_8px_16px_rgba(0,191,255,0.25)]">
+                        <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-black/[0.03] transition-all duration-500 group-hover/row:scale-110 group-hover/row:bg-accent group-hover/row:shadow-[var(--shadow-accent-icon)]">
                           <item.icon
                             className="text-black/30 transition-colors duration-500 group-hover/row:text-white"
                             size={22}
@@ -863,7 +951,7 @@ export default function Hero() {
                 <div className="hero-side-cta mt-10 border-t border-black/[0.08] pt-8.5 md:mt-11 md:pt-9">
                   <Link
                     href="/about"
-                    className={`hero-approach-btn cursor-hover group/btn relative flex w-full items-center justify-between gap-5 overflow-hidden rounded-2xl border border-black/[0.11] bg-gradient-to-r from-black/[0.07] via-black/[0.03] to-transparent px-5 py-4 transition-all duration-300 hover:border-accent/45 hover:shadow-[0_16px_40px_rgba(0,191,255,0.14)] md:px-6 md:py-[1.125rem] ${ctaHover}`}
+                    className={`hero-approach-btn cursor-hover group/btn relative flex w-full items-center justify-between gap-5 overflow-hidden rounded-2xl border border-black/[0.11] bg-gradient-to-r from-black/[0.07] via-black/[0.03] to-transparent px-5 py-4 transition-all duration-300 hover:border-accent/45 hover:shadow-[var(--shadow-accent-approach)] md:px-6 md:py-[1.125rem] ${ctaHover}`}
                   >
                     <div className="hero-approach-glint pointer-events-none absolute inset-y-0 left-[-35%] w-[28%] -skew-x-12 bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
                     <div className="absolute inset-x-0 bottom-0 h-[1px] w-0 bg-gradient-to-r from-transparent via-accent/60 to-transparent transition-all duration-700 group-hover/btn:w-full" />
@@ -892,7 +980,7 @@ export default function Hero() {
 
           <div className="hero-kpi-strip mt-10 md:mt-12 lg:mt-16">
             <div className="grid grid-cols-1 gap-5 md:gap-6 lg:grid-cols-12 lg:gap-6">
-              <article className="hero-kpi-card group relative overflow-visible rounded-3xl border border-black/[0.08] bg-white/70 backdrop-blur-xl px-7 py-9 shadow-[0_30px_60px_rgba(0,0,0,0.03),inset_0_1px_0_rgba(255,255,255,0.8)] transition-shadow duration-500 hover:shadow-[0_45px_100px_rgba(0,191,255,0.08)] md:px-9 md:py-10 lg:px-10 lg:py-11 lg:col-span-4 [transform-style:preserve-3d]">
+              <article className="hero-kpi-card group relative overflow-visible rounded-3xl border border-black/[0.08] bg-white/70 backdrop-blur-xl px-7 py-9 shadow-[0_30px_60px_rgba(0,0,0,0.03),inset_0_1px_0_rgba(255,255,255,0.8)] transition-shadow duration-500 hover:shadow-[var(--shadow-accent-kpi)] md:px-9 md:py-10 lg:px-10 lg:py-11 lg:col-span-4 [transform-style:preserve-3d]">
                 <div className="hero-metric-sweep pointer-events-none absolute inset-y-0 left-[-34%] w-[24%] -skew-x-12 bg-gradient-to-r from-transparent via-accent/15 to-transparent" />
                 <div className="mb-6 md:mb-7 flex items-center justify-between">
                   <p className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-black/35">Outcomes</p>
@@ -910,7 +998,7 @@ export default function Hero() {
                 </div>
               </article>
 
-              <article className="hero-kpi-card group relative overflow-visible rounded-3xl border border-black/[0.08] bg-white/70 backdrop-blur-xl px-7 py-9 shadow-[0_30px_60px_rgba(0,0,0,0.03),inset_0_1px_0_rgba(255,255,255,0.8)] transition-shadow duration-500 hover:shadow-[0_45px_100px_rgba(0,191,255,0.08)] md:px-9 md:py-10 lg:px-10 lg:py-11 lg:col-span-4 [transform-style:preserve-3d]">
+              <article className="hero-kpi-card group relative overflow-visible rounded-3xl border border-black/[0.08] bg-white/70 backdrop-blur-xl px-7 py-9 shadow-[0_30px_60px_rgba(0,0,0,0.03),inset_0_1px_0_rgba(255,255,255,0.8)] transition-shadow duration-500 hover:shadow-[var(--shadow-accent-kpi)] md:px-9 md:py-10 lg:px-10 lg:py-11 lg:col-span-4 [transform-style:preserve-3d]">
                 <div className="hero-metric-sweep pointer-events-none absolute inset-y-0 left-[-34%] w-[24%] -skew-x-12 bg-gradient-to-r from-transparent via-secondary/20 to-transparent" />
                 <div className="mb-6 md:mb-7 flex flex-col gap-3">
                   <div className="min-w-0 flex-1">
@@ -920,13 +1008,13 @@ export default function Hero() {
                   <span className="hidden text-[8px] font-black uppercase tracking-[0.2em] text-black/20 sm:block whitespace-nowrap">Fast response</span>
                 </div>
                 <div className="grid grid-cols-1 gap-3.5">
-                  <Link
+                  <ButtonPrimary
                     href="/contact"
-                    className={`hero-action-btn cursor-hover inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-accent/45 bg-accent px-5 py-3.5 text-[10px] md:text-[11px] font-black uppercase tracking-[0.12em] text-white shadow-[0_8px_20px_rgba(0,191,255,0.35)] ${ctaHover}`}
+                    className="hero-cta hero-action-btn cursor-hover min-h-[3.25rem] rounded-xl border border-accent/45 bg-accent px-6 py-4 text-[11px] md:min-h-14 md:px-7 md:py-4 md:text-xs font-black uppercase tracking-[0.12em] text-white shadow-[var(--shadow-accent-cta)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-[0.98]"
                   >
                     Start a project
                     <ArrowRight size={14} strokeWidth={2.5} />
-                  </Link>
+                  </ButtonPrimary>
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                     <Link
                       href="/works"
@@ -944,7 +1032,7 @@ export default function Hero() {
                 </div>
               </article>
 
-              <article className="hero-kpi-card group relative overflow-visible rounded-3xl border border-black/[0.08] bg-white/70 backdrop-blur-xl px-7 py-9 shadow-[0_30px_60px_rgba(0,0,0,0.03),inset_0_1px_0_rgba(255,255,255,0.8)] transition-shadow duration-500 hover:shadow-[0_45px_100px_rgba(0,191,255,0.08)] md:px-9 md:py-10 lg:px-10 lg:py-11 lg:col-span-4 [transform-style:preserve-3d]">
+              <article className="hero-kpi-card group relative overflow-visible rounded-3xl border border-black/[0.08] bg-white/70 backdrop-blur-xl px-7 py-9 shadow-[0_30px_60px_rgba(0,0,0,0.03),inset_0_1px_0_rgba(255,255,255,0.8)] transition-shadow duration-500 hover:shadow-[var(--shadow-accent-kpi)] md:px-9 md:py-10 lg:px-10 lg:py-11 lg:col-span-4 [transform-style:preserve-3d]">
                 <div className="hero-metric-sweep pointer-events-none absolute inset-y-0 left-[-34%] w-[24%] -skew-x-12 bg-gradient-to-r from-transparent via-accent/20 to-transparent" />
                 <p className="mb-6 md:mb-7 text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-black/35">Performance Snapshot</p>
                 <dl className="space-y-3.5">

@@ -85,7 +85,7 @@ export default function ProjectModal({
         .pm-glitch-img:nth-child(2) { animation: pm-glitch-1 2s infinite linear; }
         .pm-glitch-img:nth-child(3) { animation: pm-glitch-2 3s infinite linear; }
         .pm-glitch-img:nth-child(4) { animation: pm-glitch-3 3s infinite linear; }
-        .pm-glitch-img:nth-child(5) { animation: pm-glitch-4 2s infinite linear; background-blend-mode: overlay; background-color: #0088cc; }
+        .pm-glitch-img:nth-child(5) { animation: pm-glitch-4 2s infinite linear; background-blend-mode: overlay; background-color: var(--accent); }
         .pm-content-col { margin-left: 3px !important; }
         .pm-card { max-height: 550px !important; height: calc(100% - 10px) !important; }
       `}</style>

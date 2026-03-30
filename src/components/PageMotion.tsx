@@ -18,26 +18,25 @@ type PageMotionProps = {
   children: React.ReactNode;
 };
 
+function motionTier(section: HTMLElement): "tier1" | "tier2" {
+  const v = section.getAttribute("data-page-motion")?.trim().toLowerCase();
+  if (v === "tier2") return "tier2";
+  return "tier1";
+}
+
 export default function PageMotion({ children }: PageMotionProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const lenis = useLenis();
   const preloaderDone = usePreloaderDone();
-  // Track whether we've already set up animations for this mount to avoid
-  // double-initialisation when StrictMode double-invokes effects.
   const animatedRef = useRef(false);
 
   useEffect(() => {
     if (!rootRef.current) return;
 
-    // Block until Lenis + scrollerProxy are both wired inside ClientProvider.
-    // lenis becomes truthy only AFTER scrollerProxy is configured, so this
-    // single guard is sufficient.
     if (!lenis || !preloaderDone) return;
 
-    // Reset guard when lenis instance recreates (e.g. route change).
     animatedRef.current = false;
 
-    // Idempotent — safe to call many times.
     registerGsapPlugins();
 
     const scroller = getScroller();
@@ -51,49 +50,93 @@ export default function PageMotion({ children }: PageMotionProps) {
 
       if (sections.length === 0) return;
 
-      if (reduced) {
-        // Skip animation for users who prefer reduced motion.
-        gsap.set(sections, {
-          autoAlpha: 1,
-          y: 0,
-          clearProps: "transform",
-        });
-        return;
-      }
+      sections.forEach((section) => {
+        const q = gsap.utils.selector(section);
+        const targets = q("[data-reveal]") as HTMLElement[];
+        const tier = motionTier(section);
 
-      sections.forEach((section, index) => {
-        gsap.fromTo(
-          section,
-          {
-            autoAlpha: 0,
-            y: 20,
-          },
-          {
+        if (reduced) {
+          const els = targets.length ? targets : [section];
+          gsap.set(els, {
             autoAlpha: 1,
             y: 0,
-            duration: 0.9,
-            delay: index === 0 ? 0.05 : 0,
-            ease: "expo.out",
-            clearProps: "all",
-            scrollTrigger: {
-              trigger: section,
-              start: "top bottom",
-              once: true,
-              scroller,
-            },
-          }
-        );
+            clearProps: "transform,opacity",
+          });
+          return;
+        }
+
+        const scrollTrigger = {
+          trigger: section,
+          start: "top 82%",
+          once: true,
+          scroller,
+        };
+
+        if (targets.length === 0) {
+          const from =
+            tier === "tier1"
+              ? { y: 32, opacity: 0 }
+              : { y: 14, opacity: 0 };
+          const to =
+            tier === "tier1"
+              ? {
+                  y: 0,
+                  opacity: 1,
+                  duration: 0.65,
+                  ease: "power3.out" as const,
+                  scrollTrigger,
+                  clearProps: "transform,opacity",
+                }
+              : {
+                  y: 0,
+                  opacity: 1,
+                  duration: 0.42,
+                  ease: "power2.out" as const,
+                  scrollTrigger,
+                  clearProps: "transform,opacity",
+                };
+          gsap.fromTo(section, from, to);
+          return;
+        }
+
+        if (tier === "tier1") {
+          gsap.fromTo(
+            targets,
+            { y: 32, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              stagger: 0.06,
+              duration: 0.65,
+              ease: "power3.out",
+              scrollTrigger,
+              clearProps: "transform,opacity",
+            }
+          );
+        } else {
+          gsap.fromTo(
+            targets,
+            { y: 14, opacity: 0 },
+            {
+              y: 0,
+              opacity: 1,
+              stagger: 0.04,
+              duration: 0.42,
+              ease: "power2.out",
+              scrollTrigger,
+              clearProps: "transform,opacity",
+            }
+          );
+        }
       });
 
-      // Fonts + Lenis can shift layout after the first paint — refresh ST so
-      // trigger positions are recalculated correctly.
       scheduleScrollTriggerRefresh();
     }, root);
 
     return () => {
       ctx.revert();
     };
-  }, [lenis, preloaderDone]); // Re-run whenever the lenis instance changes (e.g. route change).
+  }, [lenis, preloaderDone]);
 
   return (
     <div ref={rootRef} className="page-motion-root relative">

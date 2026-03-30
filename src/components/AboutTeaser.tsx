@@ -5,7 +5,6 @@ import Image from "next/image";
 import dynamic from "next/dynamic";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import SplitType from "split-type";
 import {
   registerGsapPlugins,
   getScroller,
@@ -65,66 +64,10 @@ export default function AboutTeaser() {
     registerGsapPlugins();
     const scroller = getScroller();
     const reduced = prefersReducedMotion();
-    const splits: SplitType[] = [];
 
     const ctx = gsap.context(() => {
       const section = sectionRef.current;
       if (!section) return;
-
-      // ── Heading char reveal ──
-      const headingEl = section.querySelector(".abt-heading") as HTMLElement | null;
-      if (headingEl) {
-        const split = new SplitType(headingEl, { types: "chars" });
-        splits.push(split);
-        if (split.chars) {
-          gsap.fromTo(
-            split.chars,
-            { yPercent: reduced ? 0 : 115, opacity: reduced ? 1 : 0 },
-            {
-              yPercent: 0,
-              opacity: 1,
-              duration: reduced ? 0 : 1.25,
-              stagger: 0.02,
-              ease: "expo.out",
-              immediateRender: false,
-              scrollTrigger: {
-                trigger: headingEl,
-                scroller,
-                start: "top 95%", // Fire earlier
-                once: true,
-              },
-            },
-          );
-        }
-      }
-
-      // ── Kicker ──
-      gsap.fromTo(
-        ".abt-kicker",
-        { y: reduced ? 0 : 20, opacity: reduced ? 1 : 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: reduced ? 0 : 0.8,
-          ease: "expo.out",
-          immediateRender: false,
-          scrollTrigger: { trigger: ".abt-kicker", scroller, start: "top 90%", once: true },
-        },
-      );
-
-      // ── Lead paragraph ──
-      gsap.fromTo(
-        ".abt-lead",
-        { y: reduced ? 0 : 28, opacity: reduced ? 1 : 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: reduced ? 0 : 1,
-          ease: "expo.out",
-          immediateRender: false,
-          scrollTrigger: { trigger: ".abt-lead", scroller, start: "top 88%", once: true },
-        },
-      );
 
       // ── Rule ──
       gsap.fromTo(
@@ -140,24 +83,9 @@ export default function AboutTeaser() {
         },
       );
 
-      // ── Stat cards (clean lift + settle) ──
+      // ── Stat count-ups (entrance via PageMotion data-reveal) ──
       const statCards = gsap.utils.toArray<HTMLElement>(".abt-stat-card");
-      statCards.forEach((card, i) => {
-        gsap.fromTo(
-          card,
-          { y: reduced ? 0 : 56, opacity: reduced ? 1 : 0, scale: reduced ? 1 : 0.94 },
-          {
-            y: 0,
-            opacity: 1,
-            scale: 1,
-            duration: reduced ? 0 : 0.95,
-            delay: i * 0.1,
-            ease: "power4.out",
-            immediateRender: false,
-            scrollTrigger: { trigger: card, scroller, start: "top 95%", once: true },
-          },
-        );
-
+      statCards.forEach((card) => {
         const numEl = card.querySelector<HTMLElement>(".abt-counter");
         if (numEl) {
           const target = Number(numEl.dataset.target ?? 0);
@@ -171,51 +99,6 @@ export default function AboutTeaser() {
             onUpdate() { numEl.textContent = Math.round(proxy.val).toString(); },
           });
         }
-      });
-
-      // ── Team cards — staggered reveal with subtle 3D settle ──
-      const photoCards = gsap.utils.toArray<HTMLElement>(".abt-photo-card");
-      photoCards.forEach((card, i) => {
-        gsap.fromTo(
-          card,
-          {
-            y: reduced ? 0 : 64,
-            opacity: reduced ? 1 : 0,
-            rotateX: reduced ? 0 : 7,
-            rotateY: reduced ? 0 : -3,
-            transformPerspective: 900,
-            clipPath: reduced ? "inset(0% 0 0 0 round 1.5rem)" : "inset(18% 0 0 0 round 1.5rem)",
-          },
-          {
-            y: 0,
-            opacity: 1,
-            rotateX: 0,
-            rotateY: 0,
-            clipPath: "inset(0% 0 0 0 round 1.5rem)",
-            duration: reduced ? 0 : 1.05,
-            delay: i * 0.11,
-            ease: "power4.out",
-            immediateRender: false,
-            scrollTrigger: { trigger: card, scroller, start: "top 84%", once: true },
-          },
-        );
-      });
-
-      // ── Gallery subtle parallax ──
-      if (!reduced) {
-        gsap.set("[data-about-shift]", { yPercent: 0, scale: 1 });
-      }
-      gsap.to("[data-about-shift]", {
-        yPercent: reduced ? 0 : -3,
-        scale: reduced ? 1 : 1.02,
-        ease: "none",
-        scrollTrigger: {
-          trigger: section,
-          scroller,
-          start: "top bottom",
-          end: "bottom top",
-          scrub: true,
-        },
       });
 
       // ── Watermark drift (cinematic depth) ──
@@ -258,7 +141,6 @@ export default function AboutTeaser() {
     scheduleScrollTriggerRefresh();
 
     return () => {
-      splits.forEach((s) => s.revert());
       ctx.revert();
     };
   }, [lenis, preloaderDone]);
@@ -268,7 +150,7 @@ export default function AboutTeaser() {
       id="about"
       ref={sectionRef}
       data-chapter="custom"
-      className="relative overflow-hidden bg-background py-28 md:py-36"
+      className="relative overflow-hidden bg-background pt-28 pb-32 md:pt-36 md:pb-44"
       aria-label="About"
     >
       {/* Ambient glow */}
@@ -284,25 +166,40 @@ export default function AboutTeaser() {
 
         {/* ── Section Header ── */}
         <div className="mb-32 md:mb-48 relative z-20">
-          <p className="abt-kicker mb-6 text-[11px] font-black uppercase leading-[1.4] tracking-[0.5em] text-accent">
+          <p
+            data-reveal
+            className="abt-kicker mb-6 text-[11px] font-black uppercase leading-[1.4] tracking-[0.5em] text-accent"
+          >
             The Studio
           </p>
           <div className="flex flex-col gap-6 md:gap-8">
-            <h2 className="abt-heading pb-1 whitespace-normal text-[clamp(2.5rem,8vw,8rem)] font-black uppercase leading-[0.95] tracking-tighter text-foreground will-change-transform">
+            <h2
+              data-reveal
+              className="abt-heading pb-1 whitespace-normal text-[clamp(2.5rem,8vw,8rem)] font-black uppercase leading-[0.95] tracking-tighter text-foreground will-change-transform"
+            >
               <span className="whitespace-nowrap">Colombo-based.</span> <br />
               <span className="text-foreground italic whitespace-nowrap">Globally delivered.</span>
             </h2>
-            <p className="abt-lead max-w-2xl text-base font-[1000] leading-[1.8] text-foreground sm:mt-4 lg:text-xl lg:text-left">
+            <p
+              data-reveal
+              className="abt-lead max-w-2xl text-base font-[1000] leading-[1.8] text-foreground sm:mt-4 lg:text-xl lg:text-left"
+            >
               10+ years turning ambitious ideas into measurable outcomes — a tight team of strategists,
               designers, filmmakers, and builders.
             </p>
           </div>
         </div>
 
+        {/* Stats + team: flex gap + bottom padding (margin on grid was not visible; parallax transform removed). */}
+        <div className="flex flex-col gap-10 md:gap-14 lg:gap-16 pb-20 md:pb-28 lg:pb-36">
         {/* ── Stats Bar ── */}
-        <div className="abt-rule mt-64 md:mt-80 mb-48 flex flex-col gap-8 border-t border-black/[0.15] pt-20 sm:flex-row sm:items-center sm:gap-0 md:mb-72 relative z-20 bg-background">
+        <div className="abt-rule mt-64 md:mt-80 flex flex-col gap-8 border-t border-black/[0.15] pt-20 sm:flex-row sm:items-center sm:gap-0 relative z-20 bg-background">
           {stats.map((item, i) => (
-            <article key={item.label} className={`abt-stat-card flex items-baseline gap-3 rounded-2xl bg-black/[0.015] px-4 py-3 sm:bg-transparent sm:px-0 sm:py-0 ${i < stats.length - 1 ? "sm:pr-16 sm:mr-16 sm:border-r sm:border-black/[0.06]" : ""}`}>
+            <article
+              key={item.label}
+              data-reveal
+              className={`abt-stat-card flex items-baseline gap-3 rounded-2xl bg-black/[0.015] px-4 py-3 sm:bg-transparent sm:px-0 sm:py-0 ${i < stats.length - 1 ? "sm:pr-16 sm:mr-16 sm:border-r sm:border-black/[0.06]" : ""}`}
+            >
               <span className="abt-counter text-6xl font-black leading-none tracking-tighter text-foreground md:text-7xl" data-target={item.value}>
                 0
               </span>
@@ -315,16 +212,20 @@ export default function AboutTeaser() {
         </div>
 
         {/* ── Team Grid ── */}
-        <div data-about-shift className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-12 lg:gap-6 relative z-10">
+        <div className="abt-team-grid grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-12 lg:gap-6 relative z-10">
           {team.map((member, index) => (
             <article
               key={member.name}
-              className={`abt-photo-card group relative overflow-hidden rounded-[1.5rem] bg-black/5 shadow-[0_20px_60px_rgba(0,0,0,0.06)] transform-gpu transition-all duration-700 hover:-translate-y-1 hover:shadow-[0_32px_80px_rgba(0,0,0,0.1)] ${
+              data-reveal
+              className={`abt-photo-card abt-photo-stack group flex flex-col overflow-hidden rounded-[1.5rem] border border-black/[0.06] bg-background shadow-[0_20px_60px_rgba(0,0,0,0.06)] transform-gpu transition-all duration-700 hover:-translate-y-1 hover:shadow-[0_32px_80px_rgba(0,0,0,0.1)] ${
                 index === 0 ? "sm:col-span-2 lg:col-span-6" : "lg:col-span-3"
               }`}
-              style={{ aspectRatio: index === 0 ? "16/10" : "4/5" }}
             >
-              <div className="absolute inset-0">
+              <div
+                className={`abt-photo-stack__media relative w-full overflow-hidden bg-black/5 ${
+                  index === 0 ? "aspect-[16/10]" : "aspect-[4/5]"
+                }`}
+              >
                 <Image
                   src={member.image}
                   alt={member.name}
@@ -332,20 +233,19 @@ export default function AboutTeaser() {
                   sizes="(max-width: 768px) 50vw, 25vw"
                   quality={95}
                   loading="lazy"
-                  className="object-cover object-center transition-transform duration-[1800ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] group-hover:scale-105"
+                  className="object-cover transition-transform duration-[1800ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] group-hover:scale-105"
                 />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-80" />
               </div>
-
-              {/* Professional darker gradient for legibility */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent" />
-
-              {/* Name + Role — always visible at bottom */}
-              <div className="absolute bottom-0 left-0 right-0 p-5 md:p-7">
-                <p className="text-base font-black italic tracking-tight text-white md:text-xl">{member.name}</p>
-                <p className="mt-0.5 text-[9px] font-black uppercase tracking-[0.45em] text-accent/90">{member.role}</p>
+              <div className="abt-photo-stack__meta">
+                <p className="text-lg font-black italic tracking-tight text-foreground md:text-xl">{member.name}</p>
+                <p className="mt-2 text-[9px] font-black uppercase tracking-[0.45em] text-accent">{member.role}</p>
               </div>
             </article>
           ))}
+        </div>
+        {/* Fixed block — guarantees empty space after cards (not affected by transforms) */}
+        <div className="h-10 shrink-0 md:h-14" aria-hidden />
         </div>
 
       </div>

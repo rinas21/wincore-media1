@@ -3,7 +3,8 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ArrowUpRight, Send, Sparkles, Palette, HardDrive, Cpu, Lightbulb, PenTool, Check } from "lucide-react";
-import { prefersReducedMotion, registerGsapPlugins, scheduleScrollTriggerRefresh, getScroller } from "@/lib/motion";
+import { prefersReducedMotion, registerGsapPlugins, scheduleScrollTriggerRefresh } from "@/lib/motion";
+import { ButtonPrimary } from "@/components/ui/ButtonPrimary";
 
 type SubmitState = "idle" | "loading" | "sent" | "error";
 
@@ -15,8 +16,8 @@ const SERVICES: { label: string; icon: any }[] = [
   { label: "Content & Strategy", icon: Lightbulb },
 ];
 
-/** Input / chip fill — explicit hex so layout never depends on theme merge quirks */
-const fieldBg = "bg-[#f4f4f5]";
+/** Input / chip fill — tied to --surface-muted / bg-muted */
+const fieldBg = "bg-muted";
 
 /** Readable gaps between words + lines (body copy) */
 const wordEase =
@@ -44,64 +45,6 @@ export default function ContactPageContent() {
           ".ct-line",
           { scaleX: 0 },
           { scaleX: 1, duration: 0.8, ease: "expo.out", delay: 0.1 },
-        );
-
-        // Intro Card fade-up
-        gsap.fromTo(
-          ".ct-intro-card",
-          { opacity: 0, y: 30 },
-          { opacity: 1, y: 0, duration: 1.2, ease: "expo.out", delay: 0.2 }
-        );
-
-        // Sidebar staggered reveal
-        gsap.fromTo(
-          ".ct-side-item",
-          { opacity: 0, x: -20 },
-          {
-            opacity: 1,
-            x: 0,
-            duration: 1,
-            stagger: 0.1,
-            ease: "expo.out",
-            delay: 0.5,
-          }
-        );
-
-        // Form Fields staggered reveal
-        gsap.fromTo(
-          ".ct-field",
-          { opacity: 0, y: 20 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 1,
-            stagger: 0.1,
-            ease: "expo.out",
-            scrollTrigger: {
-              trigger: ".ct-field-wrap",
-              scroller: getScroller(),
-              start: "top 90%",
-            },
-          }
-        );
-
-        // Staggered service chips reveal
-        gsap.fromTo(
-          ".ct-chip",
-          { opacity: 0, y: 20, scale: 0.95 },
-          {
-            opacity: 1,
-            y: 0,
-            scale: 1,
-            duration: 0.8,
-            stagger: 0.05,
-            ease: "expo.out",
-            scrollTrigger: {
-              trigger: ".ct-chip-grid",
-              scroller: getScroller(),
-              start: "top 95%",
-            },
-          }
         );
       }
     }, rootRef);
@@ -156,15 +99,17 @@ export default function ContactPageContent() {
         </div>
 
         <div className="ct-intro-card !mb-[150px] rounded-2xl border border-black/10 bg-white p-6 shadow-sm sm:p-8 md:p-10 lg:rounded-3xl">
-          <p className="mb-4 text-[13px] font-black uppercase tracking-[0.55em] text-accent leading-normal">
-            Contact
-          </p>
-          <h1 className="font-heading max-w-4xl text-balance text-4xl font-black uppercase leading-[1.1] tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-7xl [word-spacing:0.04em]">
-            Let&apos;s build something
-            <br className="sm:hidden" />{" "}
-            <span>that performs.</span>
-          </h1>
-          <div className={`mt-8 max-w-3xl space-y-5 text-lg text-foreground/60 md:mt-12 md:text-xl ${wordEase}`}>
+          <div data-reveal>
+            <p className="mb-4 text-[13px] font-black uppercase tracking-[0.55em] text-accent leading-normal">
+              Contact
+            </p>
+            <h1 className="font-heading max-w-4xl text-balance text-4xl font-black uppercase leading-[1.1] tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-7xl [word-spacing:0.04em]">
+              Let&apos;s build something
+              <br className="sm:hidden" />{" "}
+              <span>that performs.</span>
+            </h1>
+          </div>
+          <div data-reveal className={`mt-8 max-w-3xl space-y-5 text-lg text-foreground/60 md:mt-12 md:text-xl ${wordEase}`}>
             <p className="font-medium">
               Share the brief: goals, timeline, and budget band.
             </p>
@@ -173,7 +118,7 @@ export default function ContactPageContent() {
         </div>
 
         <div className="grid grid-cols-1 gap-16 lg:grid-cols-12 lg:gap-24 lg:items-start">
-          <aside className="lg:col-span-4 translate-y-[3px]">
+          <aside data-reveal className="lg:col-span-4 translate-y-[3px]">
             <div className="space-y-10 rounded-2xl border border-black/10 bg-white p-6 md:p-9">
               <div className="ct-side-item">
                 <p className="mb-4 text-[15px] font-black uppercase tracking-[0.45em] text-foreground/45">
@@ -218,7 +163,7 @@ export default function ContactPageContent() {
               onSubmit={onSubmit}
               className="space-y-16 rounded-2xl border border-black/10 bg-white p-6 sm:p-10 md:space-y-20 md:p-14 lg:rounded-3xl"
             >
-              <div className="space-y-10">
+              <div data-reveal className="space-y-10">
                 <div className="mb-10 flex items-center gap-3 text-accent/60">
                   <Sparkles size={18} className="shrink-0" aria-hidden />
                   <span className="text-[14px] font-[1000] uppercase tracking-[0.5em] [word-spacing:0.12em]">
@@ -259,7 +204,7 @@ export default function ContactPageContent() {
                 </div>
               </div>
 
-              <div className="ct-field-wrap mt-20 space-y-12 border-t border-black/10 pt-16 md:space-y-14 md:pt-20">
+              <div data-reveal className="ct-field-wrap mt-20 space-y-12 border-t border-black/10 pt-16 md:space-y-14 md:pt-20">
                 <div className="ct-field">
                   <label
                     htmlFor="ct-name"
@@ -314,14 +259,14 @@ export default function ContactPageContent() {
                 </div>
               </div>
 
-              <div className="flex flex-col gap-6 border-t border-black/10 pt-8 sm:flex-row sm:items-center sm:justify-between">
+              <div data-reveal className="flex flex-col gap-6 border-t border-black/10 pt-8 sm:flex-row sm:items-center sm:justify-between">
                 <p className={`max-w-sm text-xs text-foreground/50 ${wordEase}`}>
                   We usually reply within two business days.
                 </p>
-                <button
+                <ButtonPrimary
                   type="submit"
                   disabled={submitState === "loading"}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-accent px-8 py-4 text-[14px] font-[1000] uppercase tracking-[0.3em] text-white shadow-lg shadow-accent/25 transition-transform active:scale-95 hover:opacity-95 disabled:opacity-50 sm:w-auto sm:min-w-[240px]"
+                  className="w-full rounded-full bg-accent px-8 py-4 text-[14px] font-[1000] uppercase tracking-[0.3em] text-white shadow-lg shadow-accent/25 active:scale-[0.98] disabled:opacity-50 sm:w-auto sm:min-w-[240px]"
                 >
                   {submitState === "loading" ? (
                     "Sending…"
@@ -331,7 +276,7 @@ export default function ContactPageContent() {
                       <Send size={17} />
                     </>
                   )}
-                </button>
+                </ButtonPrimary>
               </div>
 
               {feedback ? (

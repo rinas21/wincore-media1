@@ -3,7 +3,6 @@
 import { useEffect, useRef } from "react";
 import Image from "next/image";
 import gsap from "gsap";
-import SplitType from "split-type";
 import { ArrowUpRight } from "lucide-react";
 import {
   registerGsapPlugins,
@@ -50,53 +49,12 @@ export default function AwardsStats() {
     registerGsapPlugins();
     const scroller = getScroller();
     const reduced = prefersReducedMotion();
-    const splits: SplitType[] = [];
 
     const ctx = gsap.context(() => {
-      // Heading Entry animations
-      const headingEl = sectionRef.current?.querySelector(".aw-heading") as HTMLElement | null;
-      if (headingEl) {
-        const split = new SplitType(headingEl, { types: "chars,words" });
-        splits.push(split);
-        if (split.chars) {
-          gsap.fromTo(
-            split.chars,
-            { yPercent: reduced ? 0 : 100, opacity: reduced ? 1 : 0 },
-            {
-              yPercent: 0,
-              opacity: 1,
-              duration: reduced ? 0 : 1.2,
-              stagger: 0.02,
-              ease: "expo.out",
-              clearProps: "transform,opacity",
-              scrollTrigger: { trigger: headingEl, scroller, start: "top 85%", once: true },
-            }
-          );
-        }
-      }
-
-      gsap.fromTo(
-        ".aw-fade-up",
-        { y: reduced ? 0 : 30, opacity: reduced ? 1 : 0 },
-        {
-          y: 0, opacity: 1, duration: reduced ? 0 : 1, ease: "expo.out", stagger: 0.1, clearProps: "transform,opacity",
-          scrollTrigger: { trigger: ".aw-header-container", scroller, start: "top 85%", once: true },
-        }
-      );
-
       // Desktop Image Accordion Hover Logic
       const panels = gsap.utils.toArray<HTMLElement>(".aw-panel");
       if (panels.length && !reduced) {
-        panels.forEach((panel, i) => {
-          gsap.fromTo(
-            panel,
-            { opacity: 0, scale: 0.95 },
-            {
-              opacity: 1, scale: 1, duration: 1.2, stagger: 0.1, ease: "power3.out", clearProps: "transform,opacity",
-              scrollTrigger: { trigger: ".aw-accordion-container", scroller, start: "top 80%", once: true }
-            }
-          );
-
+        panels.forEach((panel) => {
           panel.addEventListener("mouseenter", () => {
             panels.forEach(p => {
               p.style.flex = "1";
@@ -114,12 +72,6 @@ export default function AwardsStats() {
       // Mobile Image Accordion Interaction Array
       const mobilePanels = gsap.utils.toArray<HTMLElement>(".aw-mobile-panel");
       if (mobilePanels.length && !reduced) {
-        gsap.fromTo(
-          mobilePanels,
-          { y: 30, opacity: 0 },
-          { y: 0, opacity: 1, duration: 1, stagger: 0.1, ease: "power3.out", scrollTrigger: { trigger: ".aw-accordion-mobile", scroller, start: "top 85%", once: true } }
-        );
-
         mobilePanels.forEach((panel) => {
           panel.addEventListener("click", () => {
             mobilePanels.forEach(p => {
@@ -158,7 +110,6 @@ export default function AwardsStats() {
     scheduleScrollTriggerRefresh();
 
     return () => {
-      splits.forEach((s) => s.revert());
       ctx.revert();
     };
   }, []);
@@ -170,15 +121,15 @@ export default function AwardsStats() {
         {/* Header Section */}
         <div className="aw-header-container mb-20 lg:mb-28 flex flex-col lg:flex-row items-start lg:items-end justify-between gap-12">
           <div className="max-w-3xl">
-            <span className="aw-fade-up mb-8 block text-xs font-bold uppercase tracking-[0.2em] text-accent">
+            <span data-reveal className="aw-fade-up mb-8 block text-xs font-bold uppercase tracking-[0.2em] text-accent">
               Track Record
             </span>
-            <h2 className="aw-heading text-[3.5rem] font-medium leading-[0.95] tracking-tight md:text-[6.5rem] lg:text-[8rem]">
+            <h2 data-reveal className="aw-heading text-[3.5rem] font-medium leading-[0.95] tracking-tight md:text-[6.5rem] lg:text-[8rem]">
               Outcomes<br />
               <span className="text-black/30 italic font-light">that lead.</span>
             </h2>
           </div>
-          <p className="aw-fade-up max-w-[28ch] text-lg font-light leading-relaxed text-black/60 md:text-xl md:pb-6">
+          <p data-reveal className="aw-fade-up max-w-[28ch] text-lg font-light leading-relaxed text-black/60 md:text-xl md:pb-6">
             Awards are a signal. Outcomes are the standard. We build systems that perform and visuals that move.
           </p>
         </div>
@@ -188,6 +139,7 @@ export default function AwardsStats() {
           {stats.map((stat, i) => (
             <div
               key={i}
+              data-reveal
               className={`aw-panel relative h-full rounded-[2.5rem] overflow-hidden cursor-pointer bg-black/5 group`}
               style={{
                 transition: "flex 0.8s cubic-bezier(0.25, 1, 0.5, 1)",
@@ -240,6 +192,7 @@ export default function AwardsStats() {
           {stats.map((stat, i) => (
             <div
               key={i}
+              data-reveal
               className={`aw-mobile-panel relative w-full rounded-[2rem] overflow-hidden cursor-pointer bg-black`}
               style={{
                 transition: "height 0.8s cubic-bezier(0.25, 1, 0.5, 1)",

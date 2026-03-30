@@ -10,10 +10,10 @@ gsap.registerPlugin(ScrollTrigger);
 
 /** Floating tags — tftl-agency Preloader.tsx pattern */
 const PRELOADER_TAGS: { text: string; bg: string; style: CSSProperties }[] = [
-  { text: "Wincore", bg: "rgba(0,136,204,0.2)", style: { left: "18%", top: "22%" } },
-  { text: "Brand · Motion", bg: "rgba(110,86,58,0.15)", style: { left: "12%", top: "42%" } },
-  { text: "WebGL", bg: "rgba(0,136,204,0.12)", style: { left: "62%", top: "28%" } },
-  { text: "Performance", bg: "rgba(0,0,0,0.06)", style: { right: "14%", bottom: "26%" } },
+  { text: "Wincore", bg: "var(--accent-preloader-pill)", style: { left: "18%", top: "22%" } },
+  { text: "Brand · Motion", bg: "var(--secondary-wash)", style: { left: "12%", top: "42%" } },
+  { text: "WebGL", bg: "var(--accent-preloader-pill-2)", style: { left: "62%", top: "28%" } },
+  { text: "Performance", bg: "var(--foreground-wash-6)", style: { right: "14%", bottom: "26%" } },
 ];
 
 export default function Preloader() {
@@ -200,7 +200,7 @@ export default function Preloader() {
       </div>
 
       <div
-        className="absolute bottom-0 left-0 h-[2px] bg-accent transition-all duration-300 shadow-[0_0_20px_rgba(0,191,255,0.75)]"
+        className="absolute bottom-0 left-0 h-[2px] bg-accent transition-all duration-300 shadow-[var(--shadow-accent-preloader)]"
         style={{ width: `${percentage}%` }}
       />
 
