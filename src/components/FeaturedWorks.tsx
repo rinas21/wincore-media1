@@ -229,11 +229,11 @@ export default function FeaturedWorks() {
 
             {/* Bottom info for when not hovered */}
             {/* Initial info layer — more subtle gradient for better clarity */}
-            <div className="absolute -bottom-1 left-0 z-20 w-full p-9 sm:p-10 text-foreground transition-all duration-300 group-hover:opacity-0 bg-gradient-to-t from-white/95 via-white/40 to-transparent">
-              <p className="mb-1 text-[10px] font-bold uppercase tracking-[0.3em] text-black/40">
+            <div className="absolute bottom-0 left-0 z-20 w-full p-7 sm:p-9 text-foreground transition-all duration-300 group-hover:opacity-0 bg-gradient-to-t from-white/95 via-white/40 to-transparent">
+              <p className="mb-1 text-[11px] font-bold uppercase tracking-[0.3em] text-black/40">
                 {project.category}
               </p>
-              <h3 className="text-lg font-semibold">{project.title}</h3>
+              <h3 className="text-base font-semibold sm:text-lg">{project.title}</h3>
             </div>
           </div>
         ))}

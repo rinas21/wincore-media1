@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type ComponentType } from "react";
 import gsap from "gsap";
 import { ArrowUpRight, Send, Sparkles, Palette, HardDrive, Cpu, Lightbulb, PenTool, Check } from "lucide-react";
 import { prefersReducedMotion, registerGsapPlugins, scheduleScrollTriggerRefresh } from "@/lib/motion";
@@ -8,7 +8,9 @@ import { ButtonPrimary } from "@/components/ui/ButtonPrimary";
 
 type SubmitState = "idle" | "loading" | "sent" | "error";
 
-const SERVICES: { label: string; icon: any }[] = [
+type LucideIconLike = ComponentType<{ size?: number; strokeWidth?: number }>;
+
+const SERVICES: { label: string; icon: LucideIconLike }[] = [
   { label: "Design & Branding", icon: Palette },
   { label: "Digital Products", icon: PenTool },
   { label: "Creative Development", icon: HardDrive },

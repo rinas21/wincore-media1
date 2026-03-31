@@ -435,7 +435,7 @@ export default function ServiceCards() {
                 <div
                   key={s.title}
                   data-reveal
-                  className="sc-row group relative cursor-pointer overflow-hidden"
+                  className="sc-row group relative cursor-pointer overflow-visible"
                   onClick={() => openModal(s)}
                   role="button"
                   tabIndex={0}
@@ -477,18 +477,18 @@ export default function ServiceCards() {
                     }}
                   >
                     {/* number */}
-                    <span className="hidden shrink-0 text-[11px] font-black italic tracking-[0.08em] text-black/20 transition-colors duration-300 group-hover:text-accent md:block md:w-12">
+                    <span className="shrink-0 text-[11px] font-black italic tracking-[0.08em] text-black/20 transition-colors duration-300 group-hover:text-accent md:block md:w-12">
                       {s.num}
                     </span>
 
                     {/* title */}
-                    <h3 className="flex-1 text-[8.5vw] font-black uppercase leading-[0.96] tracking-tight text-foreground/75 transition-colors duration-300 group-hover:text-foreground md:text-[3.8vw]">
+                    <h3 className="flex-1 text-[clamp(2.1rem,6.8vw,3.6rem)] font-black uppercase leading-[1.02] tracking-tight text-foreground/75 transition-colors duration-300 group-hover:text-foreground md:text-[3.8vw]">
                       {s.title}
                     </h3>
 
                     {/* right side: desc + button */}
                     <div className="flex shrink-0 flex-col items-end gap-4 text-right">
-                      <p className="hidden max-w-[28ch] text-[13px] font-light leading-[1.7] text-black/40 transition-colors duration-300 group-hover:text-black/65 md:block">
+                      <p className="max-w-[28ch] text-[13px] font-light leading-[1.7] text-black/40 transition-colors duration-300 group-hover:text-black/65">
                         {s.desc}
                       </p>
 
