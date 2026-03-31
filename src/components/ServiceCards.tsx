@@ -253,7 +253,7 @@ function ServiceModal({
     >
       <div
         ref={panelRef}
-        className="service-modal-panel relative mb-1 w-full max-w-2xl max-h-[calc(100dvh-1rem)] overflow-y-auto rounded-t-[2rem] bg-background shadow-[0_32px_80px_rgba(0,0,0,0.18)] sm:mb-0 sm:max-h-[92dvh] sm:rounded-[2rem] scrollbar-hide"
+        className="service-modal-panel relative mb-1 w-full max-w-3xl max-h-[calc(100dvh-1rem)] overflow-y-auto rounded-t-[2rem] bg-background shadow-[0_32px_80px_rgba(0,0,0,0.18)] sm:mb-0 sm:max-h-[92dvh] sm:rounded-[2rem] scrollbar-hide"
       >
         {/* ── Hero image ── */}
         <div className="relative h-56 w-full overflow-hidden rounded-t-[2rem] sm:h-72">
@@ -289,10 +289,10 @@ function ServiceModal({
         </div>
 
         {/* ── Body ── */}
-        <div className="service-modal-body px-6 py-8 sm:px-10 sm:py-10">
+        <div className="service-modal-body px-7 py-9 sm:px-12 sm:py-11">
 
           {/* What we do */}
-          <p className="smodal-stagger mb-8 text-[15px] font-light leading-[1.8] text-black/50">
+          <p className="smodal-stagger mb-9 text-[17px] font-light leading-[1.85] text-black/58 sm:text-[18px]">
             {service.what}
           </p>
 
@@ -304,12 +304,12 @@ function ServiceModal({
 
             {/* Deliverables */}
             <div className="smodal-stagger">
-              <p className="mb-5 text-[10px] font-black uppercase tracking-[0.5em] text-accent">
+              <p className="mb-5 text-[12px] font-black uppercase tracking-[0.36em] text-accent">
                 Deliverables
               </p>
               <ul className="flex flex-col gap-3">
                 {service.deliverables.map((d) => (
-                  <li key={d} className="flex items-start gap-3 text-[13px] font-medium leading-[1.65] text-black/55">
+                  <li key={d} className="flex items-start gap-3 text-[15px] font-medium leading-[1.7] text-black/60 sm:text-[16px]">
                     {/* accent dot — matches site's list bullet style */}
                     <span className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-accent/70" aria-hidden />
                     {d}
@@ -320,13 +320,13 @@ function ServiceModal({
 
             {/* Process */}
             <div className="smodal-stagger">
-              <p className="mb-5 text-[10px] font-black uppercase tracking-[0.5em] text-accent">
+              <p className="mb-5 text-[12px] font-black uppercase tracking-[0.36em] text-accent">
                 Our Process
               </p>
               <ol className="flex flex-col gap-3">
                 {service.processSteps.map((step, i) => (
-                  <li key={step} className="flex items-start gap-3 text-[13px] font-medium leading-[1.65] text-black/55">
-                    <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-accent/20 text-[9px] font-black text-accent">
+                  <li key={step} className="flex items-start gap-3 text-[15px] font-medium leading-[1.7] text-black/60 sm:text-[16px]">
+                    <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-accent/20 text-[10px] font-black text-accent">
                       {i + 1}
                     </span>
                     {step}
@@ -338,17 +338,17 @@ function ServiceModal({
 
           {/* Ideal for — tint block matching site's accent/[0.06] convention */}
           <div className="smodal-stagger mt-8 rounded-2xl bg-accent/[0.05] px-6 py-5 border border-accent/[0.08]">
-            <p className="mb-1.5 text-[10px] font-black uppercase tracking-[0.5em] text-accent">
+            <p className="mb-1.5 text-[12px] font-black uppercase tracking-[0.36em] text-accent">
               Ideal for
             </p>
-            <p className="text-[13px] font-light leading-[1.8] text-black/55">{service.ideal}</p>
+            <p className="text-[15px] font-light leading-[1.8] text-black/60 sm:text-[16px]">{service.ideal}</p>
           </div>
 
           {/* CTA row */}
           <div className="service-modal-footer smodal-stagger mt-9 flex flex-col-reverse items-stretch gap-3 border-t border-black/[0.06] pt-7 sm:flex-row sm:items-center sm:justify-between">
             <button
               onClick={handleClose}
-              className="text-[10px] font-black uppercase tracking-[0.4em] text-black/30 transition-colors hover:text-black/55"
+              className="text-[12px] font-black uppercase tracking-[0.28em] text-black/35 transition-colors hover:text-black/60"
             >
               Close
             </button>
@@ -357,7 +357,7 @@ function ServiceModal({
               <ButtonPrimary
                 href={service.link}
                 external
-                className="rounded-full bg-accent px-10 py-3.5 text-[10px] font-black uppercase tracking-[0.35em] text-white shadow-md shadow-accent/20 active:scale-[0.98]"
+                className="rounded-full bg-accent px-10 py-3.5 text-[12px] font-black uppercase tracking-[0.28em] text-white shadow-md shadow-accent/20 active:scale-[0.98]"
               >
                 {service.linkLabel ?? "Explore"}
                 <ArrowUpRight size={13} />
@@ -365,7 +365,7 @@ function ServiceModal({
             ) : (
               <ButtonPrimary
                 href="/contact"
-                className="rounded-full bg-accent px-10 py-3.5 text-[10px] font-black uppercase tracking-[0.35em] text-white shadow-md shadow-accent/20 active:scale-[0.98]"
+                className="rounded-full bg-accent px-10 py-3.5 text-[12px] font-black uppercase tracking-[0.28em] text-white shadow-md shadow-accent/20 active:scale-[0.98]"
               >
                 Start a project
                 <ArrowUpRight size={13} />

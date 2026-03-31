@@ -1,29 +1,23 @@
 "use client";
 
-import { useEffect, useRef, useState, type ComponentType } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
-import { ArrowUpRight, Send, Sparkles, Palette, HardDrive, Cpu, Lightbulb, PenTool, Check } from "lucide-react";
+import { ArrowUpRight, Send } from "lucide-react";
 import { prefersReducedMotion, registerGsapPlugins, scheduleScrollTriggerRefresh } from "@/lib/motion";
 import { ButtonPrimary } from "@/components/ui/ButtonPrimary";
 
 type SubmitState = "idle" | "loading" | "sent" | "error";
 
-type LucideIconLike = ComponentType<{ size?: number; strokeWidth?: number }>;
+const SERVICES = [
+  "Design & Branding",
+  "Digital Products",
+  "Creative Development",
+  "AI Architecture",
+  "Content & Strategy",
+] as const;
 
-const SERVICES: { label: string; icon: LucideIconLike }[] = [
-  { label: "Design & Branding", icon: Palette },
-  { label: "Digital Products", icon: PenTool },
-  { label: "Creative Development", icon: HardDrive },
-  { label: "AI Architecture", icon: Cpu },
-  { label: "Content & Strategy", icon: Lightbulb },
-];
-
-/** Input / chip fill — tied to --surface-muted / bg-muted */
-const fieldBg = "bg-muted";
-
-/** Readable gaps between words + lines (body copy) */
-const wordEase =
-  "[word-spacing:0.06em] [overflow-wrap:break-word] [word-break:normal] leading-[1.85]";
+const inputLine =
+  "min-h-[3.25rem] w-full border-0 border-b-2 border-black/12 bg-transparent px-0 py-4 text-xl leading-snug text-foreground outline-none transition-[border-color] placeholder:text-foreground/30 focus:border-accent focus:ring-0 md:min-h-[3.5rem] md:py-5 md:text-2xl lg:text-[1.65rem]";
 
 export default function ContactPageContent() {
   const rootRef = useRef<HTMLElement>(null);
@@ -38,17 +32,25 @@ export default function ContactPageContent() {
     );
   }
 
+  useLayoutEffect(() => {
+    const reduced = prefersReducedMotion();
+    const els = [".ct-h1", ".ct-lead", ".ct-aside"];
+    if (reduced) {
+      gsap.set(els, { opacity: 1, y: 0 });
+      return;
+    }
+    gsap.set(els, { opacity: 0, y: 20 });
+  }, []);
+
   useEffect(() => {
     registerGsapPlugins();
     const reduced = prefersReducedMotion();
     const ctx = gsap.context(() => {
-      if (!reduced) {
-        gsap.fromTo(
-          ".ct-line",
-          { scaleX: 0 },
-          { scaleX: 1, duration: 0.8, ease: "expo.out", delay: 0.1 },
-        );
-      }
+      if (reduced) return;
+      const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+      tl.to(".ct-h1", { opacity: 1, y: 0, duration: 0.75 }, 0)
+        .to(".ct-lead", { opacity: 1, y: 0, duration: 0.65 }, 0.12)
+        .to(".ct-aside", { opacity: 1, y: 0, duration: 0.55 }, 0.2);
     }, rootRef);
 
     scheduleScrollTriggerRefresh();
@@ -90,129 +92,115 @@ export default function ContactPageContent() {
   return (
     <section
       ref={rootRef}
-      className="relative isolate overflow-x-clip border-t border-black/10 bg-background pb-16 pt-6 md:pb-24 md:pt-8"
+      className="relative overflow-x-clip bg-[#fafafa] pb-32 pt-12 text-base md:pb-40 md:pt-16 lg:pb-48"
     >
-      <div className="_container">
-        <div className="mb-10">
-          <div
-            className="ct-line h-0.5 w-20 rounded-full bg-accent md:w-28"
-            style={{ transformOrigin: "left center" }}
-          />
-        </div>
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,transparent_0%,color-mix(in_srgb,var(--accent)_4%,transparent)_45%,transparent_100%)] opacity-60" aria-hidden />
 
-        <div className="ct-intro-card !mb-[150px] rounded-2xl border border-black/10 bg-white p-6 shadow-sm sm:p-8 md:p-10 lg:rounded-3xl">
-          <div data-reveal>
-            <p className="mb-4 text-[13px] font-black uppercase tracking-[0.55em] text-accent leading-normal">
+      <div className="_container relative z-10 max-w-[1240px]">
+        {/* Hero — asymmetric, editorial */}
+        <div className="mb-16 grid gap-10 md:mb-24 md:gap-14 lg:mb-32 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:gap-16">
+          <div>
+            <p className="ct-h1 mb-5 font-mono text-sm font-medium uppercase tracking-[0.28em] text-foreground/45 md:mb-6 md:text-base">
               Contact
             </p>
-            <h1 className="font-heading max-w-4xl text-balance text-4xl font-black uppercase leading-[1.1] tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-7xl [word-spacing:0.04em]">
-              Let&apos;s build something
-              <br className="sm:hidden" />{" "}
-              <span>that performs.</span>
+            <h1 className="ct-h1 font-heading text-[clamp(2.75rem,8vw,5rem)] font-black uppercase leading-[0.95] tracking-[-0.03em] text-foreground">
+              Start a project.
             </h1>
-          </div>
-          <div data-reveal className={`mt-8 max-w-3xl space-y-5 text-lg text-foreground/60 md:mt-12 md:text-xl ${wordEase}`}>
-            <p className="font-medium">
-              Share the brief: goals, timeline, and budget band.
+            <p className="ct-lead mt-8 max-w-[48ch] text-lg leading-relaxed text-foreground/50 md:mt-10 md:text-xl md:leading-relaxed lg:text-2xl lg:leading-relaxed">
+              Tell us what you&apos;re building. We respond with scope, timeline, and a clear next step—no
+              pitch deck required.
             </p>
-            <p>We&apos;ll reply with a clear scope and next steps.</p>
           </div>
+          <aside className="ct-aside hidden lg:flex lg:flex-col lg:items-end lg:gap-7 lg:pb-1 lg:text-right">
+            <a
+              href="mailto:hello@wincore.media"
+              className="font-mono text-base font-medium tracking-tight text-accent underline decoration-accent/30 underline-offset-[5px] transition-colors hover:decoration-accent md:text-lg"
+            >
+              hello@wincore.media
+            </a>
+            <p className="max-w-[18ch] font-mono text-sm leading-relaxed tracking-wide text-foreground/40 md:text-base">
+              Colombo — remote worldwide
+            </p>
+            <a
+              href="https://cal.com/wincore"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2.5 font-mono text-base font-medium text-foreground transition-colors hover:text-accent md:text-lg"
+            >
+              Book 30 min
+              <ArrowUpRight className="h-5 w-5 md:h-6 md:w-6" strokeWidth={2} />
+            </a>
+          </aside>
         </div>
 
-        <div className="grid grid-cols-1 gap-16 lg:grid-cols-12 lg:gap-24 lg:items-start">
-          <aside data-reveal className="lg:col-span-4 translate-y-[3px]">
-            <div className="space-y-10 rounded-2xl border border-black/10 bg-white p-6 md:p-9">
-              <div className="ct-side-item">
-                <p className="mb-4 text-[15px] font-black uppercase tracking-[0.45em] text-foreground/45">
-                  Email
-                </p>
-                <a
-                  href="mailto:hello@wincore.media"
-                  className="font-heading text-xl font-black tracking-tight text-foreground underline-offset-4 transition-colors hover:text-accent hover:underline md:text-2xl"
-                >
+        <div className="grid gap-14 lg:grid-cols-[minmax(200px,260px)_minmax(0,1fr)] lg:gap-16 xl:gap-20">
+          {/* Left rail — mobile contact + desktop label */}
+          <div className="ct-aside flex flex-col gap-10 lg:gap-12">
+            <div className="space-y-5 lg:sticky lg:top-36">
+              <p className="font-mono text-sm font-medium uppercase tracking-[0.24em] text-foreground/40 md:text-base">
+                Direct
+              </p>
+              <div className="flex flex-col gap-7 font-mono text-base text-foreground/85 md:text-lg lg:hidden">
+                <a href="mailto:hello@wincore.media" className="break-all text-accent hover:underline">
                   hello@wincore.media
                 </a>
-              </div>
-              <div className="ct-side-item h-px bg-black/10" />
-              <div className="ct-side-item">
-                <p className="mb-4 text-[15px] font-black uppercase tracking-[0.4em] text-foreground/45">
-                  Studio
-                </p>
-                <p className={`text-lg font-bold text-foreground ${wordEase}`}>
-                  Colombo · Remote worldwide
-                </p>
-              </div>
-              <div className="ct-side-item">
-                <p className="mb-4 text-[15px] font-black uppercase tracking-[0.4em] text-foreground/45">
-                  Schedule
-                </p>
+                <span className="leading-relaxed text-foreground/50">Colombo · Remote worldwide</span>
                 <a
                   href="https://cal.com/wincore"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-sm font-bold text-accent transition-opacity hover:opacity-80"
+                  className="inline-flex items-center gap-2.5 text-foreground"
                 >
-                  Book a call
-                  <ArrowUpRight size={18} strokeWidth={2.5} />
+                  Book 30 min
+                  <ArrowUpRight className="h-5 w-5" strokeWidth={2} />
                 </a>
               </div>
+              <p className="hidden max-w-[16rem] font-mono text-sm leading-relaxed tracking-wide text-foreground/45 md:text-base lg:block">
+                Prefer email. We read everything and reply within two working days.
+              </p>
             </div>
-          </aside>
+          </div>
 
-          <div className="min-w-0 lg:col-span-8">
-            <form
-              ref={formRef}
-              onSubmit={onSubmit}
-              className="space-y-16 rounded-2xl border border-black/10 bg-white p-6 sm:p-10 md:space-y-20 md:p-14 lg:rounded-3xl"
-            >
-              <div data-reveal className="space-y-10">
-                <div className="mb-10 flex items-center gap-3 text-accent/60">
-                  <Sparkles size={18} className="shrink-0" aria-hidden />
-                  <span className="text-[14px] font-[1000] uppercase tracking-[0.5em] [word-spacing:0.12em]">
-                    Services <span className="text-foreground/30 font-bold lowercase tracking-normal">(Select any)</span>
-                  </span>
+          <div className="min-w-0">
+            <form ref={formRef} onSubmit={onSubmit} className="flex flex-col gap-16 md:gap-[4.5rem]">
+              <div data-reveal className="space-y-8">
+                <div className="flex flex-wrap items-baseline justify-between gap-4">
+                  <label className="font-mono text-sm font-medium uppercase tracking-[0.22em] text-foreground/45 md:text-base">
+                    Focus
+                  </label>
+                  <span className="font-mono text-sm text-foreground/40 md:text-base">Tap to toggle</span>
                 </div>
-                <div className="ct-chip-grid grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  {SERVICES.map((svc) => {
-                    const active = selectedServices.includes(svc.label);
+                <div className="flex flex-wrap gap-x-1.5 gap-y-3 leading-snug">
+                  {SERVICES.map((svc, i) => {
+                    const active = selectedServices.includes(svc);
                     return (
-                      <button
-                        key={svc.label}
-                        type="button"
-                        onClick={() => toggleService(svc.label)}
-                        className={`ct-chip group relative flex items-center gap-4 overflow-hidden rounded-2xl border px-6 py-5 text-left transition-all duration-300 ${
-                          active
-                            ? "border-accent bg-accent/5 ring-1 ring-accent/20"
-                            : `border-black/[0.06] ${fieldBg} hover:border-accent/30 hover:bg-accent/[0.02]`
-                        }`}
-                      >
-                        <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl transition-all duration-500 ${
-                          active ? "bg-accent text-white scale-110" : "bg-black/[0.04] text-foreground/40 group-hover:bg-accent/10 group-hover:text-accent"
-                        }`}>
-                          {active ? <Check size={20} strokeWidth={3} /> : <svc.icon size={20} strokeWidth={1.5} />}
-                        </div>
-                        <span className={`text-[15px] font-bold uppercase tracking-widest transition-colors ${
-                          active ? "text-foreground" : "text-foreground/50 group-hover:text-foreground"
-                        }`}>
-                          {svc.label}
-                        </span>
-                        {/* Interactive fill effect */}
-                        {active && (
-                          <div className="absolute inset-0 z-[-1] bg-gradient-to-br from-accent/5 to-transparent animate-pulse" />
-                        )}
-                      </button>
+                      <span key={svc} className="inline-flex items-center">
+                        {i > 0 ? (
+                          <span className="mr-1.5 font-mono text-lg text-foreground/20 select-none md:text-xl" aria-hidden>
+                            ·
+                          </span>
+                        ) : null}
+                        <button
+                          type="button"
+                          onClick={() => toggleService(svc)}
+                          className={`rounded-full px-0 py-2 text-left font-mono text-base transition-colors md:text-lg lg:text-xl ${
+                            active
+                              ? "font-semibold text-accent"
+                              : "text-foreground/45 hover:text-foreground/75"
+                          }`}
+                        >
+                          {svc}
+                        </button>
+                      </span>
                     );
                   })}
                 </div>
               </div>
 
-              <div data-reveal className="ct-field-wrap mt-20 space-y-12 border-t border-black/10 pt-16 md:space-y-14 md:pt-20">
-                <div className="ct-field">
-                  <label
-                    htmlFor="ct-name"
-                    className="mb-3 block text-[13px] font-black uppercase tracking-[0.4em] text-foreground/45"
-                  >
-                    Name *
+              <div data-reveal className="space-y-12 md:space-y-14">
+                <div className="ct-field space-y-3">
+                  <label htmlFor="ct-name" className="font-mono text-sm font-medium uppercase tracking-[0.22em] text-foreground/45 md:text-base">
+                    Name
                   </label>
                   <input
                     id="ct-name"
@@ -220,17 +208,15 @@ export default function ContactPageContent() {
                     type="text"
                     required
                     autoComplete="name"
-                    className={`m-[3px] w-full rounded-lg border border-black/10 ${fieldBg} px-4 py-4 text-[1.125rem] [word-spacing:0.04em] text-foreground outline-none ring-0 transition placeholder:text-foreground/35 focus:border-accent focus:ring-2 focus:ring-accent/20`}
-                    placeholder="Your name"
+                    className={inputLine}
+                    placeholder="Jane Doe"
+                    aria-label="Name"
                   />
                 </div>
 
-                <div className="ct-field">
-                  <label
-                    htmlFor="ct-email"
-                    className="mb-3 block text-[13px] font-black uppercase tracking-[0.4em] text-foreground/45"
-                  >
-                    Email *
+                <div className="ct-field space-y-3">
+                  <label htmlFor="ct-email" className="font-mono text-sm font-medium uppercase tracking-[0.22em] text-foreground/45 md:text-base">
+                    Email
                   </label>
                   <input
                     id="ct-email"
@@ -238,51 +224,50 @@ export default function ContactPageContent() {
                     type="email"
                     required
                     autoComplete="email"
-                    className={`m-[3px] w-full rounded-lg border border-black/10 ${fieldBg} px-4 py-4 text-[1.125rem] [word-spacing:0.04em] text-foreground outline-none transition placeholder:text-foreground/35 focus:border-accent focus:ring-2 focus:ring-accent/20`}
-                    placeholder="you@company.com"
+                    className={inputLine}
+                    placeholder="you@studio.com"
+                    aria-label="Email"
                   />
                 </div>
 
-                <div className="ct-field">
-                  <label
-                    htmlFor="ct-message"
-                    className="mb-4 block text-[13px] font-black uppercase tracking-[0.45em] text-foreground/45"
-                  >
-                    Message *
+                <div className="ct-field space-y-3">
+                  <label htmlFor="ct-message" className="font-mono text-sm font-medium uppercase tracking-[0.22em] text-foreground/45 md:text-base">
+                    Message
                   </label>
                   <textarea
                     id="ct-message"
                     name="message"
                     required
-                    rows={5}
-                    className={`m-[3px] w-full resize-y rounded-lg border border-black/10 ${fieldBg} px-4 py-4 text-[1.125rem] leading-[1.75] [word-spacing:0.05em] text-foreground outline-none transition placeholder:text-foreground/35 focus:border-accent focus:ring-2 focus:ring-accent/20`}
-                    placeholder="Project goals, timeline, budget…"
+                    rows={6}
+                    className={`${inputLine} min-h-[12rem] resize-y leading-[1.65]`}
+                    placeholder="Timeline, budget range, links…"
+                    aria-label="Message"
                   />
                 </div>
               </div>
 
-              <div data-reveal className="flex flex-col gap-6 border-t border-black/10 pt-8 sm:flex-row sm:items-center sm:justify-between">
-                <p className={`max-w-sm text-xs text-foreground/50 ${wordEase}`}>
+              <div data-reveal className="flex flex-col gap-8 border-t border-black/[0.08] pt-12 sm:flex-row sm:items-end sm:justify-between sm:gap-12 md:pt-14">
+                <p className="max-w-md font-mono text-base leading-relaxed text-foreground/45 md:text-lg">
                   We usually reply within two business days.
                 </p>
                 <ButtonPrimary
                   type="submit"
                   disabled={submitState === "loading"}
-                  className="w-full rounded-full bg-accent px-8 py-4 text-[14px] font-[1000] uppercase tracking-[0.3em] text-white shadow-lg shadow-accent/25 active:scale-[0.98] disabled:opacity-50 sm:w-auto sm:min-w-[240px]"
+                  className="min-h-[3.25rem] rounded-none bg-foreground px-12 py-4 font-mono text-sm font-semibold uppercase tracking-[0.18em] text-white hover:bg-foreground/90 disabled:opacity-50 md:min-h-[3.5rem] md:px-14 md:text-base md:tracking-[0.2em] sm:min-w-[220px]"
                 >
                   {submitState === "loading" ? (
                     "Sending…"
                   ) : (
                     <>
-                      Send message
-                      <Send size={17} />
+                      Send
+                      <Send size={20} />
                     </>
                   )}
                 </ButtonPrimary>
               </div>
 
               {feedback ? (
-                <p className="text-center text-[10px] font-black uppercase tracking-[0.3em] text-accent sm:text-left">
+                <p role="status" aria-live="polite" className="font-mono text-base text-foreground/55 md:text-lg">
                   {feedback}
                 </p>
               ) : null}

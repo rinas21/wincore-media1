@@ -86,7 +86,16 @@ export default function ProjectModal({
         .pm-glitch-img:nth-child(3) { animation: pm-glitch-2 3s infinite linear; }
         .pm-glitch-img:nth-child(4) { animation: pm-glitch-3 3s infinite linear; }
         .pm-glitch-img:nth-child(5) { animation: pm-glitch-4 2s infinite linear; background-blend-mode: overlay; background-color: var(--accent); }
-        .pm-content-col { margin-left: 3px !important; }
+        .pm-content-col {
+          padding-left: 12px !important;
+          border-left: 1px solid rgba(0, 0, 0, 0.06);
+        }
+        .pm-text-block {
+          padding-left: 14px;
+        }
+        .pm-schema-card {
+          padding-left: 18px !important;
+        }
         /* Avoid clipping content: allow the modal to grow with viewport height */
         .pm-card {
           max-height: min(710px, calc(100dvh - 40px)) !important;
@@ -109,7 +118,7 @@ export default function ProjectModal({
         </button>
 
         {/* LEFT: IMAGE MONOLITH (50%) */}
-        <div className="pm-image-wrap relative w-full lg:w-1/2 h-[calc(40vh-10px)] lg:h-auto overflow-hidden bg-white shrink-0">
+        <div className="pm-image-wrap relative w-full lg:w-[44%] h-[calc(40vh-10px)] lg:h-auto overflow-hidden bg-white shrink-0">
           {[1, 2, 3, 4, 5].map((id) => (
             <div key={id} className="pm-glitch-img absolute inset-0">
               <Image src={project.image} alt="" fill className="object-cover" priority={id === 1} />
@@ -122,22 +131,22 @@ export default function ProjectModal({
         </div>
 
         {/* RIGHT: DATA ARCHITECTURE (text-focused column) */}
-        <div className="pm-content-col flex-1 flex flex-col bg-white overflow-x-hidden min-h-0">
+        <div className="pm-content-col w-full lg:w-[56%] flex flex-col bg-white overflow-x-hidden min-h-0">
 
           {/* Scrollable text shell with generous padding & width */}
-          <div className="flex-1 min-h-0 overflow-y-auto px-10 py-18 lg:px-24 lg:py-20 scrollbar-hide">
-            <div className="mx-auto max-w-4xl space-y-16 pb-10">
+          <div className="flex-1 min-h-0 overflow-y-auto px-8 py-14 lg:px-16 lg:py-16 scrollbar-hide">
+            <div className="mx-auto max-w-none space-y-12 pb-8">
 
               {/* HEADER SECTION */}
-              <div className="pm-stagger space-y-5 mt-2 md:mt-4">
-                <p className="text-[13px] font-black uppercase tracking-[0.5em] text-accent">
+              <div className="pm-stagger pm-text-block space-y-4 mt-1 md:mt-2">
+                <p className="text-[12px] font-black uppercase tracking-[0.42em] text-accent">
                   Mission Objective
                 </p>
                 <div className="space-y-2">
-                  <h2 className="text-[2.9rem] lg:text-[3.4rem] font-black uppercase tracking-[-0.05em] leading-[1.04] text-black">
+                  <h2 className="text-[2.35rem] md:text-[2.7rem] lg:text-[3rem] font-black uppercase tracking-[-0.04em] leading-[1.02] text-black">
                     {project.title}
                   </h2>
-                  <p className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-black/[0.02] px-4 py-1.5 text-[0.85rem] font-black uppercase tracking-[0.34em] text-black/55">
+                  <p className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-black/[0.02] px-4 py-1.5 text-[0.78rem] font-black uppercase tracking-[0.28em] text-black/55">
                     <span className="h-1.5 w-1.5 rounded-full bg-accent" />
                     {project.category}
                   </p>
@@ -145,22 +154,22 @@ export default function ProjectModal({
               </div>
 
               {/* HIGHLIGHTED METRICS PANEL */}
-              <div className="pm-stagger rounded-[2rem] border border-black/[0.06] bg-black/[0.015] px-7 py-7 md:px-9 md:py-8 space-y-6 shadow-[0_24px_60px_rgba(0,0,0,0.04)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_32px_80px_rgba(0,0,0,0.08)] hover:border-black/[0.12]">
-                <p className="text-[12px] font-black uppercase tracking-[0.42em] text-black/45">
+              <div className="pm-stagger pm-schema-card border-y border-black/[0.08] py-6 md:py-7 space-y-5">
+                <p className="text-[11px] font-black uppercase tracking-[0.34em] text-black/45">
                   Project Schema
                 </p>
-                <div className="grid gap-x-12 gap-y-6 md:grid-cols-2">
+                <div className="grid gap-x-10 gap-y-5 md:grid-cols-2">
                   {[
                     { label: "Engineering", val: project.stack },
                     { label: "Deployment", val: project.role },
                     { label: "Timeline", val: project.duration },
                     { label: "Operational Outcome", val: project.impact },
                   ].map((s, i) => (
-                    <div key={i} className="flex flex-col gap-1.5">
-                      <p className="text-[12px] font-black uppercase tracking-[0.36em] text-black/40">
+                    <div key={i} className="flex flex-col gap-1.5 border-l border-black/[0.08] pl-4">
+                      <p className="text-[11px] font-black uppercase tracking-[0.28em] text-black/42">
                         {s.label}
                       </p>
-                      <p className="text-[1.15rem] lg:text-[1.22rem] font-semibold tracking-tight text-black">
+                      <p className="text-[1.05rem] lg:text-[1.12rem] font-semibold tracking-tight text-black">
                         {s.val}
                       </p>
                     </div>
@@ -169,13 +178,13 @@ export default function ProjectModal({
               </div>
 
               {/* MISSION DESCRIPTION — reworded for clarity */}
-              <div className="pm-stagger space-y-6">
-                <p className="text-[1.12rem] lg:text-[1.2rem] leading-[1.9] text-black/85">
+              <div className="pm-stagger pm-text-block space-y-5">
+                <p className="text-[1rem] lg:text-[1.08rem] leading-[1.8] text-black/84">
                   A flagship commerce experience for Onyx’s luxury line, built as a full-screen digital showroom
                   instead of a basic product grid. Customers move through a 3D narrative of the product, with every
                   interaction tuned for speed, clarity, and conversion.
                 </p>
-                <p className="text-[1.12rem] lg:text-[1.2rem] leading-[1.9] text-black/80">
+                <p className="text-[1rem] lg:text-[1.08rem] leading-[1.8] text-black/80">
                   WebGL is used where it actually adds value—rich 3D detail, smooth motion, and spatial storytelling—
                   while the core purchase flow stays as direct as a high-performing landing page. The result is a
                   premium brand moment that still behaves like a ruthless ecommerce engine.
@@ -183,11 +192,11 @@ export default function ProjectModal({
               </div>
 
               {/* TAGS / DISCIPLINES */}
-              <div className="pm-stagger flex flex-wrap gap-3 pt-4">
+              <div className="pm-stagger pm-text-block flex flex-wrap gap-2.5 pt-2">
                 {project.tags.map((t) => (
                   <span
                     key={t}
-                    className="text-[12px] font-black uppercase tracking-[0.38em] bg-black/[0.03] px-5 py-2.5 rounded-full text-black/65 transition-transform duration-300 hover:-translate-y-0.5"
+                    className="text-[11px] font-black uppercase tracking-[0.26em] bg-black/[0.03] px-4 py-2 rounded-full text-black/65 transition-transform duration-300 hover:-translate-y-0.5"
                   >
                     {t}
                   </span>
@@ -198,14 +207,14 @@ export default function ProjectModal({
           </div>
 
           {/* ACTION BAR (aligned to text width) */}
-          <div className="pm-stagger shrink-0 px-10 lg:px-20 pb-12 lg:pb-16 pt-0 flex flex-col sm:flex-row gap-6">
+          <div className="pm-stagger shrink-0 px-8 lg:px-16 pb-10 lg:pb-12 pt-0 flex flex-col sm:flex-row gap-4">
             <Link
               href="/contact"
-              className="group relative flex-[1.6] bg-black text-white h-20 rounded-2xl flex items-center justify-between px-10 overflow-hidden shadow-2xl transition-transform active:scale-95"
+              className="group relative flex-[1.6] bg-black text-white h-16 rounded-2xl flex items-center justify-between px-8 overflow-hidden shadow-xl transition-transform active:scale-95"
               onClick={onClose}
             >
               <div className="absolute inset-0 bg-accent translate-y-full group-hover:translate-y-0 transition-transform duration-700 ease-expo" />
-              <span className="relative z-10 text-[13px] sm:text-[14px] font-black uppercase tracking-[0.5em]">
+              <span className="relative z-10 text-[12px] sm:text-[13px] font-black uppercase tracking-[0.34em]">
                 Initiate Briefing
               </span>
               <div className="relative z-10 w-6 h-[1.5px] bg-white group-hover:w-10 transition-all duration-700" />
@@ -214,9 +223,9 @@ export default function ProjectModal({
               href={project.link}
               target="_blank"
               rel="noopener"
-              className="group flex-1 border border-black/10 h-20 rounded-2xl flex items-center justify-center gap-4 hover:border-black transition-all"
+              className="group flex-1 border border-black/10 h-16 rounded-2xl flex items-center justify-center gap-4 hover:border-black transition-all"
             >
-              <span className="text-[13px] sm:text-[14px] font-black uppercase tracking-[0.5em]">
+              <span className="text-[12px] sm:text-[13px] font-black uppercase tracking-[0.34em]">
                 Live Site
               </span>
             </a>

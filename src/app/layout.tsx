@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import ClientProvider from "@/components/ClientProvider";
 import CustomCursor from "@/components/CustomCursor";
@@ -6,6 +6,11 @@ import Header from "@/components/Header";
 import Preloader from "@/components/Preloader";
 import GrainOverlay from "@/components/GrainOverlay";
 import ContactFooter from "@/components/ContactFooter";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
 
 export const metadata: Metadata = {
   title: "Wincore — Award-Winning Creative Digital Agency | Colombo & Global",

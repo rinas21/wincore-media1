@@ -10,6 +10,8 @@ import {
   prefersReducedMotion,
 } from "@/lib/motion";
 
+const LOGO_TEXT = "WINCORE".split("");
+
 function useColomboTime() {
   const [time, setTime] = useState<string>("");
 
@@ -36,11 +38,14 @@ function useColomboTime() {
 export default function ContactFooter() {
   const colomboTime = useColomboTime();
   const footerRef = useRef<HTMLElement>(null);
+  const logoRef = useRef<HTMLAnchorElement>(null);
+  const logoPlayedRef = useRef(false);
 
   useEffect(() => {
     registerGsapPlugins();
     const scroller = getScroller();
     const reduced = prefersReducedMotion();
+    let logoObserver: IntersectionObserver | undefined;
 
     const ctx = gsap.context(() => {
       gsap.fromTo(
@@ -74,27 +79,52 @@ export default function ContactFooter() {
         );
       });
 
-      gsap.fromTo(
-        ".cf-main-logo",
-        { y: 60, opacity: 0 },
-        {
-          y: 0,
-          opacity: 1,
-          duration: 1.5,
-          ease: "expo.out",
-          scrollTrigger: {
-            trigger: ".cf-main-logo",
-            scroller,
-            start: "top 98%",
-            once: true,
-          },
+      /* WINCORE: letter-by-letter only when logo enters viewport (IO is reliable with Lenis). */
+      const logo = logoRef.current;
+      const letters = logo?.querySelectorAll<HTMLElement>(".cf-logo-letter");
+      if (!logo || !letters?.length) return;
+
+      if (reduced) {
+        gsap.set(letters, { autoAlpha: 1, clearProps: "all" });
+        return;
+      }
+
+      gsap.set(letters, { autoAlpha: 0, yPercent: 42 });
+
+      const playLetters = () => {
+        if (logoPlayedRef.current) return;
+        logoPlayedRef.current = true;
+        gsap.to(letters, {
+          autoAlpha: 1,
+          yPercent: 0,
+          duration: 0.52,
+          stagger: 0.09,
+          ease: "power3.out",
+          clearProps: "transform,opacity",
+        });
+      };
+
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) return;
+            playLetters();
+            io.disconnect();
+          });
         },
+        { root: null, rootMargin: "0px 0px -12% 0px", threshold: 0.2 },
       );
+
+      io.observe(logo);
+      logoObserver = io;
     }, footerRef);
 
     scheduleScrollTriggerRefresh();
 
-    return () => ctx.revert();
+    return () => {
+      logoObserver?.disconnect();
+      ctx.revert();
+    };
   }, []);
 
   return (
@@ -111,10 +141,20 @@ export default function ContactFooter() {
         {/* ── Main Contact Section removed as per request ── */}
 
 
-        {/* ── Massive Brand Centerpiece ── */}
-        <div className="cf-reveal mb-20 md:mb-32">
-          <Link href="/" className="group cf-main-logo flex flex-col items-start transition-transform hover:scale-[1.01]">
-            <span className="text-7xl font-[1000] tracking-[-0.05em] text-foreground md:text-[11rem] lg:text-[13rem] leading-[0.8]">WINCORE</span>
+        {/* ── Massive Brand Centerpiece (no cf-reveal opacity here — it hid the letter stagger) ── */}
+        <div className="mb-20 md:mb-32">
+          <Link
+            ref={logoRef}
+            href="/"
+            className="group cf-main-logo flex flex-col items-start transition-transform hover:scale-[1.01]"
+          >
+            <span className="text-7xl font-[1000] tracking-[-0.05em] text-foreground md:text-[11rem] lg:text-[13rem] leading-[0.8]">
+              {LOGO_TEXT.map((letter, index) => (
+                <span key={`${letter}-${index}`} className="cf-logo-letter inline-block">
+                  {letter}
+                </span>
+              ))}
+            </span>
             <div className="flex items-center gap-4 mt-4">
               <div className="h-px w-24 bg-accent/40" />
               <span className="text-xs font-black uppercase tracking-[0.6em] text-accent group-hover:tracking-[0.8em] transition-all duration-700">

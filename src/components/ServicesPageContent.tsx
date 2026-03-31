@@ -558,7 +558,7 @@ export default function ServicesPageContent() {
       </div>
 
       <div className="_container relative z-10">
-        <header className="svc-intro svc-hero">
+        <header className="svc-intro svc-hero pb-10 md:pb-14 lg:pb-16">
           <div className="grid grid-cols-1 gap-14 border-t border-black/[0.07] pt-16 md:gap-16 md:pt-20 lg:grid-cols-[minmax(0,1fr)_minmax(280px,400px)] lg:items-start lg:gap-x-20 lg:pt-24 xl:gap-x-28">
             <div className="min-w-0">
               <div className="mb-10 md:mb-12">
@@ -621,8 +621,10 @@ export default function ServicesPageContent() {
           </div>
         </header>
 
+        <div className="svc-section-spacer svc-section-spacer--sm" aria-hidden />
+
         <section
-          className="svc-cap-section mt-24 mb-20 md:mt-32 md:mb-28 lg:mt-36"
+          className="svc-cap-section mt-16 mb-20 md:mt-20 md:mb-28 lg:mt-24 lg:mb-32"
           aria-labelledby="svc-cap-heading"
         >
           <div className="svc-fade-up border-t border-black/[0.08] pt-14 md:pt-20 lg:pt-24">
@@ -656,7 +658,9 @@ export default function ServicesPageContent() {
           </div>
         </section>
 
-        <div className="svc-card-grid mb-0 mt-14 grid grid-cols-1 gap-16 perspective-[1400px] sm:grid-cols-2 sm:gap-x-12 sm:gap-y-20 md:mt-20 md:gap-x-14 md:gap-y-20 lg:grid-cols-6 lg:gap-x-16 lg:gap-y-24">
+        <div className="svc-section-spacer svc-section-spacer--md" aria-hidden />
+
+        <div className="svc-card-grid mt-10 mb-20 grid grid-cols-1 gap-16 perspective-[1400px] sm:grid-cols-2 sm:gap-x-12 sm:gap-y-20 sm:mb-24 sm:mt-12 md:mb-32 md:mt-14 md:gap-x-14 md:gap-y-20 lg:mb-40 lg:mt-16 lg:grid-cols-6 lg:gap-x-16 lg:gap-y-24">
           {SERVICES.map((service, index) => {
             const Icon = service.icon;
             const layoutClass =
@@ -693,7 +697,7 @@ export default function ServicesPageContent() {
                         <div className="svc-card-media__safe">
                           <div className="h-px w-full max-w-[min(100%,15rem)] shrink-0 bg-gradient-to-r from-transparent via-white/45 to-transparent sm:max-w-[16rem]" />
                           <div className="flex shrink-0 justify-end">
-                            <span className="font-heading text-[2.5rem] font-black leading-none tracking-tighter text-white/50 drop-shadow-md sm:text-[3.25rem] md:text-[3.75rem] lg:text-[4.25rem]">
+                            <span className="svc-card-num font-heading text-[2.5rem] font-black leading-none tracking-tighter text-white/50 drop-shadow-md sm:text-[3.25rem] md:text-[3.75rem] lg:text-[4.25rem]">
                               {String(index + 1).padStart(2, "0")}
                             </span>
                           </div>
@@ -702,9 +706,9 @@ export default function ServicesPageContent() {
                     </div>
                   </div>
 
-                  <div className="svc-card-content relative z-10 flex flex-1 flex-col border-t border-white/10 bg-zinc-950 px-12 py-14 sm:px-16 sm:py-16 md:px-20 md:py-20 lg:px-24 lg:py-20 xl:px-28">
-                  <div className="mb-9 flex items-start justify-between gap-6 md:mb-10">
-                    <span className="rounded-full border border-white/30 bg-white/10 px-5 py-2.5 text-[11px] font-black uppercase leading-[1.35] tracking-[0.2em] text-white md:text-xs md:tracking-[0.22em]">
+                  <div className="svc-card-content relative z-10 flex flex-1 flex-col border-t border-white/10 bg-zinc-950 px-10 py-12 sm:px-14 sm:py-16 md:px-20 md:py-[4.25rem] lg:px-24 lg:py-20 xl:px-[6.5rem]">
+                  <div className="svc-card-kicker-row mb-8 flex items-start justify-between gap-6 md:mb-10">
+                    <span className="svc-card-kicker rounded-full border border-white/30 bg-white/10 px-5 py-2.5 text-[11px] font-black uppercase leading-[1.35] tracking-[0.2em] text-white md:text-xs md:tracking-[0.22em]">
                       {service.link ? "Platform" : "Service"}
                     </span>
                     <div className="rounded-2xl border border-white/25 bg-white/5 p-4 text-white transition-all duration-500 group-hover:scale-110 group-hover:border-accent/70 group-hover:bg-accent group-hover:shadow-lg group-hover:shadow-accent/30">
@@ -712,14 +716,15 @@ export default function ServicesPageContent() {
                     </div>
                   </div>
 
-                  <h3 className="mb-5 text-[1.55rem] font-black leading-[1.18] tracking-tight text-white sm:text-[1.7rem] md:mb-6 md:text-[1.9rem] md:leading-[1.12] lg:text-[2.05rem]">
+                  <div className="svc-card-text-only mt-1 px-3 py-2 md:px-5 md:py-3 lg:px-6">
+                  <h3 className="text-[1.55rem] font-black leading-[1.22] tracking-tight text-white sm:text-[1.7rem] md:text-[1.9rem] md:leading-[1.12] lg:text-[2.05rem]">
                     {service.title}
                   </h3>
-                  <p className="mb-10 max-w-[52ch] text-base leading-[1.82] text-zinc-100 md:mb-11 md:text-lg md:leading-[1.78] lg:text-xl lg:leading-[1.75]">
+                  <p className="max-w-[52ch] text-base leading-[1.88] text-zinc-100 md:text-lg md:leading-[1.82] lg:text-xl lg:leading-[1.78]">
                     {service.summary}
                   </p>
 
-                  <ul className="mb-11 flex flex-wrap gap-3 md:mb-12 md:gap-3.5">
+                  <ul className="flex flex-wrap gap-3 md:gap-3.5">
                     {service.outcomes.map((outcome) => (
                       <li
                         key={outcome}
@@ -745,13 +750,17 @@ export default function ServicesPageContent() {
                     </span>
                   )}
                   </div>
+                  </div>
                 </div>
               </article>
             );
           })}
         </div>
 
-        <div className="svc-process-cta-stack flex flex-col gap-[clamp(3rem,8vw,6rem)] border-t border-black/[0.08] pt-24 md:gap-[clamp(3.5rem,9vw,7rem)] md:pt-36 lg:pt-44">
+        {/* Fixed gap: block margin can collapse with the next section — height + mt guarantees visible space */}
+        <div className="svc-card-process-spacer" aria-hidden />
+
+        <div className="svc-process-cta-stack mt-12 flex flex-col gap-[clamp(3.5rem,9vw,7.5rem)] border-t border-black/[0.08] pt-20 md:mt-16 md:pt-28 lg:mt-20 lg:pt-36">
         <div className="svc-process-container relative">
           <div className="svc-process-intro flex max-w-3xl flex-col gap-8 pb-14 md:gap-10 md:pb-20 lg:gap-12 lg:pb-24">
             <span className="svc-process-kicker block text-[11px] font-black uppercase tracking-[0.38em] text-accent md:text-xs">
@@ -766,7 +775,7 @@ export default function ServicesPageContent() {
             </p>
           </div>
 
-          <div className="svc-process-track">
+          <div className="svc-process-track mt-10 md:mt-14 lg:mt-16">
             <div className="svc-process-journey relative">
               <div className="flex flex-col">
                 {PROCESS.map((phase) => (
@@ -796,8 +805,8 @@ export default function ServicesPageContent() {
           </div>
         </div>
 
-        <div className="svc-cta relative">
-          <div className="svc-cta-inner flex flex-col gap-14 border-t border-black/[0.08] pt-14 md:gap-20 md:pt-20 lg:flex-row lg:items-end lg:justify-between lg:gap-24 lg:pt-24">
+        <div className="svc-cta relative mt-10 md:mt-14 lg:mt-16">
+          <div className="svc-cta-inner flex flex-col gap-14 border-t border-black/[0.08] pt-16 md:gap-20 md:pt-20 lg:flex-row lg:items-end lg:justify-between lg:gap-24 lg:pt-24">
             <div className="max-w-2xl flex flex-col gap-8 md:gap-10 lg:gap-12">
               <p className="svc-cta-kicker text-[10px] font-black uppercase tracking-[0.45em] text-accent">
                 Next step
