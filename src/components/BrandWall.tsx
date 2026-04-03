@@ -97,7 +97,7 @@ export default function BrandWall() {
   return (
     <section 
       ref={sectionRef}
-      className="relative bg-background overflow-hidden pt-12 pb-24 md:pt-16 md:pb-36"
+      className="relative bg-background pt-12 md:pt-16 z-20 overflow-hidden"
     >
       <div className="_container relative z-10">
         <div className="mb-16 md:mb-24 text-center max-w-4xl mx-auto">
@@ -108,7 +108,7 @@ export default function BrandWall() {
           </h2>
         </div>
 
-        <ul className="brand-codepen-grid">
+        <ul className="brand-codepen-grid mb-32 md:mb-48 lg:mb-56">
           {brands.map((brand, i) => (
             <li key={i} className="brand-reveal-item brand-card-li">
               <div className="brand-card-details">

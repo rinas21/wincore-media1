@@ -471,24 +471,26 @@ export default function ServiceCards() {
 
                   {/* row content */}
                   <div
-                    className="relative z-10 flex items-center justify-between gap-6 px-1 py-10 transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] sm:px-2 md:px-3 md:py-12"
+                    className="relative z-10 flex min-h-[130px] flex-col items-start justify-between gap-4 px-1 py-8 transition-all duration-[600ms] ease-[cubic-bezier(0.16,1,0.3,1)] sm:px-2 md:min-h-[155px] md:flex-row md:items-center md:gap-6 md:px-3 md:py-10"
                     style={{
                       paddingLeft: isHovered ? "calc(40% + 2.5rem)" : "0rem",
                     }}
                   >
-                    {/* number */}
-                    <span className="shrink-0 text-[11px] font-black italic tracking-[0.08em] text-black/20 transition-colors duration-300 group-hover:text-accent md:block md:w-12">
-                      {s.num}
-                    </span>
+                    <div className="flex flex-col md:flex-row items-start md:items-center gap-2 md:gap-6">
+                      {/* number */}
+                      <span className="shrink-0 text-[11px] font-black italic tracking-[0.08em] text-black/20 transition-colors duration-300 group-hover:text-accent md:w-12">
+                        {s.num}
+                      </span>
 
-                    {/* title */}
-                    <h3 className="flex-1 text-[clamp(2.1rem,6.8vw,3.6rem)] font-black uppercase leading-[1.02] tracking-tight text-foreground/75 transition-colors duration-300 group-hover:text-foreground md:text-[3.8vw]">
-                      {s.title}
-                    </h3>
+                      {/* title */}
+                      <h3 className="flex-1 text-[2rem] sm:text-[clamp(2.1rem,6.8vw,3.6rem)] font-black uppercase leading-[1.02] tracking-tight text-foreground/75 transition-colors duration-300 group-hover:text-foreground md:text-[3.8vw]">
+                        {s.title}
+                      </h3>
+                    </div>
 
                     {/* right side: desc + button */}
-                    <div className="flex shrink-0 flex-col items-end gap-4 text-right">
-                      <p className="max-w-[28ch] text-[13px] font-light leading-[1.7] text-black/40 transition-colors duration-300 group-hover:text-black/65">
+                    <div className="flex shrink-0 flex-col items-start md:items-end gap-4 text-left md:text-right mt-2 md:mt-0">
+                      <p className="max-w-[32ch] text-[13px] font-light leading-[1.7] text-black/40 transition-colors duration-300 group-hover:text-black/65">
                         {s.desc}
                       </p>
 

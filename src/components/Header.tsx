@@ -257,7 +257,7 @@ export default function Header() {
 
           <ButtonPrimary
             href="/contact"
-            className="relative z-10 hidden min-h-[44px] rounded-full bg-foreground px-7 py-3 text-[11px] font-black uppercase tracking-[0.2em] text-white shadow-[0_8px_22px_rgba(0,0,0,0.14)] md:flex"
+            className="relative z-10 hidden min-h-[44px] rounded-full bg-foreground px-8 py-4 text-[11px] font-black uppercase tracking-[0.2em] text-white shadow-[0_8px_22px_rgba(0,0,0,0.14)] md:flex"
           >
             Start Project
           </ButtonPrimary>

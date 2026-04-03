@@ -100,8 +100,6 @@ export default function Hero() {
       gsap.set(".hero-eyebrow-part", { autoAlpha: 0, y: 18 });
       gsap.set(".hero-sub-line", { autoAlpha: 0, y: 24 });
       gsap.set(".hero-performs-inner", { yPercent: 105, opacity: 0 });
-      gsap.set(".hero-side-card", { autoAlpha: 0, scale: 0.95, y: 20 });
-      gsap.set(".hero-kpi-card", { autoAlpha: 0, scale: 0.95, y: 20 });
       gsap.set(".hero-action-btn", { autoAlpha: 0, y: 16 });
       gsap.set(".hero-canvas-wrap", { autoAlpha: 0, scale: 1.04 });
       gsap.set(".hero-scroll-hint", { autoAlpha: 0 });
@@ -814,7 +812,7 @@ export default function Hero() {
       <section
         id="hero-section"
         ref={introRef}
-        className="relative flex min-h-[100svh] flex-col justify-center bg-background pt-16 pb-8 md:pt-20 md:pb-10"
+        className="relative flex flex-col justify-center bg-background pt-24 pb-16 md:pt-32 md:pb-20"
       >
         {/* tftl-style soft top wash + floating tip badges */}
         <div
@@ -836,7 +834,7 @@ export default function Hero() {
         <div className="pointer-events-none absolute inset-0 z-[2] bg-[radial-gradient(ellipse_85%_55%_at_50%_35%,transparent_0%,rgba(255,255,255,0.2)_70%,rgba(255,255,255,0.8)_100%)]" />
 
         <div className="hero-content-layer _container relative z-10 mx-auto w-full max-w-[1440px]">
-          <div className="grid min-h-[min(78vh,820px)] grid-cols-1 items-start gap-10 md:gap-12 lg:grid-cols-12 lg:gap-12 lg:items-center">
+          <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12 lg:gap-12 lg:items-center">
 
             {/* ── LEFT column ── */}
             <div className="hero-left-col flex flex-col text-left lg:col-span-6">
@@ -849,35 +847,32 @@ export default function Hero() {
               {/*
                 Lines 1–2: .hero-line-split → SplitType words. Line 3: gradient word in .hero-performs-inner (no split).
               */}
-              <h1 className="hero-headline font-heading text-[2.75rem] font-black uppercase leading-[0.98] tracking-tight text-foreground sm:text-6xl md:text-7xl lg:text-[4.25rem] lg:leading-[0.95]">
-                <span className="hero-line block overflow-hidden pb-[0.2em]">
+              <h1 className="hero-headline font-heading text-[2.75rem] font-black uppercase leading-[0.8] tracking-tight text-foreground sm:text-6xl md:text-7xl lg:text-[4.25rem]">
+                <span className="hero-line block overflow-hidden pb-0">
                   <span className="hero-line-inner hero-line-split block">Creative digital</span>
                 </span>
-                <span className="hero-line block overflow-hidden pb-[0.2em]">
+                <span className="hero-line block overflow-hidden pb-0">
                   <span className="hero-line-inner hero-line-split block text-black/35">that actually</span>
                 </span>
-                <span className="hero-line block overflow-hidden pb-[0.2em]">
+                <span className="hero-line block overflow-visible pb-0">
                   <span className="hero-performs-inner block will-change-transform">
-                    <span className="hero-performs inline-block bg-gradient-to-r from-foreground via-foreground/85 to-accent bg-[length:200%_100%] bg-clip-text text-transparent">
+                    <span className="hero-performs inline-block bg-gradient-to-r from-foreground via-foreground/85 to-accent bg-[length:200%_100%] bg-clip-text text-transparent pb-1">
                       performs
                     </span>
                   </span>
                 </span>
               </h1>
 
-              <div className="hero-sub mt-5 max-w-xl text-base font-light leading-relaxed text-black/55 md:mt-6 md:text-lg">
-                <p className="hero-sub-line">
-                  Brand systems, motion, WebGL, and AI-accelerated delivery — one team, one standard.
+              <div className="hero-sub mt-2 max-w-xl text-base font-light leading-[1.6] text-black/55 md:mt-3 md:text-[17px]">
+                <p className="hero-sub-line font-medium text-black/60">
+                  Brand systems, motion, WebGL, and AI-accelerated delivery — one team, one standard. Built for clarity, speed, and outcomes.
                 </p>
-                <p className="hero-sub-line mt-2.5">
-                  Built for clarity, speed, and measurable outcomes.
-                </p>
-                <div className="hero-sub-line mt-8 flex flex-col gap-5">
-                  <div className="flex flex-wrap gap-2.5">
+                <div className="hero-sub-line mt-3 flex flex-col gap-3">
+                  <div className="flex flex-wrap gap-2">
                     {HERO_TIPS.map((tip) => (
                       <span
                         key={tip.text}
-                        className="inline-flex items-center rounded-full px-3.5 py-1.5 text-xs font-bold uppercase tracking-widest shadow-sm transition-transform hover:scale-[1.03]"
+                        className="inline-flex items-center rounded-full px-3 py-1.5 text-[10.5px] font-black uppercase tracking-[0.15em] shadow-sm transition-transform hover:scale-[1.03]"
                         style={{ background: tip.bg, color: tip.color }}
                       >
                         {tip.text}
@@ -886,7 +881,7 @@ export default function Hero() {
                   </div>
 
                   {/* New Triple Kicker */}
-                  <div className="hero-plus-kicker mt-3 flex flex-col md:flex-row md:items-center gap-5 md:gap-10 border-t border-black/5 pt-6 md:pt-7">
+                  <div className="hero-plus-kicker mt-1 flex flex-col md:flex-row md:items-center gap-3 md:gap-5 border-t border-black/5 pt-3 md:pt-4">
                     <div className="flex flex-col gap-1.5">
                       <span className="text-xs font-black uppercase tracking-[0.4em] text-black/25">Studio</span>
                       <span className="text-sm font-bold uppercase tracking-widest text-foreground/70">Creative digital studio</span>
@@ -908,56 +903,56 @@ export default function Hero() {
 
             {/* ── RIGHT column (side card) ── */}
             <aside className="hero-right-col hero-side-card lg:col-span-6 lg:self-center">
-              <div className="hero-why-card relative overflow-visible rounded-[2.5rem] border border-black/[0.06] bg-gradient-to-br from-white via-white to-black/[0.02] px-6 pt-10 pb-10 shadow-[0_24px_48px_rgba(0,0,0,0.04)] sm:px-8 sm:pt-12 sm:pb-12 md:px-10 md:pt-14 md:pb-14 lg:px-12 lg:pt-16 lg:pb-16 lg:pl-[4.25rem] lg:pr-10">
+              <div className="hero-why-card relative overflow-visible rounded-[2.5rem] border border-black/[0.06] bg-gradient-to-br from-white via-white to-black/[0.02] px-6 pt-10 pb-10 shadow-[0_24px_48px_rgba(0,0,0,0.04)] sm:px-8 sm:pt-12 sm:pb-12 md:px-10 md:pt-14 md:pb-14 lg:px-12 lg:pt-16 lg:pb-16">
                 <div className="hero-why-glow pointer-events-none absolute -right-12 -top-12 h-56 w-56 rounded-full bg-accent/10 opacity-90" />
 
-                <header className="hero-why-header mb-10 flex items-center gap-6 md:mb-12">
-                  <p className="text-[12px] md:text-[13px] font-black uppercase tracking-[0.3em] text-accent whitespace-nowrap">Why Wincore</p>
-                  <div className="h-[1px] flex-1 bg-accent/20" />
+                <header className="hero-why-header mb-8 flex items-center justify-between gap-6 md:mb-10">
+                  <p className="text-[11px] md:text-[12px] font-black uppercase tracking-[0.3em] text-accent">Why Wincore</p>
+                  <div className="h-[1px] flex-1 bg-black/5" />
                 </header>
 
-                <ul className="space-y-4 md:space-y-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
                   {FOCUS.map((item, idx) => (
-                    <li
+                    <div
                       key={item.label}
-                      className="hero-why-row hero-side-row group/row relative rounded-2xl border border-transparent px-6 py-7 md:px-7 md:py-8 transition-all duration-500 hover:border-accent/30 hover:bg-accent/5"
+                      className="hero-why-row hero-side-row group/row relative flex flex-col justify-between rounded-[1.5rem] border border-black/[0.05] bg-white shadow-[0_8px_16px_rgba(0,0,0,0.02)] transition-all duration-500 hover:border-accent/40 hover:bg-white hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,136,204,0.08)]"
+                      style={{ padding: '1.75rem' }}
                       data-index={idx}
                     >
-                      <div className="flex items-start gap-5 py-1">
-                        <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-black/[0.03] transition-all duration-500 group-hover/row:scale-110 group-hover/row:bg-accent group-hover/row:shadow-[var(--shadow-accent-icon)]">
+                      <div className="mb-10 flex items-start justify-between">
+                        <div className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-xl bg-black/[0.03] transition-all duration-500 group-hover/row:scale-110 group-hover/row:bg-accent group-hover/row:shadow-[var(--shadow-accent-icon)]">
                           <item.icon
-                            className="text-black/30 transition-colors duration-500 group-hover/row:text-white"
-                            size={22}
-                            strokeWidth={1.3}
+                            className="text-black/35 transition-colors duration-500 group-hover/row:text-white"
+                            size={20}
+                            strokeWidth={1.5}
                           />
-
                         </div>
-                        <div className="flex flex-col gap-2 pr-1 pb-0 min-w-0 flex-1">
-                          <div className="mb-1 flex flex-wrap items-center gap-3">
-                            <span className="text-[16px] md:text-[18px] font-bold tracking-tight text-foreground">{item.label}</span>
-                            <span className="shrink-0 rounded-full border border-accent/25 bg-accent/8 px-2.5 py-1 text-[8px] font-black uppercase tracking-[0.2em] text-accent">
-                              {item.tag}
-                            </span>
-                          </div>
-                          <p className="text-[14px] md:text-[15px] leading-relaxed text-black/40 transition-colors group-hover/row:text-foreground/70 break-words">
-                            {item.desc}
-                          </p>
-                        </div>
+                        <span className="rounded-full border border-black/[0.06] bg-black/[0.02] px-2.5 py-1 text-[8px] font-black uppercase tracking-[0.25em] text-black/40 transition-colors duration-500 group-hover/row:border-accent/30 group-hover/row:bg-accent/10 group-hover/row:text-accent">
+                          {item.tag}
+                        </span>
                       </div>
-                    </li>
+                      
+                      <div className="flex flex-col gap-2">
+                        <h3 className="text-[16px] font-bold tracking-normal text-foreground md:text-[17px]">
+                          {item.label}
+                        </h3>
+                        <p className="text-[13px] leading-relaxed text-black/45 transition-colors group-hover/row:text-black/70">
+                          {item.desc}
+                        </p>
+                      </div>
+                    </div>
                   ))}
-                </ul>
+                </div>
 
-                <div className="hero-side-cta mt-10 border-t border-black/[0.08] pt-8.5 md:mt-11 md:pt-9">
+                <div className="hero-side-cta mt-8 pt-4 md:mt-10">
                   <Link
                     href="/about"
-                    className={`hero-approach-btn cursor-hover group/btn relative flex w-full items-center justify-between gap-5 overflow-hidden rounded-2xl border border-black/[0.11] bg-gradient-to-r from-black/[0.07] via-black/[0.03] to-transparent px-5 py-4 transition-all duration-300 hover:border-accent/45 hover:shadow-[var(--shadow-accent-approach)] md:px-6 md:py-[1.125rem] ${ctaHover}`}
+                    className={`hero-approach-btn cursor-hover group/btn relative flex w-full items-center justify-between gap-5 overflow-hidden rounded-[1.5rem] border border-black/[0.08] bg-black/[0.02] px-5 py-4 transition-all duration-300 hover:border-accent/40 hover:bg-white hover:shadow-[var(--shadow-accent-approach)] md:px-6 md:py-[1.125rem] ${ctaHover}`}
                   >
-                    <div className="hero-approach-glint pointer-events-none absolute inset-y-0 left-[-35%] w-[28%] -skew-x-12 bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
-                    <div className="absolute inset-x-0 bottom-0 h-[1px] w-0 bg-gradient-to-r from-transparent via-accent/60 to-transparent transition-all duration-700 group-hover/btn:w-full" />
-
+                    <div className="hero-approach-glint pointer-events-none absolute inset-y-0 left-[-35%] w-[28%] -skew-x-12 bg-gradient-to-r from-transparent via-accent/20 to-transparent" />
+                    
                     <div className="relative z-10 flex min-w-0 items-center gap-4">
-                      <span className="hero-approach-chip shrink-0 rounded-full border border-accent/35 bg-accent/10 px-2.5 py-1 text-[8px] font-black uppercase tracking-[0.28em] text-accent/90">
+                      <span className="hero-approach-chip flex h-8 items-center justify-center rounded-full bg-black/[0.04] px-3 text-[9px] font-black uppercase tracking-[0.28em] text-foreground/50 transition-colors group-hover/btn:bg-accent/10 group-hover/btn:text-accent">
                         Process
                       </span>
                       <span className="hero-approach-title text-[11px] font-black uppercase tracking-[0.3em] text-foreground pb-0.5 transition-colors group-hover/btn:text-accent">
@@ -965,10 +960,10 @@ export default function Hero() {
                       </span>
                     </div>
 
-                    <span className="hero-approach-arrow-wrap relative z-10 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-black/12 bg-black/[0.03] transition-all duration-500 group-hover/btn:border-accent/45 group-hover/btn:bg-accent/10">
+                    <span className="hero-approach-arrow-wrap relative z-10 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-foreground transition-all duration-500 group-hover/btn:bg-accent group-hover/btn:shadow-lg">
                       <ArrowRight
-                        className="text-foreground/45 transition-all duration-500 group-hover/btn:translate-x-0.5 group-hover/btn:text-accent"
-                        size={16}
+                        className="text-white transition-all duration-500 group-hover/btn:translate-x-0.5"
+                        size={15}
                         strokeWidth={2.5}
                       />
                     </span>
@@ -978,81 +973,7 @@ export default function Hero() {
             </aside>
           </div>
 
-          <div className="hero-kpi-strip mt-10 md:mt-12 lg:mt-16">
-            <div className="grid grid-cols-1 gap-5 md:gap-6 lg:grid-cols-12 lg:gap-6">
-              <article className="hero-kpi-card group relative overflow-visible rounded-3xl border border-black/[0.08] bg-white/70 backdrop-blur-xl px-7 py-9 shadow-[0_30px_60px_rgba(0,0,0,0.03),inset_0_1px_0_rgba(255,255,255,0.8)] transition-shadow duration-500 hover:shadow-[var(--shadow-accent-kpi)] md:px-9 md:py-10 lg:px-10 lg:py-11 lg:col-span-4 [transform-style:preserve-3d]">
-                <div className="hero-metric-sweep pointer-events-none absolute inset-y-0 left-[-34%] w-[24%] -skew-x-12 bg-gradient-to-r from-transparent via-accent/15 to-transparent" />
-                <div className="mb-6 md:mb-7 flex items-center justify-between">
-                  <p className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-black/35">Outcomes</p>
-                  <span className="h-2 w-2 rounded-full bg-accent/80" aria-hidden />
-                </div>
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-3.5">
-                  {OUTCOMES.map((p) => (
-                    <span
-                      key={p}
-                      className="hero-outcome-chip inline-flex min-h-12 items-center justify-center rounded-xl border border-black/10 bg-black/[0.03] px-5 py-4 text-center text-[10px] md:text-[11px] font-black uppercase tracking-[0.12em] leading-tight text-foreground/70"
-                    >
-                      {p}
-                    </span>
-                  ))}
-                </div>
-              </article>
 
-              <article className="hero-kpi-card group relative overflow-visible rounded-3xl border border-black/[0.08] bg-white/70 backdrop-blur-xl px-7 py-9 shadow-[0_30px_60px_rgba(0,0,0,0.03),inset_0_1px_0_rgba(255,255,255,0.8)] transition-shadow duration-500 hover:shadow-[var(--shadow-accent-kpi)] md:px-9 md:py-10 lg:px-10 lg:py-11 lg:col-span-4 [transform-style:preserve-3d]">
-                <div className="hero-metric-sweep pointer-events-none absolute inset-y-0 left-[-34%] w-[24%] -skew-x-12 bg-gradient-to-r from-transparent via-secondary/20 to-transparent" />
-                <div className="mb-6 md:mb-7 flex flex-col gap-3">
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-black/35">Actions</p>
-                    <p className="mt-2 text-[13px] md:text-[14px] leading-relaxed text-black/45">Choose a path and we will turn it into a high-performing launch.</p>
-                  </div>
-                  <span className="hidden text-[8px] font-black uppercase tracking-[0.2em] text-black/20 sm:block whitespace-nowrap">Fast response</span>
-                </div>
-                <div className="grid grid-cols-1 gap-3.5">
-                  <ButtonPrimary
-                    href="/contact"
-                    className="hero-cta hero-action-btn cursor-hover min-h-[3.25rem] rounded-xl border border-accent/45 bg-accent px-6 py-4 text-[11px] md:min-h-14 md:px-7 md:py-4 md:text-xs font-black uppercase tracking-[0.12em] text-white shadow-[var(--shadow-accent-cta)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-accent/40 focus-visible:ring-offset-2 focus-visible:ring-offset-background active:scale-[0.98]"
-                  >
-                    Start a project
-                    <ArrowRight size={14} strokeWidth={2.5} />
-                  </ButtonPrimary>
-                  <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                    <Link
-                      href="/works"
-                      className={`hero-action-btn cursor-hover inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-black/10 bg-black/[0.04] px-4 py-3.5 text-[10px] md:text-[11px] font-black uppercase tracking-[0.12em] text-foreground transition-colors hover:border-accent/50 hover:text-accent ${ctaHover}`}
-                    >
-                      View work
-                    </Link>
-                    <Link
-                      href="/services"
-                      className={`hero-action-btn cursor-hover inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-black/5 bg-transparent px-4 py-3.5 text-[10px] md:text-[11px] font-black uppercase tracking-[0.12em] text-black/60 transition-colors hover:border-black/20 hover:text-black/90 ${ctaHover}`}
-                    >
-                      Services
-                    </Link>
-                  </div>
-                </div>
-              </article>
-
-              <article className="hero-kpi-card group relative overflow-visible rounded-3xl border border-black/[0.08] bg-white/70 backdrop-blur-xl px-7 py-9 shadow-[0_30px_60px_rgba(0,0,0,0.03),inset_0_1px_0_rgba(255,255,255,0.8)] transition-shadow duration-500 hover:shadow-[var(--shadow-accent-kpi)] md:px-9 md:py-10 lg:px-10 lg:py-11 lg:col-span-4 [transform-style:preserve-3d]">
-                <div className="hero-metric-sweep pointer-events-none absolute inset-y-0 left-[-34%] w-[24%] -skew-x-12 bg-gradient-to-r from-transparent via-accent/20 to-transparent" />
-                <p className="mb-6 md:mb-7 text-[10px] md:text-[11px] font-black uppercase tracking-[0.2em] text-black/35">Performance Snapshot</p>
-                <dl className="space-y-3.5">
-                  {KPI_STATS.map((stat, i) => (
-                    <div key={stat.label} className="hero-stat relative flex items-center justify-between rounded-xl border border-black/10 bg-black/[0.02] px-5 py-5 transition-colors duration-500 group-hover:border-black/20">
-                      <div className="flex items-center gap-3 min-w-0 flex-1">
-                        <span className="text-[9px] font-black uppercase tracking-[0.16em] text-black/20 shrink-0">{String(i + 1).padStart(2, "0")}</span>
-                        <stat.icon className={`${stat.color} opacity-70 shrink-0`} size={16} />
-                        <dt className="text-[11px] md:text-[12px] font-bold uppercase tracking-[0.1em] text-black/45 leading-tight">{stat.label}</dt>
-                      </div>
-                      <dd className="flex items-baseline gap-1.5 shrink-0 ml-3">
-                        <span className="stat-value text-[1.9rem] md:text-[2.1rem] font-black tracking-tight text-foreground" data-target={stat.value}>0</span>
-                        <span className={`text-[0.9rem] font-black ${stat.color}`}>{stat.suffix}</span>
-                      </dd>
-                    </div>
-                  ))}
-                </dl>
-              </article>
-            </div>
-          </div>
         </div>
 
         {/* scroll hint */}

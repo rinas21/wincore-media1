@@ -211,35 +211,33 @@ export default function AboutTeaser() {
           ))}
         </div>
 
-        {/* ── Team Grid ── */}
-        <div className="abt-team-grid grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-12 lg:gap-6 relative z-10">
+        <div className="abt-team-grid grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5 relative z-10">
           {team.map((member, index) => (
             <article
               key={member.name}
               data-reveal
-              className={`abt-photo-card abt-photo-stack group flex flex-col overflow-hidden rounded-[1.5rem] border border-black/[0.06] bg-background shadow-[0_20px_60px_rgba(0,0,0,0.06)] transform-gpu transition-all duration-700 hover:-translate-y-1 hover:shadow-[0_32px_80px_rgba(0,0,0,0.1)] ${
-                index === 0 ? "sm:col-span-2 lg:col-span-6" : "lg:col-span-3"
-              }`}
+              className="abt-photo-card group relative flex flex-col overflow-hidden rounded-[1.25rem] bg-black shadow-md transform-gpu transition-all duration-700 hover:-translate-y-1.5 hover:shadow-xl"
             >
-              <div
-                className={`abt-photo-stack__media relative w-full overflow-hidden bg-black/5 ${
-                  index === 0 ? "aspect-[16/10]" : "aspect-[4/5]"
-                }`}
-              >
+              <div className="relative w-full overflow-hidden aspect-[4/5]">
                 <Image
                   src={member.image}
                   alt={member.name}
                   fill
-                  sizes="(max-width: 768px) 50vw, 25vw"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
                   quality={95}
                   loading="lazy"
-                  className="object-cover transition-transform duration-[1800ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] group-hover:scale-105"
+                  className="object-cover transition-transform duration-[1800ms] ease-[cubic-bezier(0.25,0.46,0.45,0.94)] group-hover:scale-[1.03] opacity-90 group-hover:opacity-100"
                 />
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-80" />
-              </div>
-              <div className="abt-photo-stack__meta">
-                <p className="text-lg font-black italic tracking-tight text-foreground md:text-xl">{member.name}</p>
-                <p className="mt-2 text-[9px] font-black uppercase tracking-[0.45em] text-accent">{member.role}</p>
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent transition-opacity duration-700 opacity-90 group-hover:opacity-100" />
+                
+                <div className="absolute inset-x-0 bottom-0 flex flex-col items-center justify-end p-6 text-center transform transition-transform duration-700 group-hover:-translate-y-1">
+                  <p className="text-[1.25rem] font-bold tracking-tight text-white mb-1.5">
+                    {member.name}
+                  </p>
+                  <p className="rounded-full border border-white/20 bg-black/40 px-3 py-1.5 text-[8px] font-black uppercase tracking-[0.3em] text-white/80 backdrop-blur-md transition-colors duration-500 group-hover:border-accent/40 group-hover:text-accent">
+                    {member.role}
+                  </p>
+                </div>
               </div>
             </article>
           ))}

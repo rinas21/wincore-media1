@@ -3,93 +3,15 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import Image from "next/image";
-import ProjectModal, { type Project } from "@/components/ProjectModal";
+import ProjectModal from "@/components/ProjectModal";
+import { PROJECTS, type Project } from "@/lib/projects";
 import {
   registerGsapPlugins,
   getScroller,
   prefersReducedMotion,
 } from "@/lib/motion";
-
-const PROJECTS: Project[] = [
-  {
-    id: 1,
-    title: "Onyx Luxury",
-    category: "High-End Commerce",
-    image: "/works/vibrant_webgl.png",
-    tags: ["E-Commerce", "WebGL", "Brand Strategy"],
-    description: "A flagship digital storefront for Onyx, blending 3D product interaction with seamless conversion architecture. Engineered for elite performance and visceral user engagement.",
-    stack: "React, Three.js, Shopify",
-    duration: "12 Weeks",
-    role: "Full-Service Partner",
-    impact: "+40% Conversion",
-    link: "https://onyx-luxury.com",
-  },
-  {
-    id: 2,
-    title: "Cipher Fintech",
-    category: "Financial Systems",
-    image: "/works/vibrant_fintech.png",
-    tags: ["Product Design", "Security", "AI Systems"],
-    description: "Reimagining the security of digital assets. Cipher is a high-security, ultra-efficient fintech dashboard built for real-time transaction monitoring and global scales.",
-    stack: "Next.js, D3.js, Rust",
-    duration: "16 Weeks",
-    role: "Product Architecture",
-    impact: "99.9% Efficiency",
-    link: "https://cipher-fin.io",
-  },
-  {
-    id: 3,
-    title: "Aura Experiences",
-    category: "Immersive Motion",
-    image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=1200",
-    tags: ["WebGL", "Motion Design", "3D UI"],
-    description: "An evocative, atmospheric experience for a luxury wellness brand. We built a fluid, non-linear navigation system that responds to the user's kinetic energy and focus.",
-    stack: "GSAP, WebGL, React",
-    duration: "8 Weeks",
-    role: "Direction & Motion",
-    impact: "1.2M+ Reach",
-    link: "https://aura-exp.com",
-  },
-  {
-    id: 4,
-    title: "Vanguard App",
-    category: "Native Mobility",
-    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=1200",
-    tags: ["App Design", "UI/UX", "Prototyping"],
-    description: "Leading the charge in premium electric mobility. Vanguard is more than an app; it is a companion for high-performance navigation and vehicle intelligence.",
-    stack: "React Native, Swift",
-    duration: "14 Weeks",
-    role: "Mobile Strategy",
-    impact: "4.8 App Rating",
-    link: "https://vanguard-drive.ai",
-  },
-  {
-    id: 5,
-    title: "Neon Analytics",
-    category: "AI Data Platform",
-    image: "https://images.unsplash.com/photo-1614729939124-032f0b56c9ce?auto=format&fit=crop&q=80&w=1200",
-    tags: ["AI Integration", "Big Data", "Visual Systems"],
-    description: "A complex data visualization engine that turns massive datasets into actionable intelligence through an intuitive, dark-mode first interface architecture.",
-    stack: "PyTorch, Next.js, D3",
-    duration: "10 Weeks",
-    role: "Engineering Lead",
-    impact: "Seed Funded",
-    link: "https://neon-data.tech",
-  },
-  {
-    id: 6,
-    title: "Prism Editorial",
-    category: "Brand Expression",
-    image: "https://images.unsplash.com/photo-1600607686527-6fb886090705?auto=format&fit=crop&q=80&w=1200",
-    tags: ["Typography", "Editorial", "Web Design"],
-    description: "A minimal, brutalist editorial platform for avant-garde architectural designs. Focusing on space, light, and the hierarchy of information over decorative clutter.",
-    stack: "Next.js, Sanity.io",
-    duration: "6 Weeks",
-    role: "Brand & Design",
-    impact: "+200% Sessions",
-    link: "https://prism-arch.com",
-  },
-];
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 
 export default function WorkCarousel() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -195,7 +117,14 @@ export default function WorkCarousel() {
                             className="object-cover transition-all duration-1000 group-hover:scale-110" 
                             sizes="(max-width: 1400px) 100vw, 800px" 
                           />
-                          <div className="absolute inset-0 bg-gradient-to-tr from-black/20 via-transparent to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-1000" />
+                          <div className="absolute inset-0 bg-gradient-to-tr from-black/60 via-transparent to-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-1000 flex items-center justify-center">
+                             <Link 
+                               href={`/work/${p.slug}`}
+                               className="scale-90 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-700 bg-white text-black px-6 py-3 rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-2 hover:bg-accent hover:text-white"
+                             >
+                               View Case Study <ArrowUpRight size={14} />
+                             </Link>
+                          </div>
                        </div>
 
                        {/* CONTENT BLOCK */}
@@ -208,6 +137,7 @@ export default function WorkCarousel() {
                              {p.title}
                           </h3>
                           <div className={`flex items-center gap-6 pt-4 ${isEven ? 'justify-start' : 'justify-end'}`}>
+                             <Link href={`/work/${p.slug}`} className="text-[10px] font-black text-black/20 hover:text-accent transition-colors uppercase tracking-[0.2em] underline decoration-accent/30 underline-offset-4">Full Case Study</Link>
                              <span className="text-[10px] font-black text-black/20 group-hover:text-black transition-colors uppercase tracking-[0.2em]">Mission {p.duration}</span>
                           </div>
                        </div>

@@ -71,7 +71,7 @@ export default function WorksModernStats() {
       ref={sectionRef} 
       className="relative overflow-hidden bg-background py-20 md:py-28"
     >
-      <div className="_container">
+      <div className="_container" style={{ marginTop: '400px' }}>
         <div className="mb-12 text-center md:mb-16">
           <span className="mb-4 inline-block text-[10px] font-black uppercase leading-[1.35] tracking-[0.45em] text-accent">
             Performance
@@ -85,25 +85,26 @@ export default function WorksModernStats() {
         {stats.map((stat, i) => (
           <div 
             key={i} 
-            className="stat-panel relative overflow-hidden rounded-[1.75rem] border border-black/[0.07] bg-white p-8 shadow-[0_20px_56px_rgba(0,0,0,0.06)] md:p-10"
+            className="stat-panel relative overflow-hidden rounded-[1.75rem] border border-black/[0.07] bg-white shadow-[0_20px_56px_rgba(0,0,0,0.06)]"
+            style={{ padding: '3rem' }}
           >
             <div className="absolute inset-0 bg-gradient-to-br from-accent/[0.05] via-transparent to-secondary/[0.04]" />
-            <div className="relative z-10">
+            <div className="relative z-10 break-words" style={{ paddingLeft: '1rem' }}>
               <span className="mb-4 inline-block text-[10px] font-black uppercase leading-[1.35] tracking-[0.45em] text-accent">
                 Metric {i + 1}
               </span>
-              <h2 className="font-heading text-[18vw] font-black uppercase leading-none tracking-tighter text-foreground md:text-[6.5rem]">
-                <span className="inline-flex items-end gap-[0.02em]">
+              <h2 className="font-heading text-[5.5rem] sm:text-[6.5rem] md:text-[5rem] lg:text-[6rem] xl:text-[6.5rem] font-black uppercase leading-[0.9] tracking-normal text-foreground">
+                <span className="inline-flex items-baseline gap-[0.02em]">
                   <span>{stat.value}</span>
-                  <span className="text-black/35">{stat.suffix}</span>
+                  <span className="text-[0.6em] text-black/35">{stat.suffix}</span>
                 </span>
               </h2>
-              <div className="mt-6">
+              <div className="mt-6 md:mt-8">
                 <p className="text-xl font-black uppercase tracking-tight text-foreground md:text-2xl">
                   {stat.label}
                 </p>
                 <div className="my-4 h-px w-20 bg-accent/35" />
-                <p className="max-w-xl text-base font-medium leading-relaxed text-black/55">
+                <p className="max-w-xl text-sm sm:text-base font-medium leading-relaxed text-black/55">
                   {stat.desc}
                 </p>
               </div>

@@ -3,22 +3,9 @@
 import { useEffect, useRef, useLayoutEffect } from "react";
 import gsap from "gsap";
 import Image from "next/image";
-import { X } from "lucide-react";
+import { X, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
-
-export type Project = {
-  id: number;
-  title: string;
-  category: string;
-  image: string;
-  tags: string[];
-  description: string;
-  stack: string;
-  duration: string;
-  role: string;
-  impact: string;
-  link: string;
-};
+import { type Project } from "@/lib/projects";
 
 export default function ProjectModal({
   project,
@@ -209,15 +196,15 @@ export default function ProjectModal({
           {/* ACTION BAR (aligned to text width) */}
           <div className="pm-stagger shrink-0 px-8 lg:px-16 pb-10 lg:pb-12 pt-0 flex flex-col sm:flex-row gap-4">
             <Link
-              href="/contact"
+              href={`/work/${project.slug}`}
               className="group relative flex-[1.6] bg-black text-white h-16 rounded-2xl flex items-center justify-between px-8 overflow-hidden shadow-xl transition-transform active:scale-95"
               onClick={onClose}
             >
               <div className="absolute inset-0 bg-accent translate-y-full group-hover:translate-y-0 transition-transform duration-700 ease-expo" />
               <span className="relative z-10 text-[12px] sm:text-[13px] font-black uppercase tracking-[0.34em]">
-                Initiate Briefing
+                Full Case Study
               </span>
-              <div className="relative z-10 w-6 h-[1.5px] bg-white group-hover:w-10 transition-all duration-700" />
+              <ArrowUpRight className="relative z-10 text-white group-hover:rotate-45 transition-all duration-700" size={20} />
             </Link>
             <a
               href={project.link}
